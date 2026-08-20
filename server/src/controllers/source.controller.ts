@@ -16,6 +16,7 @@ import {
   deleteSourceForWorkspace,
   getSourceForWorkspace,
   importWebsiteSource,
+  importYoutubeSource,
   listSourcesForWorkspace,
   uploadPdfSource,
 } from "../services/source.service.js";
@@ -161,5 +162,18 @@ export async function importWebsite(req: Request, res: Response) {
     req.session.user.id,
     input,
   );
+  res.status(201).json(source);
+}
+
+export async function importYoutube(req: Request, res: Response) {
+  const { workspaceId } = workspaceIdParamSchema.parse(req.params);
+
+  const input = importYoutubeSchema.parse(req.body);
+  const source = await importYoutubeSource(
+    workspaceId,
+    req.session.user.id,
+    input,
+  );
+
   res.status(201).json(source);
 }

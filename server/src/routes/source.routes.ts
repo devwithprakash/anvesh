@@ -6,6 +6,7 @@ import {
   deleteSource,
   getSource,
   importWebsite,
+  importYoutube,
   listSources,
   uploadPdf,
 } from "../controllers/source.controller.js";
@@ -16,6 +17,7 @@ export const sourceRoutes = Router({ mergeParams: true });
 sourceRoutes.post("/upload", uploadSinglePdf, asyncHandler(uploadPdf));
 
 sourceRoutes.post("/import/website", asyncHandler(importWebsite));
+sourceRoutes.post("/import/youtube", asyncHandler(importYoutube));
 sourceRoutes.get("/", asyncHandler(listSources));
 sourceRoutes.post("/", asyncHandler(createSource));
 sourceRoutes.post("/bulk-delete", asyncHandler(bulkDeleteSources));
