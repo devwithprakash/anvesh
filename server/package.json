@@ -14,6 +14,7 @@
   "license": "ISC",
   "packageManager": "pnpm@10.33.0",
   "dependencies": {
+    "@pinecone-database/pinecone": "^8.2.0",
     "@prisma/adapter-pg": "^7.9.1",
     "@prisma/client": "^7.9.1",
     "better-auth": "^1.7.0",
@@ -23,6 +24,7 @@
     "express": "^5.2.1",
     "firecrawl": "^4.32.2",
     "multer": "^2.2.0",
+    "openai": "^7.5.0",
     "pg": "^8.23.0",
     "prisma": "^7.9.1",
     "unpdf": "^1.8.1",
