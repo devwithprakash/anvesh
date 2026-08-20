@@ -9,7 +9,7 @@ import {
   listSourcesQuerySchema,
   sourceIdParamSchema,
 } from "../validators/source.validator.js";
-import { workspaceIdParamSchema } from "../validators/workspace-validator.js";
+import { workspaceIdParamSchema } from "../validators/workspace.validator.js";
 import {
   bulkDeleteSourcesForWorkspace,
   createTextOrMarkdownSource,

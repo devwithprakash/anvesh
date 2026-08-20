@@ -12,7 +12,7 @@ import {
     createWorkspaceSchema,
     updateWorkspaceSchema,
     workspaceIdParamSchema,
-} from "../validators/workspace-validator.js";
+} from "../validators/workspace.validator.js";
 
 function parseWorkspaceId(params: Request["params"]) {
     const parsed = workspaceIdParamSchema.safeParse(params);

@@ -1,6 +1,6 @@
 import *  as workspaceService from "../repository/workspace.repository.js"
 import { NotFoundError } from "../types/app-error.js";
-import type { CreateWorkspaceInput, UpdateWorkspaceInput } from "../validators/workspace-validator.js";
+import type { CreateWorkspaceInput, UpdateWorkspaceInput } from "../validators/workspace.validator.js";
 
 export function listWorkspacesByUser(userId: string) {
     return workspaceService.findWorkspacesByUserId(userId);
