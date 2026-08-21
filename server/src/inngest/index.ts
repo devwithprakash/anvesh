@@ -1,5 +1,6 @@
 import { findChunksBySourceId } from "../repository/source-chunk.repository.js";
 import { findSourceById } from "../repository/source.repository.js";
+import { processArtifactById } from "../services/artifact.service.js";
 import { summarizeConversationById } from "../services/conversation-memory.service.js";
 import {
   chunkSourceContent,
@@ -58,22 +59,35 @@ export const processSource = inngest.createFunction(
 );
 
 export const summarizeConversation = inngest.createFunction(
-
   {
     id: "summarize-conversation",
     retries: 2,
-    triggers: [{event: "conversation/summarize"}]
+    triggers: [{ event: "conversation/summarize" }],
   },
-  async ({event, step})=>{
-    const {conversationId, userId} = event.data
+  async ({ event, step }) => {
+    const { conversationId, userId } = event.data;
 
-    await step.run("summarize", ()=>{
-      summarizeConversationById(conversationId, userId)
-    })
+    await step.run("summarize", () => {
+      summarizeConversationById(conversationId, userId);
+    });
 
-    return {conversationId, status: "SUMMARIZE"}
-  }
-)
+    return { conversationId, status: "SUMMARIZE" };
+  },
+);
 
+export const generateArtifact = inngest.createFunction(
+  {
+    id: "generate-artifact",
+    retries: 2,
+    triggers: [{ event: "artifact/generate" }],
+  },
+  async ({ event, step }) => {
+    const { artifactId } = event.data;
+
+    await step.run("generate", () => processArtifactById(artifactId));
+
+    return { artifactId, status: "READY" };
+  },
+);
 
 export const functions = [processSource];
