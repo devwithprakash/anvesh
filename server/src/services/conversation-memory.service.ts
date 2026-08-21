@@ -7,20 +7,9 @@ import {
 } from "../repository/conversation.repository.js";
 import { findMessagesByConversationId } from "../repository/message.repository.js";
 import { NotFoundError } from "../types/app-error.js";
+import { addMemoriesFromMessages } from "../lib/mem0.js";
 
-/**
- * Generates a rolling conversation summary and syncs recent learnings to Mem0.
- *
- * Called asynchronously (via Inngest) every N messages. The summary replaces
- * older history in chat context; Mem0 receives the last 16 messages for extraction.
- *
- * @param conversationId - Conversation to summarize
- * @param userId - Owner of the conversation (used for Mem0)
- * @returns Updated conversation with `summary` and `summaryMessageCount`
- * @throws {NotFoundError} When the conversation does not exist
- *
- *
- */
+
 export async function summarizeConversationById(
   conversationId: string,
   userId: string,
@@ -71,10 +60,10 @@ export async function summarizeConversationById(
     content: message.content,
   }));
 
-  // await addMemoriesFromMessages(userId, recentMessages, {
-  //     source: "learned",
-  //     conversationId,
-  // });
+  await addMemoriesFromMessages(userId, recentMessages, {
+    source: "learned",
+    conversationId,
+  });
 
   return updated;
 }
