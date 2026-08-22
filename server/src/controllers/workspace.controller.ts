@@ -54,8 +54,6 @@ function parseUpdateBody(body: unknown) {
 }
 
 
-
-
 export async function listWorkspaces(req: Request, res: Response) {
     const workspaces = await listWorkspacesByUser(req.session.user.id);
     res.json(workspaces);
