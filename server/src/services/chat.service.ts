@@ -162,12 +162,11 @@ export async function streamWorkspaceChat(
 ) {
   const workspace = await getWorkspaceByIdForUser(workspaceId, userId);
   const requestedModel = input.model ?? workspace.defaultModel;
-  const chatModel =
-    CHAT_MODELS.find((model) => model === requestedModel) ?? CHAT_MODEL;
-  const webSearchEnabled =
-    input.webSearch === true && !!process.env.TAVILY_API_KEY?.trim();
+  const chatModel = CHAT_MODELS.find((model) => model === requestedModel) ?? CHAT_MODEL;
+  const webSearchEnabled = input.webSearch === true && !!process.env.TAVILY_API_KEY?.trim();
 
   const userText = getLastUserMessageText(input.messages);
+  
   if (!userText) {
     throw new ValidationError("A user message is required");
   }
