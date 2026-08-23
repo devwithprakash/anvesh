@@ -3,7 +3,7 @@ import {
   type Index,
   type PineconeRecord,
 } from "@pinecone-database/pinecone";
-import { EMBEDDING_DIMENSIONS } from "./ai-config.js";
+import { EMBEDDING_DIMENSIONS } from "./ai/ai-config.js";
 
 const indexName = process.env.PINECONE_INDEX ?? "chaibook";
 

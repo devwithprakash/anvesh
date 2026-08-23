@@ -1,5 +1,5 @@
 import type { Prisma } from "../generated/prisma/client.js";
-import { enqueueArtifactGeneration } from "../lib/artifact-events.js";
+import { enqueueArtifactGeneration } from "../lib/events/artifact-events.js";
 import {
   createArtifactRecord,
   deleteArtifactRecord,
@@ -8,7 +8,7 @@ import {
   findArtifactsByWorkspaceId,
   updateArtifactRecord,
   type ArtifactRecord,
-} from "../repository/artifact.repository.js";
+} from "../repositories/artifact.repository.js";
 import { NotFoundError } from "../types/app-error.js";
 import {
   gatherSourceContext,

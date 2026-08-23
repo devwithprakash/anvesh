@@ -1,7 +1,7 @@
 import type { PineconeRecord } from "@pinecone-database/pinecone";
 import type { Prisma } from "../generated/prisma/client.js";
 import { chunkPages, chunkText } from "../lib/chunking.js";
-import { embedTexts } from "../lib/openai.js";
+import { embedTexts } from "../lib/ai/openai.js";
 import { extractPdfFromCloudinary } from "../lib/pdf.js";
 import {
   deleteSourceVectors,
@@ -13,12 +13,12 @@ import {
   deleteChunksBySourceId,
   findChunksBySourceId,
   type SourceChunkRecord,
-} from "../repository/source-chunk.repository.js";
+} from "../repositories/source-chunk.repository.js";
 import {
   findSourceById,
   updateSourceRecord,
   type SourceRecord,
-} from "../repository/source.repository.js";
+} from "../repositories/source.repository.js";
 
 type SourceMetadata = {
   fileUrl?: string;

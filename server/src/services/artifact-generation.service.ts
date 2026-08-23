@@ -1,9 +1,9 @@
 import { generateText, Output } from "ai";
 import { openai } from "@ai-sdk/openai";
 import { z } from "zod";
-import { CHAT_MODEL } from "../lib/ai-config.js";
-import { findSourcesByWorkspaceId } from "../repository/source.repository.js";
-import type { ArtifactRecord } from "../repository/artifact.repository.js";
+import { CHAT_MODEL } from "../lib/ai/ai-config.js";
+import { findSourcesByWorkspaceId } from "../repositories/source.repository.js";
+import type { ArtifactRecord } from "../repositories/artifact.repository.js";
 import { ValidationError } from "../types/app-error.js";
 
 const MAX_CONTEXT_CHARS = 120_000;

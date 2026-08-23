@@ -1,7 +1,7 @@
 import { uploadPdfToCloudinary } from "../lib/cloudinary.js";
-import { scrapeWebsite } from "../lib/firecrawl.js";
+import { scrapeWebsite } from "../lib/external/firecrawl.js";
 import { extractPdfFromBuffer } from "../lib/pdf.js";
-import { enqueueSourceProcessing } from "../lib/source-events.js";
+import { enqueueSourceProcessing } from "../lib/events/source-events.js";
 import { fetchYoutubeTranscript } from "../lib/youtube.js";
 import {
   createSourceRecord,
@@ -9,7 +9,7 @@ import {
   findSourceByIdAndWorkspaceId,
   findSourcesByWorkspaceId,
   type SourceRecord,
-} from "../repository/source.repository.js";
+} from "../repositories/source.repository.js";
 import { NotFoundError } from "../types/app-error.js";
 import type {
   CreateSourceInput,
@@ -127,10 +127,12 @@ export async function uploadPdfSource(
 ) {
   await getWorkspaceByIdForUser(workspaceId, userId);
 
+  
   const upload = await uploadPdfToCloudinary(file.buffer, file.originalname);
-
+  
   let content: string | null = null;
   let pageCount: number | undefined;
+  
 
   try {
     const extracted = await extractPdfFromBuffer(file.buffer);

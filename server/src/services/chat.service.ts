@@ -16,8 +16,8 @@ import {
   CHAT_MODELS,
   CONVERSATION_SUMMARY_INTERVAL,
   RECENT_MESSAGE_WINDOW,
-} from "../lib/ai-config.js";
-import { enqueueConversationSummarize } from "../lib/conversation-events.js";
+} from "../lib/ai/ai-config.js";
+import { enqueueConversationSummarize } from "../lib/events/conversation-events.js";
 import {
   buildChatSystemPrompt,
   retrieveWorkspaceContext,
@@ -29,18 +29,18 @@ import {
   touchConversation,
   updateConversationRecord,
   deleteConversationRecord,
-} from "../repository/conversation.repository.js";
+} from "../repositories/conversation.repository.js";
 import {
   createMessageRecord,
   countMessagesByConversationId,
   findMessagesByConversationId,
-} from "../repository/message.repository.js";
+} from "../repositories/message.repository.js";
 
 import {
   formatTavilyResultsForPrompt,
   searchWeb,
   type TavilySearchResponse,
-} from "../lib/tavily.js";
+} from "../lib/external/tavily.js";
 import { NotFoundError, ValidationError } from "../types/app-error.js";
 import {
   buildConversationTitle,
