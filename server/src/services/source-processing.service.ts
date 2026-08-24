@@ -1,7 +1,7 @@
 import type { PineconeRecord } from "@pinecone-database/pinecone";
 import type { Prisma } from "../generated/prisma/client.js";
 import { chunkPages, chunkText } from "../lib/chunking.js";
-import { embedTexts } from "../lib/ai/openai.js";
+import { embedTexts } from "../lib/ai/indexing.js";
 import { extractPdfFromCloudinary } from "../lib/pdf.js";
 import {
   deleteSourceVectors,

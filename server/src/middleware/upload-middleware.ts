@@ -8,6 +8,8 @@ export const pdfUpload = multer({
   limits: { fileSize: MAX_PDF_SIZE_BYTES },
 
   fileFilter: (_req, file, callback) => {
+    console.log("Hello");
+
     const isPdf =
       file.mimetype === "application/pdf" ||
       (file.mimetype === "application/octet-stream" &&

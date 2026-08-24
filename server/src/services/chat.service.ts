@@ -162,11 +162,13 @@ export async function streamWorkspaceChat(
 ) {
   const workspace = await getWorkspaceByIdForUser(workspaceId, userId);
   const requestedModel = input.model ?? workspace.defaultModel;
-  const chatModel = CHAT_MODELS.find((model) => model === requestedModel) ?? CHAT_MODEL;
-  const webSearchEnabled = input.webSearch === true && !!process.env.TAVILY_API_KEY?.trim();
+  const chatModel =
+    CHAT_MODELS.find((model) => model === requestedModel) ?? CHAT_MODEL;
+  const webSearchEnabled =
+    input.webSearch === true && !!process.env.TAVILY_API_KEY?.trim();
 
   const userText = getLastUserMessageText(input.messages);
-  
+
   if (!userText) {
     throw new ValidationError("A user message is required");
   }
@@ -188,7 +190,7 @@ export async function streamWorkspaceChat(
     searchUserMemories(userId, userText),
   ]);
 
-  const citations = retrievedChunks.map((chunk) => ({
+  const citations = retrievedChunks.chunks.map((chunk) => ({
     sourceId: chunk.sourceId,
     sourceTitle: chunk.sourceTitle,
     sourceType: chunk.sourceType,
@@ -198,8 +200,9 @@ export async function streamWorkspaceChat(
     excerpt: chunk.text.slice(0, 280),
     score: chunk.score,
   }));
+
   const systemPrompt = buildChatSystemPrompt({
-    chunks: retrievedChunks,
+    chunks: retrievedChunks.chunks,
     conversationSummary: conversation.summary,
     userMemories: userMemories.map((memory) => memory.memory),
     webSearchEnabled,
@@ -244,6 +247,9 @@ export async function streamWorkspaceChat(
         stopWhen: webSearchEnabled ? isStepCount(3) : undefined,
       });
 
+      const usage = await result.usage;
+
+      console.log("Token usage of query: ", usage);
       writer.merge(toUIMessageStream({ stream: result.stream }));
     },
     onFinish: async ({ responseMessage, isAborted }) => {
@@ -255,6 +261,8 @@ export async function streamWorkspaceChat(
       if (!assistantText) {
         return;
       }
+
+      console.log("Final assistant response:", assistantText);
 
       const webCitations = webSearchResults
         ? webSearchResults.results.map((result) => ({
