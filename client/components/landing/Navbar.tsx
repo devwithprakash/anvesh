@@ -6,10 +6,8 @@ import { ArrowRight } from "@phosphor-icons/react";
 const navLinks = [
   { label: "Features", href: "#features" },
   { label: "How it works", href: "#how-it-works" },
-  { label: "Sources", href: "#sources" },
   { label: "Pricing", href: "#pricing" },
-  { label: "Docs", href: "#docs" },
-  { label: "Changelog", href: "#changelog" },
+  { label: "Faq", href: "#faq" },
 ];
 
 const containerVariants = {
