@@ -23,10 +23,12 @@ export const processSource = inngest.createFunction(
     await step.run("mark-processing", () => markSourceProcessing(sourceId));
 
     try {
+      // extract the text content
       const extracted = await step.run("extract-content", () =>
         extractSourceContent(sourceId),
       );
 
+      // store chunks in database
       await step.run("chunk-content", () =>
         chunkSourceContent(sourceId, extracted.text, extracted.pages),
       );
