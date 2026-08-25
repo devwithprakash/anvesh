@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Check, ArrowRight, Lightning, Users, Star } from "@phosphor-icons/react";
+import { Check, ArrowRight, Zap, Users, Star } from "lucide-react";
 
 const plans = [
   {
@@ -9,7 +9,7 @@ const plans = [
     price: "$0",
     period: "forever",
     desc: "Perfect for getting started and exploring your first notebooks.",
-    icon: <Star size={22} weight="bold" />,
+    icon: <Star size={22} />,
     iconBg: "bg-[#FFE14D]",
     cardBg: "bg-white",
     cta: "Start for free",
@@ -30,7 +30,7 @@ const plans = [
     price: "$12",
     period: "per month",
     desc: "For power users who want unlimited access and advanced features.",
-    icon: <Lightning size={22} weight="bold" />,
+    icon: <Zap size={22} />,
     iconBg: "bg-[#6C47FF]",
     cardBg: "bg-[#6C47FF]",
     cta: "Start Pro trial",
@@ -52,7 +52,7 @@ const plans = [
     price: "$38",
     period: "per month",
     desc: "For teams that need shared workspaces, admin controls and more.",
-    icon: <Users size={22} weight="bold" />,
+    icon: <Users size={22} />,
     iconBg: "bg-[#C4F0D8]",
     cardBg: "bg-white",
     cta: "Talk to us",
@@ -155,7 +155,7 @@ export default function PricingSection() {
                   {plan.features.map((feat) => (
                     <li key={feat} className="flex items-start gap-2.5">
                       <span className={`inline-flex items-center justify-center w-5 h-5 rounded-full border-[2px] border-black shrink-0 mt-0.5 ${checkBg}`}>
-                        <Check size={10} weight="bold" />
+                        <Check size={10} />
                       </span>
                       <span className={`text-sm font-semibold ${featureTextColor}`}>{feat}</span>
                     </li>
@@ -168,7 +168,7 @@ export default function PricingSection() {
                   className={`flex items-center justify-center gap-2 w-full py-3 rounded-xl border-[2.5px] border-black ${plan.ctaBg} ${plan.ctaText} font-black text-sm shadow-[4px_4px_0px_#000] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] transition-all`}
                 >
                   {plan.cta}
-                  <ArrowRight size={15} weight="bold" />
+                  <ArrowRight size={15} />
                 </a>
               </motion.div>
             );

@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowRight } from "@phosphor-icons/react";
+import { ArrowRight } from "lucide-react";
 
 const navLinks = [
   { label: "Features", href: "#features" },
@@ -58,17 +58,17 @@ export default function Navbar() {
         {/* CTA Buttons */}
         <motion.div variants={itemVariants} className="flex items-center gap-3 shrink-0">
           <a
-            href="#login"
+            href="/login"
             className="hidden sm:inline-flex items-center px-4 py-2 rounded-xl border-2 border-black bg-white text-black text-sm font-black shadow-[3px_3px_0px_#000] hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px] transition-all"
           >
             Log in
           </a>
           <a
-            href="#start"
+            href="/register"
             className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border-2 border-black bg-[#6C47FF] text-white text-sm font-black shadow-[3px_3px_0px_#000] hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px] transition-all"
           >
             Start for free
-            <ArrowRight size={15} weight="bold" />
+            <ArrowRight size={15} />
           </a>
         </motion.div>
       </div>

@@ -3,15 +3,15 @@
 import { motion } from "framer-motion";
 import {
   FolderOpen,
-  ChatTeardrop,
-  MagnifyingGlass,
-  Stack,
-} from "@phosphor-icons/react";
+  MessageCircle,
+  Search,
+  Layers,
+} from "lucide-react";
 
 const steps = [
   {
     number: "01",
-    icon: <FolderOpen size={32} weight="bold" />,
+    icon: <FolderOpen size={32} />,
     title: "Add your sources",
     desc: "Upload PDFs, docs, notes, or paste links to the content you care about.",
     bg: "bg-[#FFF9E6]",
@@ -20,7 +20,7 @@ const steps = [
   },
   {
     number: "02",
-    icon: <ChatTeardrop size={32} weight="bold" />,
+    icon: <MessageCircle size={32} />,
     title: "Ask anything",
     desc: "Ask natural-language questions about your workspace.",
     bg: "bg-[#EDE9FE]",
@@ -29,7 +29,7 @@ const steps = [
   },
   {
     number: "03",
-    icon: <MagnifyingGlass size={32} weight="bold" />,
+    icon: <Search size={32} />,
     title: "Get grounded answers",
     desc: "Receive structured answers with citations from your sources.",
     bg: "bg-[#DCFCE7]",
@@ -38,7 +38,7 @@ const steps = [
   },
   {
     number: "04",
-    icon: <Stack size={32} weight="bold" />,
+    icon: <Layers size={32} />,
     title: "Go deeper",
     desc: "Explore follow-ups, related insights, and keep building your knowledge.",
     bg: "bg-[#FFE4E1]",

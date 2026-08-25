@@ -4,18 +4,18 @@ import { motion } from "framer-motion";
 import {
   ArrowRight,
   Check,
-  FilePdf,
+  FileText,
   Globe,
-  Note,
-  PaperPlaneTilt,
-  Sparkle,
-  ChatCircle,
-  Notepad,
-  Lightning,
-  Gear,
+  StickyNote,
+  SendHorizontal,
+  Sparkles,
+  MessageCircle,
+  NotebookPen,
+  Zap,
+  Settings,
   Plus,
   UserCircle,
-} from "@phosphor-icons/react";
+} from "lucide-react";
 
 /* ─── Framer Motion helpers ──────────────────────────────── */
 const fadeUp = (delay = 0) => ({
@@ -63,13 +63,13 @@ function AppMockup() {
         <div className="text-right">
           <div className="flex items-center gap-1 font-black text-sm text-black">
             Research Assistant
-            <Sparkle size={13} weight="fill" className="text-yellow-400" />
+            <Sparkles size={13} className="text-yellow-400" />
           </div>
           <p className="text-[10px] text-gray-400 font-medium">Ask anything about your sources</p>
         </div>
         {/* New chat button */}
         <button className="flex items-center gap-1 text-[11px] font-bold border-[2px] border-black rounded-lg px-2.5 py-1.5 bg-white shadow-[2px_2px_0px_#000] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all whitespace-nowrap">
-          <Note size={12} /> New chat
+          <StickyNote size={12} /> New chat
         </button>
       </div>
 
@@ -78,11 +78,11 @@ function AppMockup() {
         {/* Sidebar */}
         <div className="w-[148px] border-r-[2px] border-black bg-[#FAFAFA] flex flex-col py-3 gap-0.5 shrink-0">
           {[
-            { icon: <FilePdf size={14} />, label: "Sources" },
-            { icon: <ChatCircle size={14} />, label: "Chat", active: true },
-            { icon: <Notepad size={14} />, label: "Notes" },
-            { icon: <Lightning size={14} />, label: "Prompts" },
-            { icon: <Gear size={14} />, label: "Settings" },
+            { icon: <FileText size={14} />, label: "Sources" },
+            { icon: <MessageCircle size={14} />, label: "Chat", active: true },
+            { icon: <NotebookPen size={14} />, label: "Notes" },
+            { icon: <Zap size={14} />, label: "Prompts" },
+            { icon: <Settings size={14} />, label: "Settings" },
           ].map((item) => (
             <div
               key={item.label}
@@ -114,7 +114,7 @@ function AppMockup() {
                 What are the main principles of formal methods?
               </div>
               <div className="w-8 h-8 rounded-full bg-gray-200 border-[2px] border-black flex items-center justify-center shrink-0 mt-0.5">
-                <UserCircle size={20} weight="fill" className="text-gray-500" />
+                <UserCircle size={20} className="text-gray-500" />
               </div>
             </div>
           </div>
@@ -181,7 +181,7 @@ function AppMockup() {
             <div className="flex items-center gap-2 border-[2px] border-black rounded-xl px-3 py-2.5 bg-white shadow-[2px_2px_0px_#000]">
               <span className="flex-1 text-[11.5px] text-gray-400 font-medium">Ask a follow-up...</span>
               <button className="bg-[#6C47FF] border-[2px] border-black text-white rounded-lg p-1.5 shadow-[2px_2px_0px_#000] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
-                <PaperPlaneTilt size={13} weight="fill" />
+                <SendHorizontal size={13} />
               </button>
             </div>
           </div>
@@ -194,9 +194,9 @@ function AppMockup() {
 /* ─── Floating Source Chips ──────────────────────────────── */
 function SourceChips() {
   const chips = [
-    { icon: <FilePdf size={14} />, label: "PDFs + Docs", bg: "bg-[#FFE8E8]", delay: 0.7 },
+    { icon: <FileText size={14} />, label: "PDFs + Docs", bg: "bg-[#FFE8E8]", delay: 0.7 },
     { icon: <Globe size={14} />, label: "Web Pages",   bg: "bg-[#FFF8E1]", delay: 0.85 },
-    { icon: <Note size={14} />, label: "Notes",        bg: "bg-[#E8F4FF]", delay: 1.0 },
+    { icon: <StickyNote size={14} />, label: "Notes",        bg: "bg-[#E8F4FF]", delay: 1.0 },
   ];
 
   return (
@@ -276,7 +276,7 @@ export default function HeroSection() {
               className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border-[2.5px] border-black bg-[#6C47FF] text-white font-black text-sm shadow-[5px_5px_0px_#000] hover:shadow-none hover:translate-x-[5px] hover:translate-y-[5px] transition-all"
             >
               Start your notebook
-              <ArrowRight size={16} weight="bold" />
+              <ArrowRight size={16} />
             </a>
             <a
               href="#how-it-works"
@@ -291,7 +291,7 @@ export default function HeroSection() {
             {["Free to start", "No credit card", "Cancel anytime"].map((text) => (
               <span key={text} className="flex items-center gap-1.5 text-xs font-bold text-gray-700">
                 <span className="inline-flex items-center justify-center w-4 h-4 rounded-full border-[2px] border-[#00B87C] bg-[#EAFFF6]">
-                  <Check size={9} weight="bold" className="text-[#00B87C]" />
+                  <Check size={9} className="text-[#00B87C]" />
                 </span>
                 {text}
               </span>

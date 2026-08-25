@@ -3,51 +3,51 @@
 import { motion } from "framer-motion";
 import {
   FileText,
-  MagnifyingGlass,
+  Search,
   ShieldCheck,
-  ArrowsClockwise,
+  RefreshCw,
   BookOpen,
-  Lightning,
-} from "@phosphor-icons/react";
+  Zap,
+} from "lucide-react";
 
 const features = [
   {
-    icon: <FileText size={28} weight="bold" />,
+    icon: <FileText size={28} />,
     title: "Upload any source",
     desc: "PDFs, docs, notes, web pages — if it has text, Notebook can learn from it.",
     bg: "bg-[#FFE14D]",
     rotate: "-rotate-1",
   },
   {
-    icon: <MagnifyingGlass size={28} weight="bold" />,
+    icon: <Search size={28} />,
     title: "Grounded answers",
     desc: "Every response is tied to your documents with precise citations so you always know the source.",
     bg: "bg-[#C4F0D8]",
     rotate: "rotate-1",
   },
   {
-    icon: <ShieldCheck size={28} weight="bold" />,
+    icon: <ShieldCheck size={28} />,
     title: "Private by default",
     desc: "Your data stays yours. Nothing is used for training. You stay in full control at all times.",
     bg: "bg-[#E8DFFF]",
     rotate: "-rotate-1",
   },
   {
-    icon: <ArrowsClockwise size={28} weight="bold" />,
+    icon: <RefreshCw size={28} />,
     title: "Always up to date",
     desc: "Re-upload updated documents and your AI instantly reflects the latest knowledge.",
     bg: "bg-[#FFD6CC]",
     rotate: "rotate-1",
   },
   {
-    icon: <BookOpen size={28} weight="bold" />,
+    icon: <BookOpen size={28} />,
     title: "Multi-source reasoning",
     desc: "Ask questions that span multiple documents. Notebook finds connections you might miss.",
     bg: "bg-[#D0F0FF]",
     rotate: "-rotate-1",
   },
   {
-    icon: <Lightning size={28} weight="bold" />,
+    icon: <Zap size={28} />,
     title: "Instant answers",
     desc: "No waiting, no loading spinners. Get answers in seconds even for complex queries.",
     bg: "bg-[#FFDAF0]",

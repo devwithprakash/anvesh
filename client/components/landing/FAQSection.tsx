@@ -1,8 +1,8 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Minus } from "@phosphor-icons/react";
+import { Plus, Minus } from "lucide-react";
 
 const faqs = [
   {
@@ -83,9 +83,9 @@ function FAQItem({
           className={`shrink-0 inline-flex items-center justify-center w-8 h-8 rounded-xl border-[2px] border-black shadow-[2px_2px_0px_#000] transition-colors ${isOpen ? "bg-black text-white" : "bg-white text-black group-hover:bg-black group-hover:text-white"}`}
         >
           {isOpen ? (
-            <Minus size={14} weight="bold" />
+            <Minus size={14} />
           ) : (
-            <Plus size={14} weight="bold" />
+            <Plus size={14} />
           )}
         </span>
       </button>
