@@ -1,7 +1,7 @@
 import { authClient } from "@/lib/auth-client";
 import { SignIn, SignUp } from "./types";
 
-export async function signIn(data: SignIn) {
+export async function signIn(data: SignIn) {  
   return authClient.signIn.email({
     email: data.email,
     password: data.password,

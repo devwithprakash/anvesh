@@ -7,11 +7,26 @@ import { AppNavbar } from "@/components/workspace/app-navbar";
 import { ConversationList } from "@/components/workspace/conversation-list";
 import { SourcesPanel } from "@/components/workspace/sources-panel";
 import { Plus, MessageSquare, FileText, ArrowRight } from "lucide-react";
+import { useGetWorkspace } from "@/features/workspace/queries";
 
 export function WorkspacePageInner({ workspaceId }: { workspaceId: string }) {
   const router = useRouter();
   const { workspaces, conversations, createConversation } = useAppState();
-  const workspace = workspaces.find((ws) => ws.id === workspaceId);
+
+  const { data: workspace, isLoading } = useGetWorkspace(workspaceId);
+
+  useEffect(() => {
+    if (!isLoading && !workspace) {
+      router.replace("/dashboard");
+    }
+  }, [isLoading, workspace, router]);
+
+  if (!workspaces || workspaces.length === 0) {
+    return;
+  }
+
+  console.log("workspace data: ", workspace)
+
   const convList = conversations[workspaceId] ?? [];
 
   const [chatsOpen, setChatsOpen] = useState(false);

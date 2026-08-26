@@ -3,11 +3,21 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { formatDistanceToNow } from "date-fns";
-import { Plus, Search, FileText, MessageSquare, Trash2, MoreHorizontal, ArrowRight } from "lucide-react";
+import {
+  Plus,
+  Search,
+  FileText,
+  MessageSquare,
+  Trash2,
+  MoreHorizontal,
+  ArrowRight,
+} from "lucide-react";
 import { useAppState } from "@/components/providers/app-provider";
 import { AppNavbar } from "@/components/workspace/app-navbar";
 import { CreateWorkspaceDialog } from "@/components/workspace/create-workspace-dialog";
 import { type Workspace } from "@/lib/mock-data";
+import { useWorkspaces } from "@/features/workspace/queries";
+import { useDeleteWorkspace } from "@/features/workspace/mutations";
 
 // ─── Workspace Card ───────────────────────────────────────────────────────────
 
@@ -34,7 +44,9 @@ function WorkspaceCard({
               {workspace.title}
             </h3>
             <span className="text-xs font-semibold text-gray-500">
-              {formatDistanceToNow(new Date(workspace.createdAt), { addSuffix: true })}
+              {formatDistanceToNow(new Date(workspace.createdAt), {
+                addSuffix: true,
+              })}
             </span>
           </div>
 
@@ -51,7 +63,10 @@ function WorkspaceCard({
             </button>
             {menuOpen && (
               <>
-                <div className="fixed inset-0 z-10" onClick={() => setMenuOpen(false)} />
+                <div
+                  className="fixed inset-0 z-10"
+                  onClick={() => setMenuOpen(false)}
+                />
                 <div className="absolute right-0 top-full mt-1 z-20 w-36 rounded-xl border-[2px] border-black bg-white shadow-[3px_3px_0px_#000] overflow-hidden">
                   <div className="p-1">
                     <button
@@ -112,15 +127,29 @@ function WorkspaceCard({
 
 export default function DashboardPage() {
   const router = useRouter();
-  const { workspaces, deleteWorkspace } = useAppState();
+  const { workspaces } = useAppState();
   const [createOpen, setCreateOpen] = useState(false);
   const [search, setSearch] = useState("");
 
   const filtered = workspaces.filter(
     (ws) =>
       ws.title.toLowerCase().includes(search.toLowerCase()) ||
-      (ws.description?.toLowerCase() ?? "").includes(search.toLowerCase())
+      (ws.description?.toLowerCase() ?? "").includes(search.toLowerCase()),
   );
+
+  const { data: workspacesList, error } = useWorkspaces();
+
+  console.log("Workspacelist :", workspacesList);
+
+  const deleteWorkspace = useDeleteWorkspace();
+
+  const handleDeleteWorkspace = async (workspaceId: string) => {
+    try {
+      const response = await deleteWorkspace.mutateAsync(workspaceId);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <div className="flex flex-col flex-1 min-h-svh bg-[#FFFBF0]">
@@ -214,11 +243,11 @@ export default function DashboardPage() {
               </div>
             </button>
 
-            {filtered.map((ws) => (
+            {workspacesList?.map((ws) => (
               <WorkspaceCard
                 key={ws.id}
                 workspace={ws}
-                onDelete={deleteWorkspace}
+                onDelete={handleDeleteWorkspace}
               />
             ))}
           </div>
@@ -226,10 +255,21 @@ export default function DashboardPage() {
 
         {/* Decorative symbols section to keep visual balance */}
         <div className="mt-16 pt-8 border-t-[2px] border-black/10 flex items-center justify-center gap-12 overflow-hidden pointer-events-none select-none">
-          <span className="text-3xl text-[#6C47FF] opacity-40 font-black animate-pulse">✳</span>
-          <span className="text-4xl text-[#FFE14D] font-black" style={{ WebkitTextStroke: "1.5px black" }}>✦</span>
-          <span className="text-2xl text-[#FF6B6B] opacity-50 font-black">✦</span>
-          <span className="text-3xl text-[#00B87C] opacity-40 font-black">✳</span>
+          <span className="text-3xl text-[#6C47FF] opacity-40 font-black animate-pulse">
+            ✳
+          </span>
+          <span
+            className="text-4xl text-[#FFE14D] font-black"
+            style={{ WebkitTextStroke: "1.5px black" }}
+          >
+            ✦
+          </span>
+          <span className="text-2xl text-[#FF6B6B] opacity-50 font-black">
+            ✦
+          </span>
+          <span className="text-3xl text-[#00B87C] opacity-40 font-black">
+            ✳
+          </span>
         </div>
       </main>
 

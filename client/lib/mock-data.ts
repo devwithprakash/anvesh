@@ -7,11 +7,11 @@ export interface Workspace {
   id: string;
   title: string;
   description?: string;
-  icon: string;
+  icon?: string;
   defaultModel: string;
   createdAt: string;
-  sourceCount: number;
-  conversationCount: number;
+  sourceCount?: number;
+  conversationCount?: number;
 }
 
 export interface Conversation {
