@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { ChevronDown, LogOut, Settings, Plus } from "lucide-react";
 import { useAppState } from "@/components/providers/app-provider";
 import { CreateWorkspaceDialog } from "@/components/workspace/create-workspace-dialog";
+import { authClient } from "@/lib/auth-client";
+import { signOut } from "@/features/auth/auth";
 
 interface AppNavbarProps {
   activeWorkspaceId?: string;
@@ -17,7 +19,21 @@ export function AppNavbar({ activeWorkspaceId }: AppNavbarProps) {
   const [userOpen, setUserOpen] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
 
+  const { data: session, isPending } = authClient.useSession();
+
+  const user = session?.user;
+
   const activeWs = workspaces.find((ws) => ws.id === activeWorkspaceId);
+
+  const handleLogOut = async () => {
+    try {
+      await signOut();
+
+      router.push("/");
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <>
@@ -25,7 +41,7 @@ export function AppNavbar({ activeWorkspaceId }: AppNavbarProps) {
         <div className="flex items-center justify-between px-5 h-14 gap-4">
           {/* Logo */}
           <button
-            onClick={() => router.push("/dashboard")}
+            onClick={() => router.push("/")}
             className="flex items-center gap-2.5 shrink-0"
           >
             <span className="inline-flex items-center justify-center w-8 h-8 rounded-lg border-[2px] border-black bg-[#6C47FF] text-white font-black text-sm shadow-[2px_2px_0px_#000]">
@@ -102,9 +118,9 @@ export function AppNavbar({ activeWorkspaceId }: AppNavbarProps) {
               className="flex items-center gap-2 px-3 py-1.5 rounded-lg border-[2px] border-black bg-white font-bold text-sm text-black shadow-[2px_2px_0px_#000] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
             >
               <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-[#EDE9FE] border-[1.5px] border-black text-[10px] font-black text-[#6C47FF]">
-                JD
+                {user?.name[0]}
               </span>
-              <span className="hidden sm:block">John Doe</span>
+              <span className="hidden sm:block">{user?.name}</span>
               <ChevronDown size={14} />
             </button>
 
@@ -121,7 +137,7 @@ export function AppNavbar({ activeWorkspaceId }: AppNavbarProps) {
                       Settings
                     </button>
                     <button
-                      onClick={() => router.push("/login")}
+                      onClick={handleLogOut}
                       className="flex items-center gap-2.5 w-full rounded-lg px-3 py-2 text-sm font-bold text-[#FF6B6B] hover:bg-[#FFF0F0] transition-colors"
                     >
                       <LogOut size={14} />
