@@ -1,36 +1,40 @@
 "use client";
 
-import * as React from "react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useAppState } from "@/components/providers/app-provider";
 import { AVAILABLE_MODELS } from "@/lib/mock-data";
+import { useCreateWorkspace } from "@/features/workspace/mutations";
 
 interface CreateWorkspaceDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-export function CreateWorkspaceDialog({ open, onOpenChange }: CreateWorkspaceDialogProps) {
+export function CreateWorkspaceDialog({
+  open,
+  onOpenChange,
+}: CreateWorkspaceDialogProps) {
   const router = useRouter();
-  const { createWorkspace } = useAppState();
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [defaultModel, setDefaultModel] = useState("gpt-4o-mini");
 
+  const createWorkspace = useCreateWorkspace();
+
   if (!open) return null;
 
-  const handleCreate = () => {
+  const handleCreate = async () => {
     if (!title.trim()) return;
-    const ws = createWorkspace({
+
+    const ws = await createWorkspace.mutateAsync({
       title: title.trim(),
       description: description.trim(),
-      icon: "📁",
       defaultModel,
     });
+
     onOpenChange(false);
     setTitle("");
     setDescription("");
@@ -41,7 +45,10 @@ export function CreateWorkspaceDialog({ open, onOpenChange }: CreateWorkspaceDia
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/20" onClick={() => onOpenChange(false)} />
+      <div
+        className="absolute inset-0 bg-black/20"
+        onClick={() => onOpenChange(false)}
+      />
 
       {/* Dialog */}
       <div className="relative w-full max-w-md rounded-2xl border-[3px] border-black bg-[#FFFBF0] shadow-[8px_8px_0px_#000]">
@@ -102,11 +109,18 @@ export function CreateWorkspaceDialog({ open, onOpenChange }: CreateWorkspaceDia
                     "flex flex-col items-start rounded-xl border-[2px] border-black px-3 py-3 text-left transition-all shadow-[2px_2px_0px_#000]",
                     defaultModel === m.value
                       ? "bg-[#6C47FF] text-white shadow-none translate-x-[2px] translate-y-[2px]"
-                      : "bg-white text-black hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
+                      : "bg-white text-black hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]",
                   )}
                 >
                   <span className="text-sm font-black">{m.label}</span>
-                  <span className={cn("text-xs font-semibold", defaultModel === m.value ? "text-white/70" : "text-gray-500")}>
+                  <span
+                    className={cn(
+                      "text-xs font-semibold",
+                      defaultModel === m.value
+                        ? "text-white/70"
+                        : "text-gray-500",
+                    )}
+                  >
                     {m.description}
                   </span>
                 </button>

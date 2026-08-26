@@ -10,7 +10,7 @@ import { serve } from "inngest/express";
 
 const app: Express = express();
 
-const clientUrl = process.env.BETTER_AUTH_URL || "http://localhost:3000";
+const clientUrl = process.env.FRONTEND_URL 
 
 app.use(
   cors({
