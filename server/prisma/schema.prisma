@@ -151,7 +151,7 @@ enum MessageRole {
 model Conversation {
   id                  String    @id @default(cuid())
   workspaceId         String
-  title               String?
+  title               String @default("New Chat")
   summary             String?
   summaryMessageCount Int       @default(0)
   summarizedAt        DateTime?

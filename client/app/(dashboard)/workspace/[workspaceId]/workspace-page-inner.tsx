@@ -15,11 +15,6 @@ export function WorkspacePageInner({ workspaceId }: { workspaceId: string }) {
 
   const { data: workspace, isLoading } = useGetWorkspace(workspaceId);
 
-  useEffect(() => {
-    if (!isLoading && !workspace) {
-      router.replace("/dashboard");
-    }
-  }, [isLoading, workspace, router]);
 
   if (!workspaces || workspaces.length === 0) {
     return;
@@ -32,11 +27,6 @@ export function WorkspacePageInner({ workspaceId }: { workspaceId: string }) {
   const [chatsOpen, setChatsOpen] = useState(false);
   const [sourcesOpen, setSourcesOpen] = useState(false);
 
-  useEffect(() => {
-    if (workspaces.length > 0 && !workspace) {
-      router.push("/dashboard");
-    }
-  }, [workspace, workspaces, router]);
 
   // Close drawers on Escape
   useEffect(() => {

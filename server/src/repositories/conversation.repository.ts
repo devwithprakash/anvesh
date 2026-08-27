@@ -45,7 +45,7 @@ export function createConversationRecord(workspaceId: string, title?: string) {
   return prisma.conversation.create({
     data: {
       workspaceId,
-      title: title ?? null,
+      title: title ?? "New Chat",
     },
     select: conversationSelect,
   });
@@ -71,7 +71,7 @@ export function updateConversationSummary(
 
 export function updateConversationRecord(
   conversationId: string,
-  data: { title?: string | null },
+  data: { title?: string },
 ) {
   return prisma.conversation.update({
     where: { id: conversationId },
