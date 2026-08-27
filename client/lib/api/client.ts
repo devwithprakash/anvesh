@@ -12,7 +12,6 @@ export async function api<T>(
     withCredentials: true,
 
     headers: {
-      "Content-Type": "application/json",
       ...options?.headers,
     },
 

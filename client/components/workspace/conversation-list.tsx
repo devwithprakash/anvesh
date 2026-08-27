@@ -1,13 +1,14 @@
 "use client";
 
-import * as React from "react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { formatDistanceToNow } from "date-fns";
 import { Plus, MessageSquare, Trash2, MoreHorizontal, X } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useAppState } from "@/components/providers/app-provider";
-import { useCreateConversation } from "@/features/conversation/mutations";
+import {
+  useCreateConversation,
+  useDeleteConversation,
+} from "@/features/conversation/mutations";
 import { useConversations } from "@/features/conversation/queries";
 
 interface ConversationListProps {
@@ -23,28 +24,27 @@ export function ConversationList({
   onClose,
 }: ConversationListProps) {
   const router = useRouter();
-  const { deleteConversation } = useAppState();
   const [openMenu, setOpenMenu] = useState<string | null>(null);
+
   const createConversation = useCreateConversation();
+  const deleteConversation = useDeleteConversation();
+  const { data: conversationList, isLoading } = useConversations(workspaceId);
 
   const handleNew = async () => {
     const conv = await createConversation.mutateAsync({ workspaceId });
-
-    console.log("workspaceId:", workspaceId);
-    console.log("created conversation:", conv);
-    console.log("conversation id:", conv?.id);
     router.push(`/workspace/${workspaceId}/${conv.id}`);
     onClose?.();
   };
 
-  const handleDelete = (convId: string) => {
-    deleteConversation(workspaceId, convId);
+  const handleDelete = async (convId: string) => {
+    const response = await deleteConversation.mutateAsync({
+      conversationId: convId,
+      workspaceId,
+    });
     if (activeConversationId === convId) {
       router.push(`/workspace/${workspaceId}`);
     }
   };
-
-  const { data: conversationList, isLoading } = useConversations(workspaceId);
 
   if (isLoading) {
     return <div>Loading...</div>;

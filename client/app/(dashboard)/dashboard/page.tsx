@@ -139,7 +139,6 @@ export default function DashboardPage() {
 
   const { data: workspacesList, error } = useWorkspaces();
 
-  console.log("Workspacelist :", workspacesList);
 
   const deleteWorkspace = useDeleteWorkspace();
 

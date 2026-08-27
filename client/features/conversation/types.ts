@@ -22,3 +22,9 @@ export type GetConversationOutputSchema = {
   createdAt: string;
   updatedAt: string;
 };
+
+
+export type DeleteConversation = {
+  workspaceId: string;
+  conversationId: string
+}

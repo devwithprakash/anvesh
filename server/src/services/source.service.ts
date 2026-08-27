@@ -29,8 +29,8 @@ async function createAndProcessSource(
   const source = await createSourceRecord(data);
 
   await enqueueSourceProcessing({
-      sourceId: source.id,
-      workspaceId: source.workspaceId,
+    sourceId: source.id,
+    workspaceId: source.workspaceId,
   });
 
   return source;
@@ -127,12 +127,10 @@ export async function uploadPdfSource(
 ) {
   await getWorkspaceByIdForUser(workspaceId, userId);
 
-  
   const upload = await uploadPdfToCloudinary(file.buffer, file.originalname);
-  
+
   let content: string | null = null;
   let pageCount: number | undefined;
-  
 
   try {
     const extracted = await extractPdfFromBuffer(file.buffer);

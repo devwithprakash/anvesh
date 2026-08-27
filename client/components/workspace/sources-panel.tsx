@@ -18,15 +18,44 @@ import { YoutubeLogo, TextT } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { useAppState } from "@/components/providers/app-provider";
 import { type SourceType, type Source } from "@/lib/mock-data";
+import { useUploadPdfSource } from "@/features/source/mutations";
 
 // ─── Source type metadata ─────────────────────────────────────────────────────
 
-const SOURCE_META: Record<SourceType, { icon: React.ReactNode; label: string; accent: string; bg: string }> = {
-  PDF:      { icon: <FileText size={14} />,   label: "PDF",      accent: "text-[#FF6B6B]",  bg: "bg-[#FFE8E8]" },
-  WEBSITE:  { icon: <Globe size={14} />,       label: "Website",  accent: "text-blue-600",   bg: "bg-[#E8F0FF]" },
-  YOUTUBE:  { icon: <YoutubeLogo size={14} />,     label: "YouTube",  accent: "text-red-600",    bg: "bg-[#FFE8E8]" },
-  TEXT:     { icon: <TextT size={14} />,        label: "Text",     accent: "text-[#00B87C]",  bg: "bg-[#EAFFF6]" },
-  MARKDOWN: { icon: <TextT size={14} />,        label: "Markdown", accent: "text-[#6C47FF]",  bg: "bg-[#EDE9FE]" },
+const SOURCE_META: Record<
+  SourceType,
+  { icon: React.ReactNode; label: string; accent: string; bg: string }
+> = {
+  PDF: {
+    icon: <FileText size={14} />,
+    label: "PDF",
+    accent: "text-[#FF6B6B]",
+    bg: "bg-[#FFE8E8]",
+  },
+  WEBSITE: {
+    icon: <Globe size={14} />,
+    label: "Website",
+    accent: "text-blue-600",
+    bg: "bg-[#E8F0FF]",
+  },
+  YOUTUBE: {
+    icon: <YoutubeLogo size={14} />,
+    label: "YouTube",
+    accent: "text-red-600",
+    bg: "bg-[#FFE8E8]",
+  },
+  TEXT: {
+    icon: <TextT size={14} />,
+    label: "Text",
+    accent: "text-[#00B87C]",
+    bg: "bg-[#EAFFF6]",
+  },
+  MARKDOWN: {
+    icon: <TextT size={14} />,
+    label: "Markdown",
+    accent: "text-[#6C47FF]",
+    bg: "bg-[#EDE9FE]",
+  },
 };
 
 // ─── Status badge ─────────────────────────────────────────────────────────────
@@ -78,7 +107,9 @@ export function SourcesPanel({ workspaceId, onClose }: SourcesPanelProps) {
       {/* Header */}
       <div className="flex items-center justify-between px-3 py-2.5 border-b-[2px] border-black">
         <div className="flex items-center gap-1.5">
-          <span className="font-black text-xs text-black uppercase tracking-wide">Sources</span>
+          <span className="font-black text-xs text-black uppercase tracking-wide">
+            Sources
+          </span>
           {srcList.length > 0 && (
             <span className="rounded-full border-[1.5px] border-black bg-[#EDE9FE] px-1.5 py-0.5 text-[9px] font-black text-[#6C47FF]">
               {readyCount}/{srcList.length}
@@ -138,7 +169,12 @@ export function SourcesPanel({ workspaceId, onClose }: SourcesPanelProps) {
                   className="group relative flex items-center gap-2 rounded-lg border-[2px] border-black bg-white px-2.5 py-2 shadow-[2px_2px_0px_#000]"
                 >
                   {/* Type icon badge */}
-                  <div className={cn("flex size-6 shrink-0 items-center justify-center rounded-md border-[1.5px] border-black", meta.bg)}>
+                  <div
+                    className={cn(
+                      "flex size-6 shrink-0 items-center justify-center rounded-md border-[1.5px] border-black",
+                      meta.bg,
+                    )}
+                  >
                     <span className={meta.accent}>{meta.icon}</span>
                   </div>
 
@@ -160,14 +196,19 @@ export function SourcesPanel({ workspaceId, onClose }: SourcesPanelProps) {
                   {/* Actions */}
                   <div className="relative shrink-0">
                     <button
-                      onClick={() => setOpenMenu(openMenu === src.id ? null : src.id)}
+                      onClick={() =>
+                        setOpenMenu(openMenu === src.id ? null : src.id)
+                      }
                       className="flex size-5 items-center justify-center rounded-md opacity-0 group-hover:opacity-100 hover:bg-gray-100 transition-all"
                     >
                       <MoreHorizontal size={11} />
                     </button>
                     {openMenu === src.id && (
                       <>
-                        <div className="fixed inset-0 z-10" onClick={() => setOpenMenu(null)} />
+                        <div
+                          className="fixed inset-0 z-10"
+                          onClick={() => setOpenMenu(null)}
+                        />
                         <div className="absolute right-0 top-full mt-1 z-20 w-28 rounded-lg border-[2px] border-black bg-white shadow-[2px_2px_0px_#000] overflow-hidden">
                           <div className="p-1">
                             <button
@@ -204,6 +245,7 @@ export function SourcesPanel({ workspaceId, onClose }: SourcesPanelProps) {
       {/* Add Source Dialog */}
       {addOpen && (
         <AddSourceDialog
+          setAddOpen={setAddOpen}
           onClose={() => setAddOpen(false)}
           workspaceId={workspaceId}
         />
@@ -216,9 +258,11 @@ export function SourcesPanel({ workspaceId, onClose }: SourcesPanelProps) {
 
 function AddSourceDialog({
   onClose,
+  setAddOpen,
   workspaceId,
 }: {
   onClose: () => void;
+  setAddOpen: React.Dispatch<React.SetStateAction<boolean>>;
   workspaceId: string;
 }) {
   const { addSource } = useAppState();
@@ -231,6 +275,8 @@ function AddSourceDialog({
   const [textTitle, setTextTitle] = useState("");
   const [textContent, setTextContent] = useState("");
   const [textType, setTextType] = useState<"TEXT" | "MARKDOWN">("TEXT");
+
+  const createPdfSource = useUploadPdfSource();
 
   const simulateAdd = (partial: Partial<Source>) => {
     addSource(workspaceId, {
@@ -246,11 +292,31 @@ function AddSourceDialog({
   };
 
   const tabs: { id: typeof tab; label: string; icon: React.ReactNode }[] = [
-    { id: "pdf",     label: "PDF",     icon: <FileText size={13} /> },
+    { id: "pdf", label: "PDF", icon: <FileText size={13} /> },
     { id: "website", label: "Website", icon: <Globe size={13} /> },
     { id: "youtube", label: "YouTube", icon: <YoutubeLogo size={13} /> },
-    { id: "text",    label: "Text",    icon: <TextT size={13} /> },
+    { id: "text", label: "Text", icon: <TextT size={13} /> },
   ];
+
+  const handleSourceUpload = async () => {
+    try {
+      if (!pdfFile) {
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("file", pdfFile);
+
+      const response = await createPdfSource.mutateAsync({
+        workspaceId,
+        formData,
+      });
+      setAddOpen(false);
+      console.log("Response of pdf source: ", response);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -280,7 +346,7 @@ function AddSourceDialog({
                 "flex flex-1 items-center justify-center gap-1.5 py-2.5 text-xs font-black transition-colors border-r-[2px] border-black last:border-r-0",
                 tab === t.id
                   ? "bg-[#6C47FF] text-white"
-                  : "bg-white text-black hover:bg-gray-100"
+                  : "bg-white text-black hover:bg-gray-100",
               )}
             >
               {t.icon}
@@ -299,33 +365,49 @@ function AddSourceDialog({
                   "flex flex-col items-center justify-center rounded-xl border-[2.5px] border-dashed px-6 py-10 cursor-pointer transition-all",
                   pdfFile
                     ? "border-[#6C47FF] bg-[#EDE9FE]"
-                    : "border-black/30 hover:border-black hover:bg-gray-50"
+                    : "border-black/30 hover:border-black hover:bg-gray-50",
                 )}
               >
                 <FileText size={32} className="text-[#FF6B6B] mb-2" />
                 {pdfFile ? (
                   <>
-                    <p className="text-sm font-black text-black">{pdfFile.name}</p>
+                    <p className="text-sm font-black text-black">
+                      {pdfFile.name}
+                    </p>
                     <p className="text-xs font-semibold text-gray-500 mt-0.5">
                       {(pdfFile.size / 1024 / 1024).toFixed(2)} MB
                     </p>
                   </>
                 ) : (
                   <>
-                    <p className="text-sm font-black text-black">Drop PDF here or click</p>
-                    <p className="text-xs font-semibold text-gray-500 mt-0.5">Max 10 MB</p>
+                    <p className="text-sm font-black text-black">
+                      Drop PDF here or click
+                    </p>
+                    <p className="text-xs font-semibold text-gray-500 mt-0.5">
+                      Max 10 MB
+                    </p>
                   </>
                 )}
-                <input id="pdf-file" type="file" accept=".pdf" className="sr-only"
-                  onChange={(e) => setPdfFile(e.target.files?.[0] ?? null)} />
+                <input
+                  id="pdf-file"
+                  type="file"
+                  accept=".pdf"
+                  className="sr-only"
+                  onChange={(e) => setPdfFile(e.target.files?.[0] ?? null)}
+                />
               </label>
               {pdfFile && (
-                <button onClick={() => setPdfFile(null)}
-                  className="flex items-center gap-1.5 text-xs font-bold text-gray-500 hover:text-black">
+                <button
+                  onClick={() => setPdfFile(null)}
+                  className="flex items-center gap-1.5 text-xs font-bold text-gray-500 hover:text-black"
+                >
                   <X size={12} /> Remove file
                 </button>
               )}
-              <NbButton onClick={() => pdfFile && simulateAdd({ type: "PDF", title: pdfFile.name.replace(".pdf",""), status: "PROCESSING" })} disabled={!pdfFile}>
+              <NbButton
+                onClick={() => pdfFile && handleSourceUpload()}
+                disabled={!pdfFile}
+              >
                 Upload PDF
               </NbButton>
             </div>
@@ -333,11 +415,31 @@ function AddSourceDialog({
 
           {tab === "website" && (
             <div className="flex flex-col gap-3">
-              <NbInput label="URL *" type="url" placeholder="https://example.com/article"
-                value={websiteUrl} onChange={(e) => setWebsiteUrl(e.target.value)} />
-              <NbInput label="Title (optional)" placeholder="Auto-detected from page"
-                value={websiteTitle} onChange={(e) => setWebsiteTitle(e.target.value)} />
-              <NbButton onClick={() => websiteUrl && simulateAdd({ type: "WEBSITE", title: websiteTitle || websiteUrl, url: websiteUrl, status: "PENDING" })} disabled={!websiteUrl}>
+              <NbInput
+                label="URL *"
+                type="url"
+                placeholder="https://example.com/article"
+                value={websiteUrl}
+                onChange={(e) => setWebsiteUrl(e.target.value)}
+              />
+              <NbInput
+                label="Title (optional)"
+                placeholder="Auto-detected from page"
+                value={websiteTitle}
+                onChange={(e) => setWebsiteTitle(e.target.value)}
+              />
+              <NbButton
+                onClick={() =>
+                  websiteUrl &&
+                  simulateAdd({
+                    type: "WEBSITE",
+                    title: websiteTitle || websiteUrl,
+                    url: websiteUrl,
+                    status: "PENDING",
+                  })
+                }
+                disabled={!websiteUrl}
+              >
                 Import website
               </NbButton>
             </div>
@@ -345,11 +447,31 @@ function AddSourceDialog({
 
           {tab === "youtube" && (
             <div className="flex flex-col gap-3">
-              <NbInput label="YouTube URL *" type="url" placeholder="https://youtube.com/watch?v=..."
-                value={youtubeUrl} onChange={(e) => setYoutubeUrl(e.target.value)} />
-              <NbInput label="Title (optional)" placeholder="Auto-detected from video"
-                value={youtubeTitle} onChange={(e) => setYoutubeTitle(e.target.value)} />
-              <NbButton onClick={() => youtubeUrl && simulateAdd({ type: "YOUTUBE", title: youtubeTitle || "YouTube Video", url: youtubeUrl, status: "PENDING" })} disabled={!youtubeUrl}>
+              <NbInput
+                label="YouTube URL *"
+                type="url"
+                placeholder="https://youtube.com/watch?v=..."
+                value={youtubeUrl}
+                onChange={(e) => setYoutubeUrl(e.target.value)}
+              />
+              <NbInput
+                label="Title (optional)"
+                placeholder="Auto-detected from video"
+                value={youtubeTitle}
+                onChange={(e) => setYoutubeTitle(e.target.value)}
+              />
+              <NbButton
+                onClick={() =>
+                  youtubeUrl &&
+                  simulateAdd({
+                    type: "YOUTUBE",
+                    title: youtubeTitle || "YouTube Video",
+                    url: youtubeUrl,
+                    status: "PENDING",
+                  })
+                }
+                disabled={!youtubeUrl}
+              >
                 Import YouTube
               </NbButton>
             </div>
@@ -359,22 +481,31 @@ function AddSourceDialog({
             <div className="flex flex-col gap-3">
               {/* Type toggle */}
               <div className="flex gap-2">
-                {(["TEXT","MARKDOWN"] as const).map((t) => (
-                  <button key={t} onClick={() => setTextType(t)}
+                {(["TEXT", "MARKDOWN"] as const).map((t) => (
+                  <button
+                    key={t}
+                    onClick={() => setTextType(t)}
                     className={cn(
                       "flex-1 rounded-lg border-[2px] border-black py-1.5 text-xs font-black transition-all shadow-[2px_2px_0px_#000]",
                       textType === t
                         ? "bg-[#6C47FF] text-white shadow-none translate-x-[2px] translate-y-[2px]"
-                        : "bg-white text-black hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
-                    )}>
+                        : "bg-white text-black hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]",
+                    )}
+                  >
                     {t === "TEXT" ? "Plain text" : "Markdown"}
                   </button>
                 ))}
               </div>
-              <NbInput label="Title *" placeholder="Source title"
-                value={textTitle} onChange={(e) => setTextTitle(e.target.value)} />
+              <NbInput
+                label="Title *"
+                placeholder="Source title"
+                value={textTitle}
+                onChange={(e) => setTextTitle(e.target.value)}
+              />
               <div className="flex flex-col gap-1">
-                <label className="text-xs font-black text-black uppercase tracking-wide">Content *</label>
+                <label className="text-xs font-black text-black uppercase tracking-wide">
+                  Content *
+                </label>
                 <textarea
                   placeholder="Paste your content here…"
                   value={textContent}
@@ -383,7 +514,19 @@ function AddSourceDialog({
                   className="w-full rounded-xl border-[2px] border-black bg-white px-3 py-2 text-sm font-semibold text-black placeholder:text-gray-400 shadow-[2px_2px_0px_#000] outline-none focus:shadow-none focus:translate-x-[2px] focus:translate-y-[2px] transition-all resize-none"
                 />
               </div>
-              <NbButton onClick={() => textTitle && textContent && simulateAdd({ type: textType, title: textTitle, content: textContent, status: "READY" })} disabled={!textTitle || !textContent}>
+              <NbButton
+                onClick={() =>
+                  textTitle &&
+                  textContent &&
+                  simulateAdd({
+                    type: textType,
+                    title: textTitle,
+                    content: textContent,
+                    status: "READY",
+                  })
+                }
+                disabled={!textTitle || !textContent}
+              >
                 Add text
               </NbButton>
             </div>
@@ -402,7 +545,9 @@ function NbInput({
 }: React.InputHTMLAttributes<HTMLInputElement> & { label: string }) {
   return (
     <div className="flex flex-col gap-1">
-      <label className="text-xs font-black text-black uppercase tracking-wide">{label}</label>
+      <label className="text-xs font-black text-black uppercase tracking-wide">
+        {label}
+      </label>
       <input
         {...props}
         className="h-10 w-full rounded-xl border-[2px] border-black bg-white px-3 text-sm font-semibold text-black placeholder:text-gray-400 shadow-[2px_2px_0px_#000] outline-none focus:shadow-none focus:translate-x-[2px] focus:translate-y-[2px] transition-all"

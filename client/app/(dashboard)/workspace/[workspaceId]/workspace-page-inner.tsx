@@ -20,7 +20,6 @@ export function WorkspacePageInner({ workspaceId }: { workspaceId: string }) {
     return;
   }
 
-  console.log("workspace data: ", workspace)
 
   const convList = conversations[workspaceId] ?? [];
 
