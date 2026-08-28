@@ -27,3 +27,7 @@ export const CONVERSATION_SUMMARY_INTERVAL = 8;
 
 /** Max recent UI messages sent to the model when a rolling summary exists. */
 export const RECENT_MESSAGE_WINDOW = 12;
+
+
+export const MAX_EMBED_TOKENS = 8192;
+export const SAFE_EMBED_TOKENS = 7500;

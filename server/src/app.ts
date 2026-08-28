@@ -10,7 +10,7 @@ import { serve } from "inngest/express";
 
 const app: Express = express();
 
-const clientUrl = process.env.FRONTEND_URL 
+const clientUrl = process.env.FRONTEND_URL;
 
 app.use(
   cors({
@@ -22,7 +22,8 @@ app.use(
 // express wildcard route pattern
 app.all("/api/auth/{*splat}", toNodeHandler(auth));
 
-app.use(express.json());
+app.use(express.json({ limit: "25mb" }));
+app.use(express.urlencoded({ extended: true, limit: "25mb" }));
 
 app.use("/api/inngest", serve({ client: inngest, functions }));
 

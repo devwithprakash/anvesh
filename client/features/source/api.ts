@@ -1,13 +1,48 @@
 import { api } from "@/lib/api/client";
-import { UploadPdfSource } from "./types";
+import {
+  DeleteSource,
+  Source,
+  UploadPdfSource,
+  UploadWebisteInput,
+  UploadYoutubeInput,
+} from "./types";
 
 export async function uploadPdfSource({
   workspaceId,
   formData,
 }: UploadPdfSource) {
-
   return api(`/workspaces/${workspaceId}/sources/upload`, {
     method: "POST",
     data: formData,
+  });
+}
+
+export async function uploadWebsiteSource({
+  workspaceId,
+  data,
+}: UploadWebisteInput) {
+  return api(`/workspaces/${workspaceId}/sources/import/website`, {
+    method: "POST",
+    data,
+  });
+}
+
+export async function uploadYoutubeSource({
+  workspaceId,
+  data,
+}: UploadYoutubeInput) {
+  return api(`/workspaces/${workspaceId}/sources/import/youtube`, {
+    method: "POST",
+    data,
+  });
+}
+
+export async function getSources(workspaceId: string) {
+  return api<Source[]>(`/workspaces/${workspaceId}/sources`);
+}
+
+export async function deleteSource({ workspaceId, sourceId }: DeleteSource) {
+  return api(`/workspaces/${workspaceId}/sources/${sourceId}`, {
+    method: "DELETE",
   });
 }

@@ -1,3 +1,4 @@
+import { encode, decode } from "gpt-tokenizer";
 import type { PineconeRecord } from "@pinecone-database/pinecone";
 import type { Prisma } from "../generated/prisma/client.js";
 import { chunkPages, chunkText } from "../lib/chunking.js";
@@ -19,6 +20,7 @@ import {
   updateSourceRecord,
   type SourceRecord,
 } from "../repositories/source.repository.js";
+import { SAFE_EMBED_TOKENS } from "../lib/ai/ai-config.js";
 
 type SourceMetadata = {
   fileUrl?: string;
@@ -170,15 +172,38 @@ export async function listChunksForSource(sourceId: string) {
   return { chunks, count: chunks.length };
 }
 
+function splitOversizedChunk(chunk: SourceChunkRecord): SourceChunkRecord[] {
+  const tokens = encode(chunk.content);
+
+  if (tokens.length <= SAFE_EMBED_TOKENS) return [chunk];
+
+  const parts: SourceChunkRecord[] = [];
+
+  for (let start = 0; start < tokens.length; start += SAFE_EMBED_TOKENS) {
+    const slice = tokens.slice(start, start + SAFE_EMBED_TOKENS);
+
+    parts.push({
+      ...chunk,
+      id: `${chunk.id}:${parts.length}`,
+      content: decode(slice),
+    });
+  }
+
+  return parts;
+}
+
 export async function embedAndIndexSource(
   source: SourceRecord,
   chunks: SourceChunkRecord[],
 ) {
+
+  const safeChunks = chunks.flatMap(splitOversizedChunk)
+
   const batchSize = 50;
   const records: PineconeRecord<VectorMetadata>[] = [];
 
-  for (let i = 0; i < chunks.length; i += batchSize) {
-    const batch = chunks.slice(i, i + batchSize);
+  for (let i = 0; i < safeChunks.length; i += batchSize) {
+    const batch = safeChunks.slice(i, i + batchSize);
     const embeddings = await embedTexts(batch.map((chunk) => chunk.content));
 
     for (let j = 0; j < batch.length; j += 1) {
@@ -223,7 +248,7 @@ export async function embedAndIndexSource(
     status: "READY",
     metadata: {
       ...metadata,
-      chunkCount: chunks.length,
+      chunkCount: safeChunks.length,
       indexedAt: new Date().toISOString(),
       processingError: undefined,
     },

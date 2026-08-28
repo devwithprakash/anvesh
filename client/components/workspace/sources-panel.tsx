@@ -18,7 +18,13 @@ import { YoutubeLogo, TextT } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { useAppState } from "@/components/providers/app-provider";
 import { type SourceType, type Source } from "@/lib/mock-data";
-import { useUploadPdfSource } from "@/features/source/mutations";
+import {
+  useDeleteSource,
+  useUploadPdfSource,
+  useUploadWebisteSource,
+  useUploadYoutubeSource,
+} from "@/features/source/mutations";
+import { useSources } from "@/features/source/queries";
 
 // ─── Source type metadata ─────────────────────────────────────────────────────
 
@@ -95,12 +101,30 @@ interface SourcesPanelProps {
 }
 
 export function SourcesPanel({ workspaceId, onClose }: SourcesPanelProps) {
-  const { sources, addSource, deleteSource } = useAppState();
-  const srcList = sources[workspaceId] ?? [];
   const [addOpen, setAddOpen] = useState(false);
   const [openMenu, setOpenMenu] = useState<string | null>(null);
 
-  const readyCount = srcList.filter((s) => s.status === "READY").length;
+  const { data: sourceList, isPending } = useSources(workspaceId);
+  const deleteSource = useDeleteSource();
+
+  if (isPending || !sourceList) {
+    return <div>Loading...</div>;
+  }
+
+  const readyCount = sourceList.filter((s) => s.status === "READY").length;
+
+  const handleDeleteSource = async (workspaceId: string, sourceId: string) => {
+    try {
+      const response = await deleteSource.mutateAsync({
+        workspaceId,
+        sourceId,
+      });
+
+      console.log("Delete source response: ", response);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <div className="flex h-full w-full md:w-[260px] shrink-0 flex-col border-l-[3px] border-black bg-[#FFFBF0]">
@@ -110,9 +134,9 @@ export function SourcesPanel({ workspaceId, onClose }: SourcesPanelProps) {
           <span className="font-black text-xs text-black uppercase tracking-wide">
             Sources
           </span>
-          {srcList.length > 0 && (
+          {sourceList.length > 0 && (
             <span className="rounded-full border-[1.5px] border-black bg-[#EDE9FE] px-1.5 py-0.5 text-[9px] font-black text-[#6C47FF]">
-              {readyCount}/{srcList.length}
+              {readyCount}/{sourceList.length}
             </span>
           )}
         </div>
@@ -147,7 +171,7 @@ export function SourcesPanel({ workspaceId, onClose }: SourcesPanelProps) {
 
       {/* Source list */}
       <div className="flex-1 min-h-0 overflow-y-auto px-2.5 py-1">
-        {srcList.length === 0 ? (
+        {sourceList.length === 0 ? (
           <div className="flex flex-col items-center justify-center gap-2.5 py-10 text-center">
             <div className="flex size-9 items-center justify-center rounded-xl border-[2px] border-black bg-white shadow-[2px_2px_0px_#000]">
               <FileText size={16} className="text-black" />
@@ -161,7 +185,7 @@ export function SourcesPanel({ workspaceId, onClose }: SourcesPanelProps) {
           </div>
         ) : (
           <div className="flex flex-col gap-1.5 py-1">
-            {srcList.map((src) => {
+            {sourceList.map((src) => {
               const meta = SOURCE_META[src.type];
               return (
                 <div
@@ -213,7 +237,7 @@ export function SourcesPanel({ workspaceId, onClose }: SourcesPanelProps) {
                           <div className="p-1">
                             <button
                               onClick={() => {
-                                deleteSource(workspaceId, src.id);
+                                handleDeleteSource(workspaceId, src.id);
                                 setOpenMenu(null);
                               }}
                               className="flex w-full items-center gap-1.5 rounded-md px-2 py-1.5 text-xs font-bold text-[#FF6B6B] hover:bg-[#FFF0F0] transition-colors"
@@ -234,10 +258,10 @@ export function SourcesPanel({ workspaceId, onClose }: SourcesPanelProps) {
       </div>
 
       {/* Footer stats */}
-      {srcList.length > 0 && (
+      {sourceList.length > 0 && (
         <div className="border-t-[2px] border-black px-3 py-1.5">
           <p className="text-[9px] font-black text-gray-400 uppercase tracking-wide">
-            {readyCount} ready · {srcList.length - readyCount} processing
+            {readyCount} ready · {sourceList.length - readyCount} processing
           </p>
         </div>
       )}
@@ -277,6 +301,8 @@ function AddSourceDialog({
   const [textType, setTextType] = useState<"TEXT" | "MARKDOWN">("TEXT");
 
   const createPdfSource = useUploadPdfSource();
+  const createWebsiteSource = useUploadWebisteSource();
+  const createYoutubeSource = useUploadYoutubeSource();
 
   const simulateAdd = (partial: Partial<Source>) => {
     addSource(workspaceId, {
@@ -298,7 +324,7 @@ function AddSourceDialog({
     { id: "text", label: "Text", icon: <TextT size={13} /> },
   ];
 
-  const handleSourceUpload = async () => {
+  const handlePdfSourceUpload = async () => {
     try {
       if (!pdfFile) {
         return;
@@ -313,6 +339,50 @@ function AddSourceDialog({
       });
       setAddOpen(false);
       console.log("Response of pdf source: ", response);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleWebisteSourceUpload = async () => {
+    try {
+      if (!websiteUrl) {
+        return;
+      }
+
+      const websiteData = {
+        url: websiteUrl,
+        title: websiteTitle,
+      };
+
+      const response = await createWebsiteSource.mutateAsync({
+        workspaceId,
+        data: websiteData,
+      });
+      setAddOpen(false);
+      console.log("Response of website source: ", response);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleYoutubeSourceUpload = async () => {
+    try {
+      if (!youtubeUrl) {
+        return;
+      }
+
+      const youtubeData = {
+        url: youtubeUrl,
+        title: youtubeTitle,
+      };
+
+      const response = await createYoutubeSource.mutateAsync({
+        workspaceId,
+        data: youtubeData,
+      });
+      setAddOpen(false);
+      console.log("Response of youtube source: ", response);
     } catch (error) {
       console.error(error);
     }
@@ -405,7 +475,7 @@ function AddSourceDialog({
                 </button>
               )}
               <NbButton
-                onClick={() => pdfFile && handleSourceUpload()}
+                onClick={() => pdfFile && handlePdfSourceUpload()}
                 disabled={!pdfFile}
               >
                 Upload PDF
@@ -429,15 +499,7 @@ function AddSourceDialog({
                 onChange={(e) => setWebsiteTitle(e.target.value)}
               />
               <NbButton
-                onClick={() =>
-                  websiteUrl &&
-                  simulateAdd({
-                    type: "WEBSITE",
-                    title: websiteTitle || websiteUrl,
-                    url: websiteUrl,
-                    status: "PENDING",
-                  })
-                }
+                onClick={() => websiteUrl && handleWebisteSourceUpload()}
                 disabled={!websiteUrl}
               >
                 Import website
@@ -461,15 +523,7 @@ function AddSourceDialog({
                 onChange={(e) => setYoutubeTitle(e.target.value)}
               />
               <NbButton
-                onClick={() =>
-                  youtubeUrl &&
-                  simulateAdd({
-                    type: "YOUTUBE",
-                    title: youtubeTitle || "YouTube Video",
-                    url: youtubeUrl,
-                    status: "PENDING",
-                  })
-                }
+                onClick={() => youtubeUrl && handleYoutubeSourceUpload()}
                 disabled={!youtubeUrl}
               >
                 Import YouTube
