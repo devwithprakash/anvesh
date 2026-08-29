@@ -8,24 +8,19 @@ import { ConversationList } from "@/components/workspace/conversation-list";
 import { SourcesPanel } from "@/components/workspace/sources-panel";
 import { Plus, MessageSquare, FileText, ArrowRight } from "lucide-react";
 import { useGetWorkspace } from "@/features/workspace/queries";
+import { useConversations } from "@/features/conversation/queries";
+import { useSources } from "@/features/source/queries";
 
 export function WorkspacePageInner({ workspaceId }: { workspaceId: string }) {
-  const router = useRouter();
-  const { workspaces, conversations, createConversation } = useAppState();
-
-  const { data: workspace, isLoading } = useGetWorkspace(workspaceId);
-
-
-  if (!workspaces || workspaces.length === 0) {
-    return;
-  }
-
-
-  const convList = conversations[workspaceId] ?? [];
-
   const [chatsOpen, setChatsOpen] = useState(false);
   const [sourcesOpen, setSourcesOpen] = useState(false);
 
+  const router = useRouter();
+  const { workspaces, createConversation } = useAppState();
+
+  const { data: workspace, isLoading } = useGetWorkspace(workspaceId);
+  const { data: conversations, isPending } = useConversations(workspaceId);
+  const { data: sources } = useSources(workspaceId);
 
   // Close drawers on Escape
   useEffect(() => {
@@ -38,6 +33,14 @@ export function WorkspacePageInner({ workspaceId }: { workspaceId: string }) {
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
   }, []);
+
+  if (!workspaces || workspaces.length === 0) {
+    return null;
+  }
+
+  if (isPending || !conversations) {
+    return <div>Loading...</div>;
+  }
 
   if (!workspace) return null;
 
@@ -103,7 +106,7 @@ export function WorkspacePageInner({ workspaceId }: { workspaceId: string }) {
               <div className="mt-4 grid grid-cols-2 gap-3">
                 <div className="rounded-xl border-[2px] border-black bg-[#FFFBF0] p-3 text-center shadow-[2px_2px_0px_#000]">
                   <div className="font-black text-2xl text-black">
-                    {convList.length}
+                    {conversations?.length ?? 0}
                   </div>
                   <div className="text-xs font-bold text-gray-600 mt-0.5">
                     Conversations
@@ -111,7 +114,7 @@ export function WorkspacePageInner({ workspaceId }: { workspaceId: string }) {
                 </div>
                 <div className="rounded-xl border-[2px] border-black bg-[#FFFBF0] p-3 text-center shadow-[2px_2px_0px_#000]">
                   <div className="font-black text-2xl text-black">
-                    {workspace.sourceCount}
+                    {sources?.length}
                   </div>
                   <div className="text-xs font-bold text-gray-600 mt-0.5">
                     Sources
@@ -130,10 +133,12 @@ export function WorkspacePageInner({ workspaceId }: { workspaceId: string }) {
                 Start new conversation
               </button>
 
-              {convList.length > 0 && (
+              {conversations.length > 0 && (
                 <button
                   onClick={() =>
-                    router.push(`/workspace/${workspaceId}/${convList[0].id}`)
+                    router.push(
+                      `/workspace/${workspaceId}/${conversations[0].id}`,
+                    )
                   }
                   className="flex items-center justify-center gap-2 w-full rounded-xl border-[2.5px] border-black bg-white px-5 py-3 text-sm font-black text-black shadow-[4px_4px_0px_#000] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] transition-all"
                 >
@@ -144,13 +149,13 @@ export function WorkspacePageInner({ workspaceId }: { workspaceId: string }) {
             </div>
 
             {/* Recent chats */}
-            {convList.length > 0 && (
+            {conversations.length > 0 && (
               <div className="w-full">
                 <p className="text-xs font-black text-black mb-2 text-left uppercase tracking-wide">
                   Recent
                 </p>
                 <div className="flex flex-col gap-1.5">
-                  {convList.slice(0, 4).map((conv) => (
+                  {conversations.slice(0, 4).map((conv) => (
                     <button
                       key={conv.id}
                       onClick={() =>

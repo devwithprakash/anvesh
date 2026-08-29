@@ -1,7 +1,9 @@
 "use client";
 
 import * as React from "react";
-import { useState, useRef, useEffect, useCallback } from "react";
+import { UIMessage, DefaultChatTransport } from "ai";
+import { useChat } from "@ai-sdk/react";
+import { useState, useRef, useEffect } from "react";
 import {
   Send,
   Search,
@@ -17,47 +19,7 @@ import {
 import { YoutubeLogo, TextT } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { useAppState } from "@/components/providers/app-provider";
-import { type Message, type Citation, AVAILABLE_MODELS } from "@/lib/mock-data";
-
-// ─── Simulated streaming responses ───────────────────────────────────────────
-
-const MOCK_RESPONSES = [
-  `Based on the sources in your workspace, here's what I found:
-
-**Key Insights**
-
-The documents collectively highlight several important themes. The primary research suggests that the approach you're asking about has been validated across multiple studies, with consistent findings pointing to a 40–60% improvement in efficiency metrics.
-
-**Supporting Evidence**
-
-The PDF documents provide foundational theoretical context, while the website sources offer more practical, applied perspectives worth exploring further.
-
-Would you like me to focus on any particular aspect?`,
-
-  `That's a great question. Here's a breakdown based on your sources:
-
-**Summary**
-
-The sources collectively point to three core principles at work here:
-
-1. **First principle** — The foundational concept that drives everything else
-2. **Second principle** — How this interacts with existing frameworks
-3. **Third principle** — Practical implications for real-world application
-
-Is there a specific aspect you'd like to dive deeper into?`,
-
-  `Excellent question! Here's what the research shows:
-
-**What the evidence says**
-
-The primary sources indicate the traditional view has been challenged by recent findings. Specifically:
-
-- Earlier studies assumed a linear relationship, but newer research reveals it's more complex
-- The interaction effects between variables are significant and often overlooked
-- Context and environment play a much larger role than previously thought
-
-Shall I elaborate on any of these points?`,
-];
+import { Citation, AVAILABLE_MODELS } from "@/lib/mock-data";
 
 // ─── Citation chip ────────────────────────────────────────────────────────────
 
@@ -159,7 +121,16 @@ function UserMessage({ content }: { content: string }) {
 
 // ─── AI message ───────────────────────────────────────────────────────────────
 
-function AIMessage({ message }: { message: Message }) {
+function getTextContent(message: UIMessage): string {
+  return message.parts
+    .filter((part) => part.type === "text")
+    .map((part) => part.text)
+    .join("");
+}
+
+function AIMessage({ message }: { message: UIMessage }) {
+  const text = getTextContent(message);
+
   return (
     <div className="flex items-start gap-2">
       {/* Avatar */}
@@ -170,20 +141,8 @@ function AIMessage({ message }: { message: Message }) {
       {/* Bubble */}
       <div className="flex-1 min-w-0 max-w-[85%]">
         <div className="rounded-xl rounded-tl-sm border-[2px] border-black bg-white px-3 py-2.5 shadow-[2px_2px_0px_#000]">
-          <FormattedText text={message.content} />
+          <FormattedText text={text} />
         </div>
-
-        {/* Citations */}
-        {message.citations && message.citations.length > 0 && (
-          <div className="mt-1.5 flex flex-wrap items-center gap-1">
-            <span className="text-[10px] font-black text-gray-400 uppercase tracking-wide">
-              Sources:
-            </span>
-            {message.citations.map((c, i) => (
-              <CitationChip key={i} citation={c} index={i} />
-            ))}
-          </div>
-        )}
       </div>
     </div>
   );
@@ -270,96 +229,84 @@ interface ChatInterfaceProps {
   onOpenSources?: () => void;
 }
 
+type ChatModel = "gpt-4o-mini" | "gpt-4o";
+
+const isChatModel = (value: string): value is ChatModel => {
+  return value === "gpt-4o-mini" || value === "gpt-4o";
+};
+
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api";
+
 export function ChatInterface({
   workspaceId,
   conversationId,
   onOpenChats,
   onOpenSources,
 }: ChatInterfaceProps) {
-  const { messages, addMessage, conversations, sources } = useAppState();
-  const msgList = messages[conversationId] ?? [];
+  const { conversations, sources } = useAppState();
   const srcList = sources[workspaceId] ?? [];
 
   const [input, setInput] = useState("");
-  const [model, setModel] = useState("gpt-4o-mini");
+  const [model, setModel] = useState<ChatModel>("gpt-4o-mini");
   const [webSearch, setWebSearch] = useState(false);
-  const [isStreaming, setIsStreaming] = useState(false);
-  const [streamingText, setStreamingText] = useState("");
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  const { messages, sendMessage, status, stop, error } = useChat({
+    id: conversationId,
+    transport: new DefaultChatTransport({
+      api: `${API_BASE_URL}/workspaces/${workspaceId}/chat`,
+      credentials: "include",
+    }),
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!input.trim() || status === "streaming" || status === "submitted") {
+      return;
+    }
+
+    sendMessage({
+      text: input,
+    });
+
+    setInput("");
+  };
+
+  const isStreaming = status === "streaming" || status === "submitted";
 
   useEffect(() => {
     textareaRef.current?.focus();
   }, [conversationId]);
 
-  // Auto-scroll on new messages
+  // Auto-scroll on new messages / streaming updates
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [msgList.length, streamingText]);
-
-  const simulateStream = useCallback(
-    async (userMessage: string) => {
-      setIsStreaming(true);
-      setStreamingText("");
-
-      addMessage(conversationId, {
-        id: `msg-${Date.now()}`,
-        conversationId,
-        role: "USER",
-        content: userMessage,
-        createdAt: new Date().toISOString(),
-      });
-
-      const responseText =
-        MOCK_RESPONSES[Math.floor(Math.random() * MOCK_RESPONSES.length)];
-
-      let accumulated = "";
-      const chunkSize = 7;
-      for (let i = 0; i < responseText.length; i += chunkSize) {
-        accumulated += responseText.slice(i, i + chunkSize);
-        setStreamingText(accumulated);
-        await new Promise((r) => setTimeout(r, 16));
-      }
-
-      const readySources = srcList.filter((s) => s.status === "READY");
-      const citations: Citation[] = readySources.slice(0, 2).map((s) => ({
-        sourceId: s.id,
-        sourceTitle: s.title,
-        sourceType: s.type,
-        chunkIndex: Math.floor(Math.random() * 10),
-        text: "Relevant excerpt from this source providing context for the answer…",
-      }));
-
-      addMessage(conversationId, {
-        id: `msg-${Date.now() + 1}`,
-        conversationId,
-        role: "ASSISTANT",
-        content: responseText,
-        citations: citations.length > 0 ? citations : undefined,
-        createdAt: new Date().toISOString(),
-      });
-      setStreamingText("");
-      setIsStreaming(false);
-    },
-    [conversationId, addMessage, srcList],
-  );
-
-  const handleSend = useCallback(() => {
-    const text = input.trim();
-    if (!text || isStreaming) return;
-    setInput("");
-    simulateStream(text);
-  }, [input, isStreaming, simulateStream]);
+  }, [messages.length, isStreaming]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      handleSend();
+      handleSubmit(e as unknown as React.FormEvent<HTMLFormElement>);
     }
   };
+
+  // While streaming the last assistant message arrives token-by-token —
+  // show it in StreamingBubble so the cursor blink animation works.
+  const lastMsg = messages.length > 0 ? messages[messages.length - 1] : null;
+  const streamingMessage =
+    isStreaming && lastMsg?.role === "assistant" ? lastMsg : null;
+
+  const staticMessages = streamingMessage ? messages.slice(0, -1) : messages;
+
+  const streamingText = streamingMessage
+    ? getTextContent(streamingMessage)
+    : "";
 
   const convTitle = conversations[workspaceId]?.find(
     (c) => c.id === conversationId,
@@ -382,7 +329,10 @@ export function ChatInterface({
               <MessageSquare size={13} />
             </button>
           )}
-          <Sparkles size={13} className="text-[#6C47FF] shrink-0 hidden sm:block" />
+          <Sparkles
+            size={13}
+            className="text-[#6C47FF] shrink-0 hidden sm:block"
+          />
           <span className="font-black text-sm text-black truncate">
             {convTitle ?? "Conversation"}
           </span>
@@ -406,7 +356,12 @@ export function ChatInterface({
             </button>
             <select
               value={model}
-              onChange={(e) => setModel(e.target.value)}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (isChatModel(value)) {
+                  setModel(value);
+                }
+              }}
               className="px-2 sm:px-2.5 py-1 text-[11px] font-black text-black bg-transparent outline-none cursor-pointer max-w-[90px] sm:max-w-none"
             >
               {AVAILABLE_MODELS.map((m) => (
@@ -432,7 +387,7 @@ export function ChatInterface({
 
       {/* ── Messages — flex-1 + overflow-y-auto for scroll ── */}
       <div ref={scrollRef} className="flex-1 min-h-0 overflow-y-auto">
-        {msgList.length === 0 && !isStreaming ? (
+        {staticMessages.length === 0 && !isStreaming ? (
           <EmptyChat
             onSuggestion={(q) => {
               setInput(q);
@@ -441,14 +396,26 @@ export function ChatInterface({
           />
         ) : (
           <div className="flex flex-col gap-3.5 px-3 sm:px-5 py-5 max-w-3xl mx-auto w-full">
-            {msgList.map((msg) =>
-              msg.role === "USER" ? (
-                <UserMessage key={msg.id} content={msg.content} />
+            {staticMessages.map((msg: UIMessage) =>
+              msg.role === "user" ? (
+                <UserMessage
+                  key={msg.id}
+                  content={msg.parts
+                    .filter((part) => part.type === "text")
+                    .map((part) => part.text)
+                    .join("")}
+                />
               ) : (
                 <AIMessage key={msg.id} message={msg} />
               ),
             )}
             {isStreaming && <StreamingBubble text={streamingText} />}
+            {error && (
+              <div className="text-xs font-semibold text-red-500 text-center py-2">
+                Error:{" "}
+                {error.message ?? "Something went wrong. Please try again."}
+              </div>
+            )}
             <div />
           </div>
         )}
@@ -464,16 +431,21 @@ export function ChatInterface({
         )}
 
         <div className="max-w-3xl mx-auto">
-          <div className="flex items-end gap-2 rounded-xl border-[2.5px] border-black bg-white px-3 py-2 shadow-[3px_3px_0px_#000] focus-within:shadow-none focus-within:translate-x-[3px] focus-within:translate-y-[3px] transition-all">
+          <form
+            onSubmit={handleSubmit}
+            className="flex items-end gap-2 rounded-xl border-[2.5px] border-black bg-white px-3 py-2 shadow-[3px_3px_0px_#000] focus-within:shadow-none focus-within:translate-x-[3px] focus-within:translate-y-[3px] transition-all"
+          >
             {/* Attachment + extra action buttons */}
             <div className="flex items-center gap-1 shrink-0 pb-0.5">
               <button
+                type="button"
                 className="flex size-6 items-center justify-center rounded-md text-gray-400 hover:text-black hover:bg-gray-100 transition-colors"
                 aria-label="Attach file"
               >
                 <Paperclip size={14} />
               </button>
               <button
+                type="button"
                 className="flex size-6 items-center justify-center rounded-md text-gray-400 hover:text-black hover:bg-gray-100 transition-colors"
                 aria-label="More options"
               >
@@ -493,13 +465,14 @@ export function ChatInterface({
               style={{ fieldSizing: "content" } as React.CSSProperties}
             />
             <button
-              onClick={handleSend}
-              disabled={!input.trim() && !isStreaming}
+              type={isStreaming ? "button" : "submit"}
+              onClick={isStreaming ? stop : undefined}
+              disabled={!isStreaming && !input.trim()}
               className="flex size-7 shrink-0 items-center justify-center rounded-lg border-[2px] border-black bg-[#6C47FF] text-white shadow-[2px_2px_0px_#000] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-40 disabled:pointer-events-none"
             >
               {isStreaming ? <Square size={11} /> : <Send size={11} />}
             </button>
-          </div>
+          </form>
           <p className="mt-1.5 text-center text-[10px] font-semibold text-gray-400">
             AI can make mistakes — always verify with your sources.
           </p>

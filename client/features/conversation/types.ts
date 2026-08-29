@@ -1,3 +1,5 @@
+import { UIMessage } from "ai";
+
 export type CreateConversation = {
   title?: string;
 };
@@ -23,8 +25,19 @@ export type GetConversationOutputSchema = {
   updatedAt: string;
 };
 
-
 export type DeleteConversation = {
   workspaceId: string;
-  conversationId: string
+  conversationId: string;
+};
+
+export type ChatSchema = {
+  conversationId: string;
+  messages: UIMessage[];
+  model: "gpt-4o-mini" | "gpt-4o";
+  webSearch: boolean;
+};
+
+export interface StreamChatSchema {
+  workspaceId: string;
+  chatData: ChatSchema;
 }
