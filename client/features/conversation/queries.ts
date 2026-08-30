@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { getConversations } from "./api";
-import { GetConversationOutputSchema } from "./types";
+import { getConversations, getMessages } from "./api";
+import { GetConversationOutputSchema, GetMessageInputSchema } from "./types";
 
 export function useConversations(workspaceId: string) {
   return useQuery<GetConversationOutputSchema[]>({
@@ -8,4 +8,12 @@ export function useConversations(workspaceId: string) {
     queryFn: () => getConversations(workspaceId),
     enabled: !!workspaceId,
   });
-} 
+}
+
+export function useMessages({ workspaceId, conversationId }: GetMessageInputSchema) {
+  return useQuery({
+    queryKey: ["messages", workspaceId, conversationId],
+    queryFn: () => getMessages({ workspaceId, conversationId }),
+    enabled: !!workspaceId && !!conversationId,
+  });
+}

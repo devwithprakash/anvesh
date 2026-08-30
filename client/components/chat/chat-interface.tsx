@@ -20,6 +20,8 @@ import { YoutubeLogo, TextT } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { useAppState } from "@/components/providers/app-provider";
 import { Citation, AVAILABLE_MODELS } from "@/lib/mock-data";
+import { useMessages } from "@/features/conversation/queries";
+import { useSources } from "@/features/source/queries";
 
 // ─── Citation chip ────────────────────────────────────────────────────────────
 
@@ -128,6 +130,14 @@ function getTextContent(message: UIMessage): string {
     .join("");
 }
 
+function toUIMessages(raw: any[] = []): UIMessage[] {
+  return raw.map((m) => ({
+    id: m.id,
+    role: m.role.toLowerCase() as "user" | "assistant",
+    parts: [{ type: "text", text: m.content }],
+  }));
+}
+
 function AIMessage({ message }: { message: UIMessage }) {
   const text = getTextContent(message);
 
@@ -218,34 +228,19 @@ function EmptyChat({ onSuggestion }: { onSuggestion: (q: string) => void }) {
   );
 }
 
-// ─── Chat Interface ───────────────────────────────────────────────────────────
-
-interface ChatInterfaceProps {
-  workspaceId: string;
-  conversationId: string;
-  /** Called on mobile to open the Chats drawer */
-  onOpenChats?: () => void;
-  /** Called on mobile to open the Sources drawer */
-  onOpenSources?: () => void;
+interface ChatInnerProps extends ChatInterfaceProps {
+  initialMessages: UIMessage[];
 }
 
-type ChatModel = "gpt-4o-mini" | "gpt-4o";
-
-const isChatModel = (value: string): value is ChatModel => {
-  return value === "gpt-4o-mini" || value === "gpt-4o";
-};
-
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api";
-
-export function ChatInterface({
+function ChatInner({
   workspaceId,
   conversationId,
+  initialMessages,
   onOpenChats,
   onOpenSources,
-}: ChatInterfaceProps) {
-  const { conversations, sources } = useAppState();
-  const srcList = sources[workspaceId] ?? [];
+}: ChatInnerProps) {
+  const { conversations,  } = useAppState();
+  const {data: sources} = useSources(workspaceId)
 
   const [input, setInput] = useState("");
   const [model, setModel] = useState<ChatModel>("gpt-4o-mini");
@@ -256,6 +251,7 @@ export function ChatInterface({
 
   const { messages, sendMessage, status, stop, error } = useChat({
     id: conversationId,
+    messages: initialMessages,
     transport: new DefaultChatTransport({
       api: `${API_BASE_URL}/workspaces/${workspaceId}/chat`,
       credentials: "include",
@@ -424,7 +420,7 @@ export function ChatInterface({
       {/* ── Sticky composer — shrink-0 keeps it pinned at bottom ── */}
       <div className="shrink-0 border-t-[2px] border-black bg-[#FFFBF0] px-3 sm:px-4 py-3">
         {/* No-source warning */}
-        {srcList.filter((s) => s.status === "READY").length === 0 && (
+        {sources?.filter((s) => s.status === "READY").length === 0 && (
           <div className="mb-2.5 flex items-center gap-2 rounded-lg border-[2px] border-amber-500 bg-amber-50 px-3 py-1.5 text-xs font-bold text-amber-700">
             ⚠️ No ready sources — add sources for grounded answers.
           </div>
@@ -479,5 +475,52 @@ export function ChatInterface({
         </div>
       </div>
     </div>
+  );
+}
+
+// ─── Chat Interface ───────────────────────────────────────────────────────────
+
+interface ChatInterfaceProps {
+  workspaceId: string;
+  conversationId: string;
+  /** Called on mobile to open the Chats drawer */
+  onOpenChats?: () => void;
+  /** Called on mobile to open the Sources drawer */
+  onOpenSources?: () => void;
+}
+
+type ChatModel = "gpt-4o-mini" | "gpt-4o";
+
+const isChatModel = (value: string): value is ChatModel => {
+  return value === "gpt-4o-mini" || value === "gpt-4o";
+};
+
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api";
+
+export function ChatInterface({
+  workspaceId,
+  conversationId,
+  onOpenChats,
+  onOpenSources,
+}: ChatInterfaceProps) {
+  const { data: conversationMessages, isPending } = useMessages({
+    workspaceId,
+    conversationId,
+  });
+
+  if (isPending) {
+    return <div>Loading...</div>;
+  }
+
+  return (
+    <ChatInner
+      key={conversationId}
+      workspaceId={workspaceId}
+      conversationId={conversationId}
+      initialMessages={toUIMessages(conversationMessages ?? [])}
+      onOpenChats={onOpenChats}
+      onOpenSources={onOpenSources}
+    />
   );
 }

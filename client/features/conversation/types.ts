@@ -41,3 +41,25 @@ export interface StreamChatSchema {
   workspaceId: string;
   chatData: ChatSchema;
 }
+
+export interface GetMessageInputSchema {
+  workspaceId: string;
+  conversationId: string;
+}
+
+export interface Citation {
+  sourceId: string;
+  chunkId?: string;
+  content?: string;
+  page?: number;
+  score?: number;
+}
+
+export interface GetMessageOutputSchema {
+  id: string;
+  createdAt: Date;
+  conversationId: string;
+  role: "USER" | "ASSISTANT";
+  content: string;
+  citations: Citation[];
+}

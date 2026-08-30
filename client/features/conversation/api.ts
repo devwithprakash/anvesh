@@ -4,6 +4,8 @@ import {
   CreateConversationVariables,
   DeleteConversation,
   GetConversationOutputSchema,
+  GetMessageInputSchema,
+  GetMessageOutputSchema,
   StreamChatSchema,
 } from "./types";
 
@@ -35,9 +37,7 @@ export async function deleteConversation({
   });
 }
 
-export async function streamChat({ workspaceId, chatData }: StreamChatSchema) {
-  return api(`/workspaces/${workspaceId}/chat`, {
-    method: "POST",
-    data: chatData,
-  });
+
+export async function getMessages({workspaceId, conversationId}: GetMessageInputSchema) {
+    return api<GetMessageOutputSchema[]>(`/workspaces/${workspaceId}/conversation/${conversationId}/messages`)
 }

@@ -138,9 +138,6 @@ export async function bulkDeleteSources(req: Request, res: Response) {
 export async function uploadPdf(req: Request, res: Response) {
   const { workspaceId } = workspaceIdParamSchema.parse(req.params);
 
-
-
-
   if (!req.file) {
     throw new ValidationError("PDF file is required");
   }
