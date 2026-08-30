@@ -11,10 +11,16 @@ export async function sendEmail({
   subject: string;
   html: string;
 }) {
-  return resend.emails.send({
-    from: "onboarding@resend.dev",
+  console.log("Sending email to:", to);
+
+  const result = await resend.emails.send({
+    from: "Your App <onboarding@resend.dev>",
     to,
     subject,
     html,
   });
+
+  console.log("Resend result:", result);
+
+  return result;
 }

@@ -4,7 +4,7 @@ import { SignIn, SignUp } from "./types";
 export async function forgotPassword(email: string) {
   return authClient.requestPasswordReset({
     email,
-    redirectTo: "/reset-password",
+    redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/reset-password`,
   });
 }
 
@@ -18,7 +18,7 @@ export async function resetPassword(newPassword: string, token: string) {
 export async function sendVerificationEmail(email: string) {
   return authClient.sendVerificationEmail({
     email,
-    callbackURL: "/dashboard",
+    callbackURL: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`,
   });
 }
 
