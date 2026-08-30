@@ -249,7 +249,6 @@ export async function streamWorkspaceChat(
 
       const usage = await result.usage;
 
-      console.log("Token usage of query: ", usage);
       writer.merge(toUIMessageStream({ stream: result.stream }));
     },
     onFinish: async ({ responseMessage, isAborted }) => {

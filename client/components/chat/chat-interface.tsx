@@ -249,12 +249,16 @@ function ChatInner({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
+
   const { messages, sendMessage, status, stop, error } = useChat({
     id: conversationId,
     messages: initialMessages,
     transport: new DefaultChatTransport({
       api: `${API_BASE_URL}/workspaces/${workspaceId}/chat`,
       credentials: "include",
+      body: {
+        conversationId,
+      }
     }),
   });
 

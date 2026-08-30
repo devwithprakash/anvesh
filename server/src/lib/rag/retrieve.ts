@@ -57,7 +57,6 @@ export async function retrieveWorkspaceContext(
     vectors.map((v) => queryWorkspaceVectors(workspaceId, v, RAG_TOP_K)),
   );
 
-  console.log("Result per query: ", resultsPerQuery);
 
   //typeof of hits:
   // [
@@ -76,10 +75,6 @@ export async function retrieveWorkspaceContext(
 
   const fused = await reciprocalRankFusion(rankedLists);
   const chunks = fused.slice(0, 5);
-
-  console.log("Ranked list length: ", rankedLists.length);
-  console.log("Fused length: ", fused.length);
-  console.log("Final chunks: ", chunks);
 
   return {
     queries: { original: userQuery, rewritten, stepBack, hyde, subQueries },

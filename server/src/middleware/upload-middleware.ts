@@ -9,7 +9,6 @@ export const pdfUpload = multer({
 
   fileFilter: (_req, file, callback) => {
 
-    console.log("Hello")
 
     const isPdf =
       file.mimetype === "application/pdf" ||

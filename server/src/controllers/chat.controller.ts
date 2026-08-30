@@ -69,7 +69,9 @@ export async function deleteConversation(req: Request, res: Response) {
 
 export async function streamChat(req: Request, res: Response) {
   const { workspaceId } = workspaceIdParamSchema.parse(req.params);
+
   const body = chatBodySchema.parse(req.body);
+
 
   await streamWorkspaceChat(res, workspaceId, req.session.user.id, {
     messages: body.messages as unknown as UIMessage[],
