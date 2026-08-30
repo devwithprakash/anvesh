@@ -10,7 +10,6 @@ import {
   MessageSquare,
   Trash2,
   MoreHorizontal,
-  ArrowRight,
 } from "lucide-react";
 import { useAppState } from "@/components/providers/app-provider";
 import { AppNavbar } from "@/components/workspace/app-navbar";
@@ -18,6 +17,8 @@ import { CreateWorkspaceDialog } from "@/components/workspace/create-workspace-d
 import { type Workspace } from "@/lib/mock-data";
 import { useWorkspaces } from "@/features/workspace/queries";
 import { useDeleteWorkspace } from "@/features/workspace/mutations";
+import { useSources } from "@/features/source/queries";
+import { useConversations } from "@/features/conversation/queries";
 
 // ─── Workspace Card ───────────────────────────────────────────────────────────
 
@@ -30,6 +31,9 @@ function WorkspaceCard({
 }) {
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
+
+  const { data: sources } = useSources(workspace.id);
+  const { data: conversations } = useConversations(workspace.id);
 
   return (
     <div className="relative group">
@@ -108,11 +112,11 @@ function WorkspaceCard({
         <div className="flex items-center gap-3 pt-3 border-t-[2px] border-black/10">
           <span className="flex items-center gap-1.5 text-xs font-bold text-gray-700">
             <FileText size={12} />
-            {workspace.sourceCount} sources
+            {sources?.length} sources
           </span>
           <span className="flex items-center gap-1.5 text-xs font-bold text-gray-700">
             <MessageSquare size={12} />
-            {workspace.conversationCount} chats
+            {conversations?.length} chats
           </span>
           <span className="ml-auto rounded-full border-[1.5px] border-black bg-[#EDE9FE] px-2 py-0.5 text-[10px] font-black text-[#6C47FF]">
             {workspace.defaultModel}
@@ -126,7 +130,6 @@ function WorkspaceCard({
 // ─── Dashboard Page ───────────────────────────────────────────────────────────
 
 export default function DashboardPage() {
-  const router = useRouter();
   const { workspaces } = useAppState();
   const [createOpen, setCreateOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -138,7 +141,6 @@ export default function DashboardPage() {
   );
 
   const { data: workspacesList, error } = useWorkspaces();
-
 
   const deleteWorkspace = useDeleteWorkspace();
 
