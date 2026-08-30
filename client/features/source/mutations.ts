@@ -8,7 +8,7 @@ import {
 import {
   DeleteSource,
   UploadPdfSource,
-  UploadWebisteInput,
+  UploadWebsiteInput,
   UploadYoutubeInput,
 } from "./types";
 
@@ -18,23 +18,24 @@ export function useUploadPdfSource() {
   return useMutation({
     mutationFn: ({ workspaceId, title, formData }: UploadPdfSource) =>
       uploadPdfSource({ workspaceId, title, formData }),
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: ["sources"],
+        queryKey: ["sources", variables.workspaceId],
       });
     },
   });
 }
 
-export function useUploadWebisteSource() {
+export function useUploadWebsiteSource() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ workspaceId, data }: UploadWebisteInput) =>
+    mutationFn: ({ workspaceId, data }: UploadWebsiteInput) =>
       uploadWebsiteSource({ workspaceId, data }),
-    onSuccess: () => {
+
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: ["sources"],
+        queryKey: ["sources", variables.workspaceId],
       });
     },
   });
@@ -46,9 +47,9 @@ export function useUploadYoutubeSource() {
   return useMutation({
     mutationFn: ({ workspaceId, data }: UploadYoutubeInput) =>
       uploadYoutubeSource({ workspaceId, data }),
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: ["sources"],
+        queryKey: ["sources", variables.workspaceId],
       });
     },
   });
@@ -60,9 +61,10 @@ export function useDeleteSource() {
   return useMutation({
     mutationFn: ({ workspaceId, sourceId }: DeleteSource) =>
       deleteSource({ workspaceId, sourceId }),
-    onSuccess: () => {
+
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: ["sources"],
+        queryKey: ["sources", variables.workspaceId],
       });
     },
   });

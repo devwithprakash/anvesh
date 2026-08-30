@@ -3,7 +3,7 @@ import {
   DeleteSource,
   Source,
   UploadPdfSource,
-  UploadWebisteInput,
+  UploadWebsiteInput,
   UploadYoutubeInput,
 } from "./types";
 
@@ -20,7 +20,7 @@ export async function uploadPdfSource({
 export async function uploadWebsiteSource({
   workspaceId,
   data,
-}: UploadWebisteInput) {
+}: UploadWebsiteInput) {
   return api(`/workspaces/${workspaceId}/sources/import/website`, {
     method: "POST",
     data,

@@ -10,7 +10,7 @@ export type ExternalSource = {
   title?: string;
 };
 
-export type UploadWebisteInput = {
+export type UploadWebsiteInput = {
   workspaceId: string;
   data: ExternalSource;
 };

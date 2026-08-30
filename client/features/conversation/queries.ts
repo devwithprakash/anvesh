@@ -6,7 +6,7 @@ export function useConversations(workspaceId: string) {
   return useQuery<GetConversationOutputSchema[]>({
     queryKey: ["conversations", workspaceId],
     queryFn: () => getConversations(workspaceId),
-    enabled: !!workspaceId,
+    enabled: Boolean(workspaceId),
   });
 }
 

@@ -21,7 +21,7 @@ import { type SourceType, type Source } from "@/lib/mock-data";
 import {
   useDeleteSource,
   useUploadPdfSource,
-  useUploadWebisteSource,
+  useUploadWebsiteSource,
   useUploadYoutubeSource,
 } from "@/features/source/mutations";
 import { useSources } from "@/features/source/queries";
@@ -301,7 +301,7 @@ function AddSourceDialog({
   const [textType, setTextType] = useState<"TEXT" | "MARKDOWN">("TEXT");
 
   const createPdfSource = useUploadPdfSource();
-  const createWebsiteSource = useUploadWebisteSource();
+  const createWebsiteSource = useUploadWebsiteSource();
   const createYoutubeSource = useUploadYoutubeSource();
 
   const simulateAdd = (partial: Partial<Source>) => {

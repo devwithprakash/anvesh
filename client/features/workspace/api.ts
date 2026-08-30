@@ -9,9 +9,7 @@ export async function getWorkspaceById(workspaceId: string) {
   return api<Workspace>(`/workspaces/${workspaceId}`, {
     method: "GET",
   })
-
 }
-
 
 export async function createWorkspace(data: CreateWorkspaceInput) {
   return api<Workspace>("/workspaces", {

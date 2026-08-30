@@ -3,7 +3,7 @@ import { getSources } from "./api";
 
 export function useSources(workspaceId: string) {
   return useQuery({
-    queryKey: ["sources"],
+    queryKey: ["sources", workspaceId],
     queryFn: () => getSources(workspaceId),
     enabled: !!workspaceId,
   });
