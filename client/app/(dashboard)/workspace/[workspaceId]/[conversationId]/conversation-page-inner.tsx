@@ -20,6 +20,7 @@ export function ConversationPageInner({
   const [chatsOpen, setChatsOpen] = useState(false);
   const [sourcesOpen, setSourcesOpen] = useState(false);
 
+
   // Close drawers on Escape
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {

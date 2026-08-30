@@ -2,14 +2,8 @@
 
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
-
-const navLinks = [
-  { label: "Features", href: "#features" },
-  { label: "How it works", href: "#how-it-works" },
-  { label: "Pricing", href: "#pricing" },
-  { label: "Faq", href: "#faq" },
-  { label: "Dashboard", href: "/dashboard" },
-];
+import { authClient } from "../../lib/auth-client";
+import { signOut } from "@/features/auth/auth";
 
 const containerVariants = {
   hidden: {},
@@ -18,10 +12,33 @@ const containerVariants = {
 
 const itemVariants = {
   hidden: { opacity: 0, y: -16 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } as any },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.4, ease: "easeOut" } as any,
+  },
 };
 
 export default function Navbar() {
+  const { data: session } = authClient.useSession();
+  const user = session?.user;
+
+  const handleLogOut = async () => {
+    try {
+      await signOut();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const navLinks = [
+    { label: "Features", href: "#features" },
+    { label: "How it works", href: "#how-it-works" },
+    { label: "Pricing", href: "#pricing" },
+    { label: "Faq", href: "#faq" },
+    ...(user ? [{ label: "Dashboard", href: "/dashboard" }] : []),
+  ];
+
   return (
     <motion.nav
       initial="hidden"
@@ -39,11 +56,16 @@ export default function Navbar() {
           <span className="inline-flex items-center justify-center w-9 h-9 rounded-lg border-2 border-black bg-[#6C47FF] text-white font-black text-sm shadow-[3px_3px_0px_#000] select-none">
             N
           </span>
-          <span className="font-black text-lg text-black tracking-tight">Notebook</span>
+          <span className="font-black text-lg text-black tracking-tight">
+            Notebook
+          </span>
         </motion.a>
 
         {/* Nav Links */}
-        <motion.ul variants={containerVariants} className="hidden md:flex items-center gap-1">
+        <motion.ul
+          variants={containerVariants}
+          className="hidden md:flex items-center gap-1"
+        >
           {navLinks.map((link) => (
             <motion.li key={link.label} variants={itemVariants}>
               <a
@@ -57,13 +79,26 @@ export default function Navbar() {
         </motion.ul>
 
         {/* CTA Buttons */}
-        <motion.div variants={itemVariants} className="flex items-center gap-3 shrink-0">
-          <a
-            href="/signin"
-            className="hidden sm:inline-flex items-center px-4 py-2 rounded-xl border-2 border-black bg-white text-black text-sm font-black shadow-[3px_3px_0px_#000] hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px] transition-all"
-          >
-            Log in
-          </a>
+        <motion.div
+          variants={itemVariants}
+          className="flex items-center gap-3 shrink-0"
+        >
+          {user ? (
+            <button
+              onClick={handleLogOut}
+              className="hidden sm:inline-flex items-center px-4 py-2 rounded-xl border-2 border-black bg-white text-black text-sm font-black shadow-[3px_3px_0px_#000] hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px] transition-all"
+            >
+              Log Out
+            </button>
+          ) : (
+            <a
+              href="/signin"
+              className="hidden sm:inline-flex items-center px-4 py-2 rounded-xl border-2 border-black bg-white text-black text-sm font-black shadow-[3px_3px_0px_#000] hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px] transition-all"
+            >
+              Log in
+            </a>
+          )}
+
           <a
             href="/signup"
             className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border-2 border-black bg-[#6C47FF] text-white text-sm font-black shadow-[3px_3px_0px_#000] hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px] transition-all"
