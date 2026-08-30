@@ -1,6 +1,27 @@
 import { authClient } from "@/lib/auth-client";
 import { SignIn, SignUp } from "./types";
 
+export async function forgotPassword(email: string) {
+  return authClient.requestPasswordReset({
+    email,
+    redirectTo: "/reset-password",
+  });
+}
+
+export async function resetPassword(newPassword: string, token: string) {
+  return authClient.resetPassword({
+    newPassword,
+    token,
+  });
+}
+
+export async function sendVerificationEmail(email: string) {
+  return authClient.sendVerificationEmail({
+    email,
+    callbackURL: "/dashboard",
+  });
+}
+
 export async function signIn(data: SignIn) {
   return authClient.signIn.email({
     email: data.email,
