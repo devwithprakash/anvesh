@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -10,6 +10,8 @@ import {
   MessageSquare,
   Trash2,
   MoreHorizontal,
+  Sparkles,
+  BookOpen,
 } from "lucide-react";
 import { useAppState } from "@/components/providers/app-provider";
 import { AppNavbar } from "@/components/workspace/app-navbar";
@@ -19,6 +21,47 @@ import { useWorkspaces } from "@/features/workspace/queries";
 import { useDeleteWorkspace } from "@/features/workspace/mutations";
 import { useSources } from "@/features/source/queries";
 import { useConversations } from "@/features/conversation/queries";
+
+// ─── Floating decorative symbols ─────────────────────────────────────────────
+
+const FLOATERS = [
+  { symbol: "✦", color: "#6C47FF", size: "text-4xl", top: "8%",  left: "3%",  delay: "0s",   dur: "6s"  },
+  { symbol: "✳", color: "#FFD166", size: "text-3xl", top: "15%", left: "88%", delay: "1s",   dur: "8s"  },
+  { symbol: "◆", color: "#FF6B6B", size: "text-2xl", top: "38%", left: "95%", delay: "2s",   dur: "7s"  },
+  { symbol: "✦", color: "#00B87C", size: "text-3xl", top: "62%", left: "2%",  delay: "0.5s", dur: "9s"  },
+  { symbol: "✳", color: "#6C47FF", size: "text-2xl", top: "78%", left: "91%", delay: "3s",   dur: "6.5s"},
+  { symbol: "◆", color: "#FFD166", size: "text-4xl", top: "88%", left: "7%",  delay: "1.5s", dur: "8.5s"},
+  { symbol: "✦", color: "#FF6B6B", size: "text-xl",  top: "25%", left: "6%",  delay: "2.5s", dur: "7.5s"},
+  { symbol: "✳", color: "#00B87C", size: "text-2xl", top: "50%", left: "93%", delay: "4s",   dur: "6s"  },
+];
+
+function FloatingSymbols() {
+  return (
+    <>
+      <style>{`
+        @keyframes floatY {
+          0%, 100% { transform: translateY(0px) rotate(0deg); }
+          50%       { transform: translateY(-18px) rotate(15deg); }
+        }
+      `}</style>
+      {FLOATERS.map((f, i) => (
+        <span
+          key={i}
+          className={`fixed pointer-events-none select-none font-black opacity-[0.18] ${f.size}`}
+          style={{
+            top: f.top,
+            left: f.left,
+            color: f.color,
+            animation: `floatY ${f.dur} ease-in-out ${f.delay} infinite`,
+            zIndex: 0,
+          }}
+        >
+          {f.symbol}
+        </span>
+      ))}
+    </>
+  );
+}
 
 // ─── Workspace Card ───────────────────────────────────────────────────────────
 
@@ -112,11 +155,11 @@ function WorkspaceCard({
         <div className="flex items-center gap-3 pt-3 border-t-[2px] border-black/10">
           <span className="flex items-center gap-1.5 text-xs font-bold text-gray-700">
             <FileText size={12} />
-            {sources?.length} sources
+            {sources?.length ?? 0} sources
           </span>
           <span className="flex items-center gap-1.5 text-xs font-bold text-gray-700">
             <MessageSquare size={12} />
-            {conversations?.length} chats
+            {conversations?.length ?? 0} chats
           </span>
           <span className="ml-auto rounded-full border-[1.5px] border-black bg-[#EDE9FE] px-2 py-0.5 text-[10px] font-black text-[#6C47FF]">
             {workspace.defaultModel}
@@ -134,49 +177,69 @@ export default function DashboardPage() {
   const [createOpen, setCreateOpen] = useState(false);
   const [search, setSearch] = useState("");
 
-  const filtered = workspaces.filter(
-    (ws) =>
-      ws.title.toLowerCase().includes(search.toLowerCase()) ||
-      (ws.description?.toLowerCase() ?? "").includes(search.toLowerCase()),
-  );
-
   const { data: workspacesList, error } = useWorkspaces();
-
   const deleteWorkspace = useDeleteWorkspace();
 
   const handleDeleteWorkspace = async (workspaceId: string) => {
     try {
-      const response = await deleteWorkspace.mutateAsync(workspaceId);
+      await deleteWorkspace.mutateAsync(workspaceId);
     } catch (error) {
       console.error(error);
     }
   };
 
+  const filtered = (workspacesList ?? []).filter(
+    (ws) =>
+      ws.title.toLowerCase().includes(search.toLowerCase()) ||
+      (ws.description?.toLowerCase() ?? "").includes(search.toLowerCase()),
+  );
+
+  const totalCount = workspacesList?.length ?? 0;
+
   return (
     <div className="flex flex-col flex-1 min-h-svh bg-[#FFFBF0]">
       {/* Dot grid texture */}
       <div
-        className="fixed inset-0 pointer-events-none opacity-[0.05]"
+        className="fixed inset-0 pointer-events-none opacity-[0.04]"
         style={{
           backgroundImage: "radial-gradient(circle, #000 1px, transparent 1px)",
           backgroundSize: "28px 28px",
         }}
       />
 
+      {/* Floating symbols */}
+      <FloatingSymbols />
+
       <AppNavbar />
 
-      <main className="relative flex-1 mx-auto w-full max-w-5xl px-6 py-10">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="font-black text-3xl text-black tracking-tight">
-            My Workspaces
-          </h1>
-          <p className="mt-1.5 text-sm font-semibold text-gray-600">
-            Organise your research, documents and AI conversations.
-          </p>
+      <main className="relative z-10 flex-1 mx-auto w-full max-w-5xl px-6 py-10">
+
+        {/* ── Hero header ── */}
+        <div className="mb-8 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+          <div>
+            <div className="inline-flex items-center gap-2 rounded-full border-[2px] border-black bg-[#EDE9FE] px-3 py-1 mb-3 shadow-[2px_2px_0px_#000]">
+              <Sparkles size={12} className="text-[#6C47FF]" />
+              <span className="text-[11px] font-black text-[#6C47FF] uppercase tracking-wider">Your workspace</span>
+            </div>
+            <h1 className="font-black text-4xl text-black tracking-tight leading-tight">
+              My Workspaces
+            </h1>
+            <p className="mt-1.5 text-sm font-semibold text-gray-600">
+              Organise your research, documents and AI conversations.
+            </p>
+          </div>
+
+          {/* Stats pills */}
+          <div className="flex items-center gap-2 shrink-0">
+            <div className="flex items-center gap-1.5 rounded-xl border-[2px] border-black bg-white px-3 py-2 shadow-[2px_2px_0px_#000]">
+              <BookOpen size={13} className="text-[#6C47FF]" />
+              <span className="text-sm font-black text-black">{totalCount}</span>
+              <span className="text-xs font-semibold text-gray-500">workspace{totalCount !== 1 ? "s" : ""}</span>
+            </div>
+          </div>
         </div>
 
-        {/* Toolbar */}
+        {/* ── Toolbar ── */}
         <div className="mb-6 flex items-center gap-3">
           <div className="relative flex-1 max-w-sm">
             <Search
@@ -200,33 +263,95 @@ export default function DashboardPage() {
           </button>
         </div>
 
-        {/* Grid */}
-        {filtered.length === 0 ? (
+        {/* ── Grid / Empty state ── */}
+        {filtered.length === 0 && !search ? (
+          /* Beautiful empty state */
+          <div className="relative mt-4">
+            {/* Big hero empty card */}
+            <div className="rounded-2xl border-[3px] border-black bg-white shadow-[6px_6px_0px_#000] overflow-hidden">
+              {/* Coloured top stripe */}
+              <div className="h-2 bg-[#6C47FF]" />
+              <div className="flex flex-col items-center justify-center gap-6 px-8 py-16 text-center">
+                {/* Icon cluster */}
+                <div className="relative">
+                  <div className="flex size-20 items-center justify-center rounded-2xl border-[3px] border-black bg-[#EDE9FE] shadow-[5px_5px_0px_#000]">
+                    <BookOpen size={36} className="text-[#6C47FF]" />
+                  </div>
+                  <span className="absolute -top-3 -right-3 flex size-8 items-center justify-center rounded-xl border-[2px] border-black bg-[#FFD166] shadow-[2px_2px_0px_#000] text-base">
+                    ✦
+                  </span>
+                </div>
+
+                <div className="space-y-2 max-w-sm">
+                  <p className="font-black text-2xl text-black leading-tight">
+                    Create your first workspace
+                  </p>
+                  <p className="text-sm font-semibold text-gray-600 leading-relaxed">
+                    A workspace holds your sources, conversations and AI insights — all in one place.
+                  </p>
+                </div>
+
+                {/* Feature pills */}
+                <div className="flex flex-wrap justify-center gap-2">
+                  {[
+                    { emoji: "📄", label: "Upload PDFs" },
+                    { emoji: "🌐", label: "Import websites" },
+                    { emoji: "▶️", label: "YouTube videos" },
+                    { emoji: "💬", label: "AI chat" },
+                  ].map((f) => (
+                    <span
+                      key={f.label}
+                      className="inline-flex items-center gap-1.5 rounded-full border-[2px] border-black bg-[#FFFBF0] px-3 py-1 text-xs font-bold shadow-[1px_1px_0px_#000]"
+                    >
+                      {f.emoji} {f.label}
+                    </span>
+                  ))}
+                </div>
+
+                <button
+                  onClick={() => setCreateOpen(true)}
+                  className="flex items-center gap-2 rounded-xl border-[3px] border-black bg-[#6C47FF] px-6 py-3 text-sm font-black text-white shadow-[5px_5px_0px_#000] hover:shadow-none hover:translate-x-[5px] hover:translate-y-[5px] transition-all"
+                >
+                  <Plus size={16} />
+                  Create my first workspace
+                </button>
+              </div>
+            </div>
+
+            {/* Decorative "what you can do" row below */}
+            <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {[
+                { color: "#EDE9FE", border: "#6C47FF", icon: "📚", title: "Add Sources", desc: "PDFs, websites, YouTube — bring all your knowledge together." },
+                { color: "#FFF9E6", border: "#FFD166", icon: "🤖", title: "Chat with AI", desc: "Ask questions and get cited answers grounded in your sources." },
+                { color: "#F0FFF8", border: "#00B87C", icon: "✨", title: "Stay Organised", desc: "Multiple workspaces keep topics and projects neatly separated." },
+              ].map((item) => (
+                <div
+                  key={item.title}
+                  className="rounded-xl border-[2px] border-black p-4 shadow-[3px_3px_0px_#000]"
+                  style={{ backgroundColor: item.color }}
+                >
+                  <div className="text-2xl mb-2">{item.icon}</div>
+                  <p className="font-black text-sm text-black mb-1">{item.title}</p>
+                  <p className="text-xs font-semibold text-gray-600 leading-relaxed">{item.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : filtered.length === 0 && search ? (
+          /* No search results */
           <div className="flex flex-col items-center justify-center gap-5 py-24 text-center">
             <div className="flex size-16 items-center justify-center rounded-2xl border-[3px] border-black bg-white shadow-[4px_4px_0px_#000]">
-              <FileText size={28} className="text-black" />
+              <Search size={24} className="text-black" />
             </div>
             <div>
-              <p className="font-black text-lg text-black">
-                {search ? "No workspaces found" : "No workspaces yet"}
-              </p>
+              <p className="font-black text-lg text-black">No workspaces found</p>
               <p className="text-sm font-semibold text-gray-600 mt-1">
-                {search
-                  ? "Try a different search term"
-                  : "Create your first workspace to get started"}
+                Try a different search term
               </p>
             </div>
-            {!search && (
-              <button
-                onClick={() => setCreateOpen(true)}
-                className="flex items-center gap-2 rounded-xl border-[2.5px] border-black bg-[#6C47FF] px-5 py-2.5 text-sm font-black text-white shadow-[4px_4px_0px_#000] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] transition-all"
-              >
-                <Plus size={16} />
-                Create workspace
-              </button>
-            )}
           </div>
         ) : (
+          /* Workspace grid */
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {/* Create new card */}
             <button
@@ -244,7 +369,7 @@ export default function DashboardPage() {
               </div>
             </button>
 
-            {workspacesList?.map((ws) => (
+            {filtered.map((ws) => (
               <WorkspaceCard
                 key={ws.id}
                 workspace={ws}
@@ -254,24 +379,16 @@ export default function DashboardPage() {
           </div>
         )}
 
-        {/* Decorative symbols section to keep visual balance */}
-        <div className="mt-16 pt-8 border-t-[2px] border-black/10 flex items-center justify-center gap-12 overflow-hidden pointer-events-none select-none">
-          <span className="text-3xl text-[#6C47FF] opacity-40 font-black animate-pulse">
-            ✳
-          </span>
-          <span
-            className="text-4xl text-[#FFE14D] font-black"
-            style={{ WebkitTextStroke: "1.5px black" }}
-          >
-            ✦
-          </span>
-          <span className="text-2xl text-[#FF6B6B] opacity-50 font-black">
-            ✦
-          </span>
-          <span className="text-3xl text-[#00B87C] opacity-40 font-black">
-            ✳
-          </span>
-        </div>
+        {/* ── Bottom decorative strip ── */}
+        {filtered.length > 0 && (
+          <div className="mt-16 pt-8 border-t-[2px] border-black/10 flex items-center justify-center gap-10 overflow-hidden pointer-events-none select-none">
+            <span className="text-3xl text-[#6C47FF] opacity-30 font-black animate-pulse">✳</span>
+            <span className="text-4xl text-[#FFD166] font-black opacity-50" style={{ WebkitTextStroke: "1.5px black" }}>✦</span>
+            <span className="text-2xl text-[#FF6B6B] opacity-30 font-black">◆</span>
+            <span className="text-3xl text-[#00B87C] opacity-30 font-black animate-pulse">✳</span>
+            <span className="text-xl text-[#6C47FF] opacity-20 font-black">✦</span>
+          </div>
+        )}
       </main>
 
       <CreateWorkspaceDialog open={createOpen} onOpenChange={setCreateOpen} />
