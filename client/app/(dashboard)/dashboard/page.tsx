@@ -207,7 +207,6 @@ export default function DashboardPage() {
         }}
       />
 
-      {/* Floating symbols */}
       <FloatingSymbols />
 
       <AppNavbar />
