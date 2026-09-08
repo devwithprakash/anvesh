@@ -18,15 +18,31 @@ import type {
   ListSourcesQuery,
 } from "../validators/source.validator.js";
 import { getWorkspaceByIdForUser } from "./workspace.service.js";
+import {
+  getFreePlan,
+  getPlanById,
+  getSubscriptionByUserId,
+} from "../repositories/workspace.repository.js";
 
 async function assertWorkspaceAccess(workspaceId: string, userId: string) {
   await getWorkspaceByIdForUser(workspaceId, userId);
 }
 
 async function createAndProcessSource(
-  data: Parameters<typeof createSourceRecord>[0],
+  data: Parameters<typeof createSourceRecord>[1],
+  userId: string,
 ) {
-  const source = await createSourceRecord(data);
+  const subscription = await getSubscriptionByUserId(userId);
+
+  const plan = subscription
+    ? await getPlanById(subscription.planId)
+    : await getFreePlan();
+
+  if (!plan) {
+    throw new Error("Plan not found");
+  }
+
+  const source = await createSourceRecord(userId, data, plan.maxSourcesPerWorkspace);
 
   await enqueueSourceProcessing({
     sourceId: source.id,
@@ -89,13 +105,16 @@ export async function createTextOrMarkdownSource(
 ) {
   await getWorkspaceByIdForUser(workspaceId, userId);
 
-  return createAndProcessSource({
-    workspaceId,
-    type: input.type,
-    title: input.title,
-    content: input.content,
-    status: "PENDING",
-  });
+  return createAndProcessSource(
+    {
+      workspaceId,
+      type: input.type,
+      title: input.title,
+      content: input.content,
+      status: "PENDING",
+    },
+    userId,
+  );
 }
 
 export async function importWebisteSource(
@@ -107,16 +126,19 @@ export async function importWebisteSource(
 
   const scraped = await scrapeWebsite(input.url);
 
-  return createAndProcessSource({
-    workspaceId,
-    type: "WEBSITE",
-    title: input.title || scraped.title || input.url,
-    content: scraped.sourceUrl,
-    status: "PENDING",
-    metadata: {
-      importedFrom: scraped.sourceUrl,
+  return createAndProcessSource(
+    {
+      workspaceId,
+      type: "WEBSITE",
+      title: input.title || scraped.title || input.url,
+      content: scraped.sourceUrl,
+      status: "PENDING",
+      metadata: {
+        importedFrom: scraped.sourceUrl,
+      },
     },
-  });
+    userId,
+  );
 }
 
 export async function uploadPdfSource(
@@ -140,21 +162,24 @@ export async function uploadPdfSource(
     // Inngest will retry extraction from Cloudinary if upload-time parse fails.
   }
 
-  return createAndProcessSource({
-    workspaceId,
-    type: "PDF",
-    title: title?.trim() || file.originalname.replace(/\.pdf$/i, ""),
-    content,
-    status: "PENDING",
-    metadata: {
-      fileUrl: upload.secureUrl,
-      fileName: upload.originalFileName,
-      fileSize: upload.bytes,
-      publicId: upload.publicId,
-      resourceType: upload.resourceType,
-      pageCount,
+  return createAndProcessSource(
+    {
+      workspaceId,
+      type: "PDF",
+      title: title?.trim() || file.originalname.replace(/\.pdf$/i, ""),
+      content,
+      status: "PENDING",
+      metadata: {
+        fileUrl: upload.secureUrl,
+        fileName: upload.originalFileName,
+        fileSize: upload.bytes,
+        publicId: upload.publicId,
+        resourceType: upload.resourceType,
+        pageCount,
+      },
     },
-  });
+    userId,
+  );
 }
 
 export async function importWebsiteSource(
@@ -166,17 +191,20 @@ export async function importWebsiteSource(
 
   const scraped = await scrapeWebsite(input.url);
 
-  return createAndProcessSource({
-    workspaceId,
-    type: "WEBSITE",
-    title: input.title || scraped.title || input.url,
-    content: scraped.markdown,
-    url: scraped.sourceUrl,
-    status: "PENDING",
-    metadata: {
-      importedFrom: scraped.sourceUrl,
+  return createAndProcessSource(
+    {
+      workspaceId,
+      type: "WEBSITE",
+      title: input.title || scraped.title || input.url,
+      content: scraped.markdown,
+      url: scraped.sourceUrl,
+      status: "PENDING",
+      metadata: {
+        importedFrom: scraped.sourceUrl,
+      },
     },
-  });
+    userId,
+  );
 }
 
 export async function importYoutubeSource(
@@ -188,15 +216,18 @@ export async function importYoutubeSource(
 
   const transcript = await fetchYoutubeTranscript(input.url);
 
-  return createAndProcessSource({
-    workspaceId,
-    type: "YOUTUBE",
-    title: input.title || `YouTube: ${transcript.videoId}`,
-    content: transcript.content,
-    url: input.url,
-    status: "PENDING",
-    metadata: {
-      videoId: transcript.videoId,
+  return createAndProcessSource(
+    {
+      workspaceId,
+      type: "YOUTUBE",
+      title: input.title || `YouTube: ${transcript.videoId}`,
+      content: transcript.content,
+      url: input.url,
+      status: "PENDING",
+      metadata: {
+        videoId: transcript.videoId,
+      },
     },
-  });
+    userId,
+  );
 }

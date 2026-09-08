@@ -1,5 +1,6 @@
 import type { Prisma } from "../generated/prisma/client.js";
 import prisma from "../lib/db.js";
+import { AppError } from "../types/app-error.js";
 import { type ListSourcesQuery } from "../validators/source.validator.js";
 
 export const sourceSelect = {
@@ -29,21 +30,39 @@ export type SourceRecord = Prisma.SourceGetPayload<{
   select: typeof sourceSelect;
 }>;
 
-export function createSourceRecord(data: CreateSourceData) {
+export function createSourceRecord(
+  userId: string,
+  data: CreateSourceData,
+  maxSourcesPerWorkspace: number,
+) {
+  return prisma.$transaction(async (tx) => {
+    const sourceCount = await tx.source.count({
+      where: {
+        workspaceId: data.workspaceId,
+      },
+    });
 
-  return prisma.source.create({
-    data: {
-      workspaceId: data.workspaceId,
-      type: data.type,
-      title: data.title,
-      content: data.content ?? null,
-      url: data.url ?? null,
-      status: data.status ?? "PENDING",
-      ...(data.metadata !== undefined && {
-        metadata: data.metadata,
-      }),
-    },
-    select: sourceSelect,
+    if (sourceCount >= maxSourcesPerWorkspace) {
+      throw new AppError(
+        403,
+        `Maximum of ${maxSourcesPerWorkspace} sources allowed per workspace`,
+      );
+    }
+
+    return tx.source.create({
+      data: {
+        workspaceId: data.workspaceId,
+        type: data.type,
+        title: data.title,
+        content: data.content ?? null,
+        url: data.url ?? null,
+        status: data.status ?? "PENDING",
+        ...(data.metadata !== undefined && {
+          metadata: data.metadata,
+        }),
+      },
+      select: sourceSelect,
+    });
   });
 }
 

@@ -1,6 +1,7 @@
 import { deleteWorkspaceVectors } from "../lib/pinecone.js";
 import {
   createWorkspaceRecord,
+  createWorkspaceWithQuota,
   deleteWorkspaceRecord,
   findWorkspaceByIdAndUserId,
   findWorkspacesByUserId,
@@ -41,35 +42,19 @@ export async function createWorkspaceForUser(
 ) {
   const subscription = await getSubscriptionByUserId(userId);
 
-  let plan;
+  const plan = subscription
+    ? await getPlanById(subscription.planId)
+    : await getFreePlan();
 
-  if (subscription) {
-    plan = await getPlanById(subscription.planId);
 
-    if (!plan) {
-      throw new Error("Subscription plan not found");
-    }
-  } else {
-    plan = await getFreePlan();
-  }
   if (!plan) {
     throw new Error("Plan not found");
   }
 
-  const usageRecords = await getUageRecordByUserId(userId);
+  const result = await createWorkspaceWithQuota(userId, input, plan.maxWorkspaces);
 
-  if (!usageRecords) {
-    throw new Error("Usage record does not exist for user");
-  }
 
-  if (usageRecords.workspaces >= plan.maxWorkspaces) {
-    throw new Error("Maximum workspace limit reached");
-  }
-
-  const workspace = await createWorkspaceRecord(userId, input);
-
-  await updateUsageRecordByUserId(userId, "workspaces", "increment");
-  return workspace;
+  return result
 }
 
 export async function updateWorkspaceForUser(
@@ -93,5 +78,5 @@ export async function deleteWorkspaceForUser(
     console.error("Failed to delete Pinecone namespace:", error);
   }
 
-  await deleteWorkspaceRecord(workspaceId);
+  await deleteWorkspaceRecord(workspaceId, userId);
 }

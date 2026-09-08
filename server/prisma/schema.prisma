@@ -220,7 +220,7 @@ model Plan {
   name                  String
   price                 Int
   maxWorkspaces         Int
-  maxSourcesPerNotebook Int
+  maxSourcesPerWorkspace Int
   maxAiQueries          Int
   webSearchEnabled      Boolean  @default(false)
   createdAt             DateTime @default(now())
@@ -257,11 +257,15 @@ model Subscription {
 }
 
 model UsageRecords {
-  id         String   @id @default(cuid())
-  userId     String @unique
-  sources    Int
-  workspaces Int
-  AiQueries  Int
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id          String   @id @default(cuid())
+  userId      String
+  sources     Int
+  workspaces  Int
+  AiQueries   Int
+  periodStart DateTime
+  periodEnd   DateTime
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([userId, periodStart])
 }
