@@ -8,8 +8,6 @@ import {
   getFreePlan,
   getPlanById,
   getSubscriptionByUserId,
-  getUageRecordByUserId,
-  updateUsageRecordByUserId,
   updateWorkspaceRecord,
   type WorkspaceRecord,
 } from "../repositories/workspace.repository.js";
@@ -46,15 +44,17 @@ export async function createWorkspaceForUser(
     ? await getPlanById(subscription.planId)
     : await getFreePlan();
 
-
   if (!plan) {
     throw new Error("Plan not found");
   }
 
-  const result = await createWorkspaceWithQuota(userId, input, plan.maxWorkspaces);
+  const result = await createWorkspaceWithQuota(
+    userId,
+    input,
+    plan.maxWorkspaces,
+  );
 
-
-  return result
+  return result;
 }
 
 export async function updateWorkspaceForUser(

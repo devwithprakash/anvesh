@@ -1,3 +1,4 @@
+import type { Prisma } from "../generated/prisma/client.js";
 import prisma from "../lib/db.js";
 import { ConflictError, NotFoundError } from "../types/app-error.js";
 import type {
@@ -43,8 +44,10 @@ export function getSubscriptionByUserId(userId: string) {
 }
 
 export function getFreePlan() {
-  return prisma.plan.findFirst({
-    where: { name: "FREE" },
+  return prisma.plan.findUnique({
+    where: {
+      name: "FREE",
+    },
   });
 }
 
@@ -168,25 +171,55 @@ export async function deleteWorkspaceRecord(
   });
 }
 
-export async function updateUsageRecordByUserId(
+async function resetExpiredUsageIfNeeded(
+  tx: Prisma.TransactionClient,
   userId: string,
-  field: UsageField,
-  operation: UsageOperation,
-  amount = 1,
 ) {
   const now = new Date();
-  return prisma.usageRecords.update({
+
+  await tx.usageRecords.updateMany({
     where: {
-      userId_periodStart: {
-        userId,
-        periodStart: now,
+      userId,
+      periodEnd: {
+        lte: now,
       },
     },
     data: {
-      [field]: {
-        [operation]: amount,
-      },
+      AiQueries: 0,
+      periodStart: now,
+      periodEnd: addOneMonth(now),
     },
+  });
+}
+
+export async function updateAiQueryUsageRecord(
+  userId: string,
+  maxAiQueries: number,
+) {
+  return prisma.$transaction(async (tx) => {
+    await resetExpiredUsageIfNeeded(tx, userId);
+
+    const result = await tx.usageRecords.updateMany({
+      where: {
+        userId,
+        AiQueries: {
+          lt: maxAiQueries,
+        },
+      },
+      data: {
+        AiQueries: {
+          increment: 1,
+        },
+      },
+    });
+
+    if (result.count === 0) {
+      throw new ConflictError(
+        "Monthly AI query limit reached. Upgrade your plan.",
+      );
+    }
+
+    return result;
   });
 }
 
@@ -197,41 +230,27 @@ export async function createWorkspaceWithQuota(
 ) {
   return prisma.$transaction(async (tx) => {
     const now = new Date();
-    await tx.usageRecords.upsert({
-      where: {
-        userId_periodStart: {
-          userId,
-          periodStart: now,
-        },
-      },
-      create: {
-        userId,
-        workspaces: 0,
-        AiQueries: 0,
-        sources: 0,
-        periodStart: now,
-        periodEnd: addOneMonth(now),
-      },
-      update: {},
-    });
+    const periodStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    const periodEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
 
-    const result = await tx.usageRecords.updateMany({
-      where: {
-        userId,
-        workspaces: {
-          lt: maxWorkspaces,
-        },
-      },
-      data: {
+    const usageRecord = await tx.usageRecords.upsert({
+      where: { userId },
+      update: {
         workspaces: {
           increment: 1,
         },
       },
+      create: {
+        userId,
+        workspaces: 1,
+        periodStart,
+        periodEnd,
+      },
     });
 
-    if (result.count === 0) {
+    if (usageRecord.workspaces > maxWorkspaces) {
       throw new ConflictError(
-        "Maximum workspace limit reached upgrade your plan.",
+        "Maximum workspace limit reached. Upgrade your plan.",
       );
     }
 

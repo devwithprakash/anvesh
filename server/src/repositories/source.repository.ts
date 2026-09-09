@@ -31,7 +31,6 @@ export type SourceRecord = Prisma.SourceGetPayload<{
 }>;
 
 export function createSourceRecord(
-  userId: string,
   data: CreateSourceData,
   maxSourcesPerWorkspace: number,
 ) {

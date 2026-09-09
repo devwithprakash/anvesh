@@ -216,15 +216,15 @@ model LearningArtifact {
 }
 
 model Plan {
-  id                    String   @id @default(cuid())
-  name                  String
-  price                 Int
-  maxWorkspaces         Int
-  maxSourcesPerWorkspace Int
-  maxAiQueries          Int
-  webSearchEnabled      Boolean  @default(false)
-  createdAt             DateTime @default(now())
-  updatedAt             DateTime @updatedAt
+  id                     String   @id @default(cuid())
+  name                   String @unique
+  price                  Int
+  maxWorkspaces          Int @default(0)
+  maxSourcesPerWorkspace Int @default(0)
+  maxAiQueries           Int @default(0)
+  webSearchEnabled       Boolean  @default(false)
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
 
   subscription Subscription[]
 }
@@ -258,14 +258,11 @@ model Subscription {
 
 model UsageRecords {
   id          String   @id @default(cuid())
-  userId      String
-  sources     Int
-  workspaces  Int
-  AiQueries   Int
+  userId      String   @unique
+  workspaces  Int      @default(0)
+  AiQueries   Int      @default(0)
   periodStart DateTime
   periodEnd   DateTime
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-
-  @@unique([userId, periodStart])
 }

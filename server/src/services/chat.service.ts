@@ -49,6 +49,12 @@ import {
 } from "../utils/chat-message.js";
 import { getWorkspaceByIdForUser } from "./workspace.service.js";
 import { addMemoriesFromMessages, searchUserMemories } from "../lib/mem0.js";
+import {
+  getFreePlan,
+  getPlanById,
+  getSubscriptionByUserId,
+  updateAiQueryUsageRecord,
+} from "../repositories/workspace.repository.js";
 
 export async function listConversationsForWorkspace(
   workspaceId: string,
@@ -63,6 +69,7 @@ export async function createConversationForWorkspace(
   userId: string,
   title?: string,
 ) {
+  console.log("Inside the create conversation")
   await getWorkspaceByIdForUser(workspaceId, userId);
   return createConversationRecord(workspaceId, title);
 }
@@ -160,6 +167,18 @@ export async function streamWorkspaceChat(
     webSearch?: boolean;
   },
 ) {
+  const subscription = await getSubscriptionByUserId(userId);
+
+  const plan = subscription
+    ? await getPlanById(subscription.planId)
+    : await getFreePlan();
+
+  if (!plan) {
+    throw new Error("Plan not found");
+  }
+
+  await updateAiQueryUsageRecord(userId, plan.maxAiQueries);
+
   const workspace = await getWorkspaceByIdForUser(workspaceId, userId);
   const requestedModel = input.model ?? workspace.defaultModel;
   const chatModel =

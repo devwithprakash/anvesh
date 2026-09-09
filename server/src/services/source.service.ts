@@ -29,7 +29,7 @@ async function assertWorkspaceAccess(workspaceId: string, userId: string) {
 }
 
 async function createAndProcessSource(
-  data: Parameters<typeof createSourceRecord>[1],
+  data: Parameters<typeof createSourceRecord>[0],
   userId: string,
 ) {
   const subscription = await getSubscriptionByUserId(userId);
@@ -42,7 +42,7 @@ async function createAndProcessSource(
     throw new Error("Plan not found");
   }
 
-  const source = await createSourceRecord(userId, data, plan.maxSourcesPerWorkspace);
+  const source = await createSourceRecord(data, plan.maxSourcesPerWorkspace);
 
   await enqueueSourceProcessing({
     sourceId: source.id,
