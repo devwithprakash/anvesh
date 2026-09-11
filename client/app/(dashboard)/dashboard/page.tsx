@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { formatDistanceToNow } from "date-fns";
 import {
@@ -26,14 +26,78 @@ import { useConversations } from "@/features/conversation/queries";
 // ─── Floating decorative symbols ─────────────────────────────────────────────
 
 const FLOATERS = [
-  { symbol: "✦", color: "#6C47FF", size: "text-4xl", top: "8%",  left: "3%",  delay: "0s",   dur: "6s"  },
-  { symbol: "✳", color: "#FFD166", size: "text-3xl", top: "15%", left: "88%", delay: "1s",   dur: "8s"  },
-  { symbol: "◆", color: "#FF6B6B", size: "text-2xl", top: "38%", left: "95%", delay: "2s",   dur: "7s"  },
-  { symbol: "✦", color: "#00B87C", size: "text-3xl", top: "62%", left: "2%",  delay: "0.5s", dur: "9s"  },
-  { symbol: "✳", color: "#6C47FF", size: "text-2xl", top: "78%", left: "91%", delay: "3s",   dur: "6.5s"},
-  { symbol: "◆", color: "#FFD166", size: "text-4xl", top: "88%", left: "7%",  delay: "1.5s", dur: "8.5s"},
-  { symbol: "✦", color: "#FF6B6B", size: "text-xl",  top: "25%", left: "6%",  delay: "2.5s", dur: "7.5s"},
-  { symbol: "✳", color: "#00B87C", size: "text-2xl", top: "50%", left: "93%", delay: "4s",   dur: "6s"  },
+  {
+    symbol: "✦",
+    color: "#6C47FF",
+    size: "text-4xl",
+    top: "8%",
+    left: "3%",
+    delay: "0s",
+    dur: "6s",
+  },
+  {
+    symbol: "✳",
+    color: "#FFD166",
+    size: "text-3xl",
+    top: "15%",
+    left: "88%",
+    delay: "1s",
+    dur: "8s",
+  },
+  {
+    symbol: "◆",
+    color: "#FF6B6B",
+    size: "text-2xl",
+    top: "38%",
+    left: "95%",
+    delay: "2s",
+    dur: "7s",
+  },
+  {
+    symbol: "✦",
+    color: "#00B87C",
+    size: "text-3xl",
+    top: "62%",
+    left: "2%",
+    delay: "0.5s",
+    dur: "9s",
+  },
+  {
+    symbol: "✳",
+    color: "#6C47FF",
+    size: "text-2xl",
+    top: "78%",
+    left: "91%",
+    delay: "3s",
+    dur: "6.5s",
+  },
+  {
+    symbol: "◆",
+    color: "#FFD166",
+    size: "text-4xl",
+    top: "88%",
+    left: "7%",
+    delay: "1.5s",
+    dur: "8.5s",
+  },
+  {
+    symbol: "✦",
+    color: "#FF6B6B",
+    size: "text-xl",
+    top: "25%",
+    left: "6%",
+    delay: "2.5s",
+    dur: "7.5s",
+  },
+  {
+    symbol: "✳",
+    color: "#00B87C",
+    size: "text-2xl",
+    top: "50%",
+    left: "93%",
+    delay: "4s",
+    dur: "6s",
+  },
 ];
 
 function FloatingSymbols() {
@@ -76,6 +140,20 @@ function WorkspaceCard({
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
 
+  useEffect(() => {
+    if (!menuOpen) return;
+
+    const handleClickOutside = () => {
+      setMenuOpen(false);
+    };
+
+    document.addEventListener("click", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, [menuOpen]);
+
   const { data: sources } = useSources(workspace.id);
   const { data: conversations } = useConversations(workspace.id);
 
@@ -109,38 +187,35 @@ function WorkspaceCard({
             >
               <MoreHorizontal size={14} />
             </button>
+
             {menuOpen && (
-              <>
-                <div
-                  className="fixed inset-0 z-10"
-                  onClick={() => setMenuOpen(false)}
-                />
-                <div className="absolute right-0 top-full mt-1 z-20 w-36 rounded-xl border-[2px] border-black bg-white shadow-[3px_3px_0px_#000] overflow-hidden">
-                  <div className="p-1">
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setMenuOpen(false);
-                        router.push(`/workspace/${workspace.id}`);
-                      }}
-                      className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs font-bold hover:bg-gray-100 transition-colors"
-                    >
-                      Open
-                    </button>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setMenuOpen(false);
-                        onDelete(workspace.id);
-                      }}
-                      className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs font-bold text-[#FF6B6B] hover:bg-[#FFF0F0] transition-colors"
-                    >
-                      <Trash2 size={12} />
-                      Delete
-                    </button>
-                  </div>
+              <div
+                onClick={(e) => e.stopPropagation()}
+                className="absolute right-0 top-full mt-1 z-20 w-36 rounded-xl border-[2px] border-black bg-white shadow-[3px_3px_0px_#000] overflow-hidden"
+              >
+                <div className="p-1">
+                  <button
+                    onClick={() => {
+                      setMenuOpen(false);
+                      router.push(`/workspace/${workspace.id}`);
+                    }}
+                    className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs font-bold hover:bg-gray-100 transition-colors"
+                  >
+                    Open
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setMenuOpen(false);
+                      onDelete(workspace.id);
+                    }}
+                    className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs font-bold text-[#FF6B6B] hover:bg-[#FFF0F0] transition-colors"
+                  >
+                    <Trash2 size={12} />
+                    Delete
+                  </button>
                 </div>
-              </>
+              </div>
             )}
           </div>
         </div>
@@ -213,13 +288,14 @@ export default function DashboardPage() {
       <AppNavbar />
 
       <main className="relative z-10 flex-1 mx-auto w-full max-w-5xl px-6 py-10">
-
         {/* ── Hero header ── */}
         <div className="mb-8 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
           <div>
             <div className="inline-flex items-center gap-2 rounded-full border-[2px] border-black bg-[#EDE9FE] px-3 py-1 mb-3 shadow-[2px_2px_0px_#000]">
               <Sparkles size={12} className="text-[#6C47FF]" />
-              <span className="text-[11px] font-black text-[#6C47FF] uppercase tracking-wider">Your workspace</span>
+              <span className="text-[11px] font-black text-[#6C47FF] uppercase tracking-wider">
+                Your workspace
+              </span>
             </div>
             <h1 className="font-black text-4xl text-black tracking-tight leading-tight">
               My Workspaces
@@ -233,8 +309,12 @@ export default function DashboardPage() {
           <div className="flex items-center gap-2 shrink-0">
             <div className="flex items-center gap-1.5 rounded-xl border-[2px] border-black bg-white px-3 py-2 shadow-[2px_2px_0px_#000]">
               <BookOpen size={13} className="text-[#6C47FF]" />
-              <span className="text-sm font-black text-black">{totalCount}</span>
-              <span className="text-xs font-semibold text-gray-500">workspace{totalCount !== 1 ? "s" : ""}</span>
+              <span className="text-sm font-black text-black">
+                {totalCount}
+              </span>
+              <span className="text-xs font-semibold text-gray-500">
+                workspace{totalCount !== 1 ? "s" : ""}
+              </span>
             </div>
           </div>
         </div>
@@ -290,7 +370,8 @@ export default function DashboardPage() {
                     Create your first workspace
                   </p>
                   <p className="text-sm font-semibold text-gray-600 leading-relaxed">
-                    A workspace holds your sources, conversations and AI insights — all in one place.
+                    A workspace holds your sources, conversations and AI
+                    insights — all in one place.
                   </p>
                 </div>
 
@@ -324,9 +405,27 @@ export default function DashboardPage() {
             {/* Decorative "what you can do" row below */}
             <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
               {[
-                { color: "#EDE9FE", border: "#6C47FF", icon: "📚", title: "Add Sources", desc: "PDFs, websites, YouTube — bring all your knowledge together." },
-                { color: "#FFF9E6", border: "#FFD166", icon: "🤖", title: "Chat with AI", desc: "Ask questions and get cited answers grounded in your sources." },
-                { color: "#F0FFF8", border: "#00B87C", icon: "✨", title: "Stay Organised", desc: "Multiple workspaces keep topics and projects neatly separated." },
+                {
+                  color: "#EDE9FE",
+                  border: "#6C47FF",
+                  icon: "📚",
+                  title: "Add Sources",
+                  desc: "PDFs, websites, YouTube — bring all your knowledge together.",
+                },
+                {
+                  color: "#FFF9E6",
+                  border: "#FFD166",
+                  icon: "🤖",
+                  title: "Chat with AI",
+                  desc: "Ask questions and get cited answers grounded in your sources.",
+                },
+                {
+                  color: "#F0FFF8",
+                  border: "#00B87C",
+                  icon: "✨",
+                  title: "Stay Organised",
+                  desc: "Multiple workspaces keep topics and projects neatly separated.",
+                },
               ].map((item) => (
                 <div
                   key={item.title}
@@ -334,8 +433,12 @@ export default function DashboardPage() {
                   style={{ backgroundColor: item.color }}
                 >
                   <div className="text-2xl mb-2">{item.icon}</div>
-                  <p className="font-black text-sm text-black mb-1">{item.title}</p>
-                  <p className="text-xs font-semibold text-gray-600 leading-relaxed">{item.desc}</p>
+                  <p className="font-black text-sm text-black mb-1">
+                    {item.title}
+                  </p>
+                  <p className="text-xs font-semibold text-gray-600 leading-relaxed">
+                    {item.desc}
+                  </p>
                 </div>
               ))}
             </div>
@@ -347,7 +450,9 @@ export default function DashboardPage() {
               <Search size={24} className="text-black" />
             </div>
             <div>
-              <p className="font-black text-lg text-black">No workspaces found</p>
+              <p className="font-black text-lg text-black">
+                No workspaces found
+              </p>
               <p className="text-sm font-semibold text-gray-600 mt-1">
                 Try a different search term
               </p>
@@ -385,11 +490,24 @@ export default function DashboardPage() {
         {/* ── Bottom decorative strip ── */}
         {filtered.length > 0 && (
           <div className="mt-16 pt-8 border-t-[2px] border-black/10 flex items-center justify-center gap-10 overflow-hidden pointer-events-none select-none">
-            <span className="text-3xl text-[#6C47FF] opacity-30 font-black animate-pulse">✳</span>
-            <span className="text-4xl text-[#FFD166] font-black opacity-50" style={{ WebkitTextStroke: "1.5px black" }}>✦</span>
-            <span className="text-2xl text-[#FF6B6B] opacity-30 font-black">◆</span>
-            <span className="text-3xl text-[#00B87C] opacity-30 font-black animate-pulse">✳</span>
-            <span className="text-xl text-[#6C47FF] opacity-20 font-black">✦</span>
+            <span className="text-3xl text-[#6C47FF] opacity-30 font-black animate-pulse">
+              ✳
+            </span>
+            <span
+              className="text-4xl text-[#FFD166] font-black opacity-50"
+              style={{ WebkitTextStroke: "1.5px black" }}
+            >
+              ✦
+            </span>
+            <span className="text-2xl text-[#FF6B6B] opacity-30 font-black">
+              ◆
+            </span>
+            <span className="text-3xl text-[#00B87C] opacity-30 font-black animate-pulse">
+              ✳
+            </span>
+            <span className="text-xl text-[#6C47FF] opacity-20 font-black">
+              ✦
+            </span>
           </div>
         )}
       </main>

@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { Check, ArrowRight, Zap, Crown, Star } from "lucide-react";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 const plans = [
   {
@@ -85,19 +85,11 @@ const cardVariants = {
 };
 
 export default function PricingSection() {
-  const router = useRouter();
-
-  const handleCtaClick = (planKey: string) => {
-    if (planKey === "FREE") {
-      router.push("/signup");
-    } else {
-      // Redirect to signup — once logged in, users can upgrade from the dashboard
-      router.push("/signup");
-    }
-  };
-
   return (
-    <section id="pricing" className="bg-[#FFFBF0] py-20 border-t-[3px] border-black">
+    <section
+      id="pricing"
+      className="bg-[#FFFBF0] py-20 border-t-[3px] border-black"
+    >
       <div className="max-w-6xl mx-auto px-6">
         {/* Heading */}
         <motion.div
@@ -114,7 +106,8 @@ export default function PricingSection() {
             Simple, honest pricing.
           </h2>
           <p className="text-gray-600 font-semibold text-base max-w-md mx-auto">
-            Start free. Upgrade when you need more. Cancel anytime — no questions asked.
+            Start free. Upgrade when you need more. Cancel anytime — no
+            questions asked.
           </p>
         </motion.div>
 
@@ -123,10 +116,18 @@ export default function PricingSection() {
           {plans.map((plan, i) => {
             const isPopular = plan.popular;
             const textColor = isPopular ? "text-white" : "text-black";
-            const subTextColor = isPopular ? "text-purple-200" : "text-gray-500";
-            const featureTextColor = isPopular ? "text-purple-100" : "text-gray-700";
-            const checkBg = isPopular ? "bg-white/20 text-white" : "bg-[#C4F0D8] text-black";
-            const dividerColor = isPopular ? "border-purple-400" : "border-black";
+            const subTextColor = isPopular
+              ? "text-purple-200"
+              : "text-gray-500";
+            const featureTextColor = isPopular
+              ? "text-purple-100"
+              : "text-gray-700";
+            const checkBg = isPopular
+              ? "bg-white/20 text-white"
+              : "bg-[#C4F0D8] text-black";
+            const dividerColor = isPopular
+              ? "border-purple-400"
+              : "border-black";
 
             return (
               <motion.div
@@ -148,19 +149,33 @@ export default function PricingSection() {
 
                 {/* Icon + Name */}
                 <div className="flex items-center gap-3 mb-5">
-                  <span className={`inline-flex items-center justify-center w-10 h-10 rounded-xl border-[2px] border-black ${plan.iconBg} ${isPopular ? "text-white" : "text-black"} shadow-[2px_2px_0px_#000]`}>
+                  <span
+                    className={`inline-flex items-center justify-center w-10 h-10 rounded-xl border-[2px] border-black ${plan.iconBg} ${isPopular ? "text-white" : "text-black"} shadow-[2px_2px_0px_#000]`}
+                  >
                     {plan.icon}
                   </span>
-                  <span className={`text-xl font-black ${textColor}`}>{plan.name}</span>
+                  <span className={`text-xl font-black ${textColor}`}>
+                    {plan.name}
+                  </span>
                 </div>
 
                 {/* Price */}
                 <div className="mb-2">
-                  <span className={`text-5xl font-black ${textColor} tracking-tight`}>{plan.price}</span>
-                  <span className={`text-sm font-bold ml-2 ${subTextColor}`}>/ {plan.period}</span>
+                  <span
+                    className={`text-5xl font-black ${textColor} tracking-tight`}
+                  >
+                    {plan.price}
+                  </span>
+                  <span className={`text-sm font-bold ml-2 ${subTextColor}`}>
+                    / {plan.period}
+                  </span>
                 </div>
 
-                <p className={`text-sm font-semibold ${subTextColor} mb-6 leading-relaxed`}>{plan.desc}</p>
+                <p
+                  className={`text-sm font-semibold ${subTextColor} mb-6 leading-relaxed`}
+                >
+                  {plan.desc}
+                </p>
 
                 {/* Divider */}
                 <div className={`border-t-[2px] ${dividerColor} mb-6`} />
@@ -169,22 +184,28 @@ export default function PricingSection() {
                 <ul className="space-y-3 flex-1 mb-8">
                   {plan.features.map((feat) => (
                     <li key={feat} className="flex items-start gap-2.5">
-                      <span className={`inline-flex items-center justify-center w-5 h-5 rounded-full border-[2px] border-black shrink-0 mt-0.5 ${checkBg}`}>
+                      <span
+                        className={`inline-flex items-center justify-center w-5 h-5 rounded-full border-[2px] border-black shrink-0 mt-0.5 ${checkBg}`}
+                      >
                         <Check size={10} />
                       </span>
-                      <span className={`text-sm font-semibold ${featureTextColor}`}>{feat}</span>
+                      <span
+                        className={`text-sm font-semibold ${featureTextColor}`}
+                      >
+                        {feat}
+                      </span>
                     </li>
                   ))}
                 </ul>
 
                 {/* CTA */}
-                <button
-                  onClick={() => handleCtaClick(plan.planKey)}
+                <Link
+                  href={"/pricing"}
                   className={`flex items-center justify-center gap-2 w-full py-3 rounded-xl border-[2.5px] border-black ${plan.ctaBg} ${plan.ctaText} font-black text-sm shadow-[4px_4px_0px_#000] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] transition-all`}
                 >
                   {plan.cta}
                   <ArrowRight size={15} />
-                </button>
+                </Link>
               </motion.div>
             );
           })}
@@ -198,7 +219,11 @@ export default function PricingSection() {
           transition={{ duration: 0.5, delay: 0.4 }}
           className="text-center text-sm font-bold text-gray-500 mt-10"
         >
-          All paid plans include a <span className="text-black underline decoration-[#FFE14D] decoration-2 underline-offset-2">14-day free trial</span>. No credit card required to start.
+          All paid plans include a{" "}
+          <span className="text-black underline decoration-[#FFE14D] decoration-2 underline-offset-2">
+            14-day free trial
+          </span>
+          . No credit card required to start.
         </motion.p>
       </div>
     </section>
