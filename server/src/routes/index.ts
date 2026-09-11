@@ -3,6 +3,7 @@ import workspaceRoutes from "./workspace.routes.js";
 import { sourceRoutes } from "./source.routes.js";
 import { chatRoutes, conversationRoutes } from "./chat.routes.js";
 import { memoryRoutes } from "./memory.routes.js";
+import { subscriptionRoutes } from "./subscription.routes.js";
 
 export function registerRoutes(app: Express): void {
   workspaceRoutes.use("/:workspaceId/sources", sourceRoutes);
@@ -10,4 +11,6 @@ export function registerRoutes(app: Express): void {
   workspaceRoutes.use("/:workspaceId/chat", chatRoutes);
   app.use("/api/workspaces", workspaceRoutes);
   app.use("/api/memory", memoryRoutes);
+  app.use("/api/subscription", subscriptionRoutes);
 }
+

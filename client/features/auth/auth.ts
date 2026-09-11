@@ -1,10 +1,13 @@
 import { authClient } from "@/lib/auth-client";
 import { SignIn, SignUp } from "./types";
 
+
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+
 export async function forgotPassword(email: string) {
   return authClient.requestPasswordReset({
     email,
-    redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/reset-password`,
+    redirectTo: `${APP_URL}/reset-password`,
   });
 }
 
@@ -18,7 +21,7 @@ export async function resetPassword(newPassword: string, token: string) {
 export async function sendVerificationEmail(email: string) {
   return authClient.sendVerificationEmail({
     email,
-    callbackURL: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`,
+    callbackURL: `${APP_URL}/dashboard`,
   });
 }
 
@@ -26,7 +29,7 @@ export async function signIn(data: SignIn) {
   return authClient.signIn.email({
     email: data.email,
     password: data.password,
-    callbackURL: "/dashboard",
+    callbackURL: `${APP_URL}/dashboard`,
   });
 }
 
@@ -35,7 +38,7 @@ export async function signUp(data: SignUp) {
     name: data.name,
     email: data.email,
     password: data.password,
-    callbackURL: "/dashboard",
+    callbackURL: `${APP_URL}/dashboard`,
   });
 }
 

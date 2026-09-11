@@ -117,29 +117,6 @@ export async function createTextOrMarkdownSource(
   );
 }
 
-export async function importWebisteSource(
-  workspaceId: string,
-  userId: string,
-  input: ImportWebsiteInput,
-) {
-  await getWorkspaceByIdForUser(workspaceId, userId);
-
-  const scraped = await scrapeWebsite(input.url);
-
-  return createAndProcessSource(
-    {
-      workspaceId,
-      type: "WEBSITE",
-      title: input.title || scraped.title || input.url,
-      content: scraped.sourceUrl,
-      status: "PENDING",
-      metadata: {
-        importedFrom: scraped.sourceUrl,
-      },
-    },
-    userId,
-  );
-}
 
 export async function uploadPdfSource(
   workspaceId: string,

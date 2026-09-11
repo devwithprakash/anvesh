@@ -1,12 +1,14 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Check, ArrowRight, Zap, Users, Star } from "lucide-react";
+import { Check, ArrowRight, Zap, Crown, Star } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 const plans = [
   {
     name: "Free",
-    price: "$0",
+    planKey: "FREE",
+    price: "₹0",
     period: "forever",
     desc: "Perfect for getting started and exploring your first notebooks.",
     icon: <Star size={22} />,
@@ -17,8 +19,8 @@ const plans = [
     ctaText: "text-black",
     popular: false,
     features: [
-      "3 notebooks",
-      "Up to 10 sources per notebook",
+      "3 workspaces",
+      "Up to 10 sources per workspace",
       "50 AI queries / month",
       "PDF & document upload",
       "Basic citations",
@@ -27,46 +29,48 @@ const plans = [
   },
   {
     name: "Pro",
-    price: "$12",
+    planKey: "PRO",
+    price: "₹299",
     period: "per month",
-    desc: "For power users who want unlimited access and advanced features.",
+    desc: "For power users who want more workspaces, queries and web search.",
     icon: <Zap size={22} />,
     iconBg: "bg-[#6C47FF]",
     cardBg: "bg-[#6C47FF]",
-    cta: "Start Pro trial",
+    cta: "Upgrade to Pro",
     ctaBg: "bg-[#FFE14D]",
     ctaText: "text-black",
     popular: true,
     features: [
-      "Unlimited notebooks",
-      "Unlimited sources",
-      "Unlimited AI queries",
-      "Web page & link sources",
+      "20 workspaces",
+      "Up to 50 sources per workspace",
+      "500 AI queries / month",
+      "Web search powered answers",
       "Advanced citations + export",
       "Priority support",
       "Early access to new features",
     ],
   },
   {
-    name: "Team",
-    price: "$38",
+    name: "Premium",
+    planKey: "PREMIUM",
+    price: "₹499",
     period: "per month",
-    desc: "For teams that need shared workspaces, admin controls and more.",
-    icon: <Users size={22} />,
+    desc: "For teams and power researchers who need maximum capacity.",
+    icon: <Crown size={22} />,
     iconBg: "bg-[#C4F0D8]",
     cardBg: "bg-white",
-    cta: "Talk to us",
+    cta: "Go Premium",
     ctaBg: "bg-black",
     ctaText: "text-white",
     popular: false,
     features: [
-      "Everything in Pro",
-      "Up to 20 team members",
-      "Shared workspaces",
-      "Admin dashboard",
-      "SSO & audit logs",
-      "Dedicated onboarding",
-      "SLA & enterprise support",
+      "50 workspaces",
+      "Up to 100 sources per workspace",
+      "1,000 AI queries / month",
+      "Web search powered answers",
+      "Advanced citations + export",
+      "Priority support",
+      "Early access to new features",
     ],
   },
 ];
@@ -81,6 +85,17 @@ const cardVariants = {
 };
 
 export default function PricingSection() {
+  const router = useRouter();
+
+  const handleCtaClick = (planKey: string) => {
+    if (planKey === "FREE") {
+      router.push("/signup");
+    } else {
+      // Redirect to signup — once logged in, users can upgrade from the dashboard
+      router.push("/signup");
+    }
+  };
+
   return (
     <section id="pricing" className="bg-[#FFFBF0] py-20 border-t-[3px] border-black">
       <div className="max-w-6xl mx-auto px-6">
@@ -163,13 +178,13 @@ export default function PricingSection() {
                 </ul>
 
                 {/* CTA */}
-                <a
-                  href="#start"
+                <button
+                  onClick={() => handleCtaClick(plan.planKey)}
                   className={`flex items-center justify-center gap-2 w-full py-3 rounded-xl border-[2.5px] border-black ${plan.ctaBg} ${plan.ctaText} font-black text-sm shadow-[4px_4px_0px_#000] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] transition-all`}
                 >
                   {plan.cta}
                   <ArrowRight size={15} />
-                </a>
+                </button>
               </motion.div>
             );
           })}
@@ -183,7 +198,7 @@ export default function PricingSection() {
           transition={{ duration: 0.5, delay: 0.4 }}
           className="text-center text-sm font-bold text-gray-500 mt-10"
         >
-          All plans include a <span className="text-black underline decoration-[#FFE14D] decoration-2 underline-offset-2">14-day free trial</span>. No credit card required.
+          All paid plans include a <span className="text-black underline decoration-[#FFE14D] decoration-2 underline-offset-2">14-day free trial</span>. No credit card required to start.
         </motion.p>
       </div>
     </section>

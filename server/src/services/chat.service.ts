@@ -69,7 +69,6 @@ export async function createConversationForWorkspace(
   userId: string,
   title?: string,
 ) {
-  console.log("Inside the create conversation")
   await getWorkspaceByIdForUser(workspaceId, userId);
   return createConversationRecord(workspaceId, title);
 }
@@ -184,7 +183,9 @@ export async function streamWorkspaceChat(
   const chatModel =
     CHAT_MODELS.find((model) => model === requestedModel) ?? CHAT_MODEL;
   const webSearchEnabled =
-    input.webSearch === true && !!process.env.TAVILY_API_KEY?.trim();
+    input.webSearch === true &&
+    plan.webSearchEnabled === true &&
+    !!process.env.TAVILY_API_KEY?.trim();
 
   const userText = getLastUserMessageText(input.messages);
 

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { ChevronDown, LogOut, Settings, Plus } from "lucide-react";
 import { useAppState } from "@/components/providers/app-provider";
 import { CreateWorkspaceDialog } from "@/components/workspace/create-workspace-dialog";
+import { PlanBadge } from "@/components/workspace/plan-banner";
 import { authClient } from "@/lib/auth-client";
 import { signOut } from "@/features/auth/auth";
 
@@ -112,7 +113,9 @@ export function AppNavbar({ activeWorkspaceId }: AppNavbarProps) {
           )}
 
           {/* User menu — right */}
-          <div className="relative shrink-0">
+          <div className="flex items-center gap-2 shrink-0">
+            <PlanBadge />
+            <div className="relative">
             <button
               onClick={() => setUserOpen((v) => !v)}
               className="flex items-center gap-2 px-3 py-1.5 rounded-lg border-[2px] border-black bg-white font-bold text-sm text-black shadow-[2px_2px_0px_#000] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
@@ -147,6 +150,7 @@ export function AppNavbar({ activeWorkspaceId }: AppNavbarProps) {
                 </div>
               </>
             )}
+          </div>
           </div>
         </div>
       </nav>

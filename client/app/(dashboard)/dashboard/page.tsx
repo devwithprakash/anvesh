@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -16,6 +16,7 @@ import {
 import { useAppState } from "@/components/providers/app-provider";
 import { AppNavbar } from "@/components/workspace/app-navbar";
 import { CreateWorkspaceDialog } from "@/components/workspace/create-workspace-dialog";
+import { PlanBanner } from "@/components/workspace/plan-banner";
 import { type Workspace } from "@/lib/mock-data";
 import { useWorkspaces } from "@/features/workspace/queries";
 import { useDeleteWorkspace } from "@/features/workspace/mutations";
@@ -237,6 +238,9 @@ export default function DashboardPage() {
             </div>
           </div>
         </div>
+
+        {/* ── Plan & Usage Banner ── */}
+        <PlanBanner />
 
         {/* ── Toolbar ── */}
         <div className="mb-6 flex items-center gap-3">

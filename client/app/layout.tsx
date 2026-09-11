@@ -8,6 +8,7 @@ import {
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { QueryProvider } from "@/components/providers/query-provider";
+import Script from "next/script";
 
 const sourceSans3Heading = Source_Sans_3({
   subsets: ["latin"],
@@ -49,7 +50,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       )}
     >
       <QueryProvider>
-        <body className="min-h-full flex flex-col">{children}</body>
+        <body className="min-h-full flex flex-col">
+          <Script
+            src="https://checkout.razorpay.com/v1/checkout.js"
+            strategy="lazyOnload"
+          />
+          {children}
+        </body>
       </QueryProvider>
     </html>
   );

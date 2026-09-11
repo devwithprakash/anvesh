@@ -22,6 +22,7 @@ import { useAppState } from "@/components/providers/app-provider";
 import { Citation, AVAILABLE_MODELS } from "@/lib/mock-data";
 import { useMessages } from "@/features/conversation/queries";
 import { useSources } from "@/features/source/queries";
+import { useSubscriptionStatus } from "@/features/subscription/queries";
 
 // ─── Citation chip ────────────────────────────────────────────────────────────
 
@@ -241,6 +242,8 @@ function ChatInner({
 }: ChatInnerProps) {
   const { conversations,  } = useAppState();
   const {data: sources} = useSources(workspaceId)
+  const { data: subStatus } = useSubscriptionStatus();
+  const webSearchAllowed = subStatus?.plan?.webSearchEnabled ?? false;
 
   const [input, setInput] = useState("");
   const [model, setModel] = useState<ChatModel>("gpt-4o-mini");
@@ -343,12 +346,16 @@ function ChatInner({
           {/* Grouped controls — web search + model selector */}
           <div className="flex items-center rounded-full border-[2px] border-black bg-white shadow-[2px_2px_0px_#000] overflow-hidden">
             <button
-              onClick={() => setWebSearch((v) => !v)}
+              onClick={() => webSearchAllowed && setWebSearch((v) => !v)}
+              disabled={!webSearchAllowed}
+              title={!webSearchAllowed ? "Upgrade to Pro to use Web Search" : webSearch ? "Disable web search" : "Enable web search"}
               className={cn(
                 "flex items-center gap-1 px-2.5 py-1 text-[11px] font-black border-r-[2px] border-black transition-colors",
-                webSearch
-                  ? "bg-[#6C47FF] text-white"
-                  : "text-black hover:bg-gray-50",
+                !webSearchAllowed
+                  ? "text-gray-400 cursor-not-allowed bg-gray-50"
+                  : webSearch
+                    ? "bg-[#6C47FF] text-white"
+                    : "text-black hover:bg-gray-50",
               )}
             >
               <Search size={10} />

@@ -5,6 +5,8 @@ import { motion } from "framer-motion";
 import { Eye, EyeOff, ArrowRight, Mail, Lock, User } from "lucide-react";
 import Link from "next/link";
 import { signUp } from "@/features/auth/auth";
+import {useRouter} from "next/navigation"
+
 
 const fadeUp = (delay = 0) => ({
   initial: { opacity: 0, y: 24 },
@@ -31,6 +33,7 @@ export default function SignUpPage() {
     email: "",
     password: "",
   });
+  const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,8 +41,8 @@ export default function SignUpPage() {
 
     try {
       const response = await signUp(form);
-
-      console.log("Signup response: ", response)
+      router.push(`/verify-email?email=${encodeURIComponent(form.email)}`);
+      console.log("Signup response: ", response);
     } catch (error) {
       console.error(error);
     } finally {

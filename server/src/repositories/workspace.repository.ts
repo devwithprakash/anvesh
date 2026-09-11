@@ -26,28 +26,23 @@ export type WorkspaceRecord = {
   updatedAt: Date;
 };
 
-type UsageField = "workspaces" | "sources" | "aiQueries";
-type UsageOperation = "increment" | "decrement";
-
 function addOneMonth(presentDate: Date): Date {
   const newDate = new Date(presentDate.getTime());
-
   newDate.setMonth(newDate.getMonth() + 1);
-
   return newDate;
 }
 
+// ── Subscription / Plan helpers ──────────────────────────────────────────────
+
 export function getSubscriptionByUserId(userId: string) {
   return prisma.subscription.findFirst({
-    where: { userId },
+    where: { userId, status: "ACTIVE" },
   });
 }
 
 export function getFreePlan() {
   return prisma.plan.findUnique({
-    where: {
-      name: "FREE",
-    },
+    where: { name: "FREE" },
   });
 }
 
@@ -56,11 +51,14 @@ export function getPlanById(planId: string) {
     where: { id: planId },
   });
 }
-export function getUageRecordByUserId(userId: string) {
+
+export function getUsageRecordByUserId(userId: string) {
   return prisma.usageRecords.findFirst({
     where: { userId },
   });
 }
+
+// ── Workspace CRUD ───────────────────────────────────────────────────────────
 
 export function findWorkspacesByUserId(userId: string) {
   return prisma.workspace.findMany({
@@ -122,52 +120,53 @@ export async function deleteWorkspaceRecord(
   workspaceId: string,
   userId: string,
 ) {
-  const now = new Date();
-
   return prisma.$transaction(async (tx) => {
     const workspace = await tx.workspace.findFirst({
-      where: {
-        id: workspaceId,
-        userId,
-      },
+      where: { id: workspaceId, userId },
     });
 
     if (!workspace) {
       throw new NotFoundError("Workspace not found");
     }
 
-    const usage = await tx.usageRecords.findFirst({
-      where: {
-        userId,
-        periodStart: {
-          lte: now,
-        },
-        periodEnd: {
-          gt: now,
-        },
-      },
-    });
-
-    if (!usage) {
-      throw new NotFoundError("Active usage record not found");
-    }
-
     await tx.workspace.delete({
-      where: {
-        id: workspaceId,
-      },
+      where: { id: workspaceId },
     });
 
-    await tx.usageRecords.update({
-      where: {
-        id: usage.id,
-      },
-      data: {
-        workspaces: {
-          decrement: 1,
-        },
-      },
+    // Decrement usage counter if a record exists — don't throw if missing
+    await tx.usageRecords.updateMany({
+      where: { userId },
+      data: { workspaces: { decrement: 1 } },
     });
+
+    // Clamp to zero in case of underflow
+    await tx.usageRecords.updateMany({
+      where: { userId, workspaces: { lt: 0 } },
+      data: { workspaces: 0 },
+    });
+  });
+}
+
+// ── Usage records ────────────────────────────────────────────────────────────
+
+async function ensureUsageRecord(
+  tx: Prisma.TransactionClient,
+  userId: string,
+) {
+  const now = new Date();
+  const periodStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const periodEnd = addOneMonth(periodStart);
+
+  return tx.usageRecords.upsert({
+    where: { userId },
+    update: {},
+    create: {
+      userId,
+      workspaces: 0,
+      AiQueries: 0,
+      periodStart,
+      periodEnd,
+    },
   });
 }
 
@@ -180,9 +179,7 @@ async function resetExpiredUsageIfNeeded(
   await tx.usageRecords.updateMany({
     where: {
       userId,
-      periodEnd: {
-        lte: now,
-      },
+      periodEnd: { lte: now },
     },
     data: {
       AiQueries: 0,
@@ -197,19 +194,16 @@ export async function updateAiQueryUsageRecord(
   maxAiQueries: number,
 ) {
   return prisma.$transaction(async (tx) => {
+    await ensureUsageRecord(tx, userId);
     await resetExpiredUsageIfNeeded(tx, userId);
 
     const result = await tx.usageRecords.updateMany({
       where: {
         userId,
-        AiQueries: {
-          lt: maxAiQueries,
-        },
+        AiQueries: { lt: maxAiQueries },
       },
       data: {
-        AiQueries: {
-          increment: 1,
-        },
+        AiQueries: { increment: 1 },
       },
     });
 
@@ -229,30 +223,25 @@ export async function createWorkspaceWithQuota(
   maxWorkspaces: number,
 ) {
   return prisma.$transaction(async (tx) => {
-    const now = new Date();
-    const periodStart = new Date(now.getFullYear(), now.getMonth(), 1);
-    const periodEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+    // Ensure usage record exists
+    await ensureUsageRecord(tx, userId);
 
-    const usageRecord = await tx.usageRecords.upsert({
+    // Check current count BEFORE incrementing
+    const usage = await tx.usageRecords.findUnique({
       where: { userId },
-      update: {
-        workspaces: {
-          increment: 1,
-        },
-      },
-      create: {
-        userId,
-        workspaces: 1,
-        periodStart,
-        periodEnd,
-      },
     });
 
-    if (usageRecord.workspaces > maxWorkspaces) {
+    if (usage && usage.workspaces >= maxWorkspaces) {
       throw new ConflictError(
         "Maximum workspace limit reached. Upgrade your plan.",
       );
     }
+
+    // Now increment
+    await tx.usageRecords.update({
+      where: { userId },
+      data: { workspaces: { increment: 1 } },
+    });
 
     return tx.workspace.create({
       data: {
