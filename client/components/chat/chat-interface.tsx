@@ -19,7 +19,7 @@ import {
 import { YoutubeLogo, TextT } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { useAppState } from "@/components/providers/app-provider";
-import { Citation, AVAILABLE_MODELS } from "@/lib/mock-data";
+import { Citation } from "@/lib/mock-data";
 import { useMessages } from "@/features/conversation/queries";
 import { useSources } from "@/features/source/queries";
 import { useSubscriptionStatus } from "@/features/subscription/queries";
@@ -246,7 +246,6 @@ function ChatInner({
   const webSearchAllowed = subStatus?.plan?.webSearchEnabled ?? false;
 
   const [input, setInput] = useState("");
-  const [model, setModel] = useState<ChatModel>("gpt-4o-mini");
   const [webSearch, setWebSearch] = useState(false);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -343,41 +342,23 @@ function ChatInner({
 
         {/* Right: web search + model + sources toggle */}
         <div className="flex items-center gap-2 shrink-0">
-          {/* Grouped controls — web search + model selector */}
-          <div className="flex items-center rounded-full border-[2px] border-black bg-white shadow-[2px_2px_0px_#000] overflow-hidden">
-            <button
-              onClick={() => webSearchAllowed && setWebSearch((v) => !v)}
-              disabled={!webSearchAllowed}
-              title={!webSearchAllowed ? "Upgrade to Pro to use Web Search" : webSearch ? "Disable web search" : "Enable web search"}
-              className={cn(
-                "flex items-center gap-1 px-2.5 py-1 text-[11px] font-black border-r-[2px] border-black transition-colors",
-                !webSearchAllowed
-                  ? "text-gray-400 cursor-not-allowed bg-gray-50"
-                  : webSearch
-                    ? "bg-[#6C47FF] text-white"
-                    : "text-black hover:bg-gray-50",
-              )}
-            >
-              <Search size={10} />
-              <span className="hidden sm:inline">Web</span>
-            </button>
-            <select
-              value={model}
-              onChange={(e) => {
-                const value = e.target.value;
-                if (isChatModel(value)) {
-                  setModel(value);
-                }
-              }}
-              className="px-2 sm:px-2.5 py-1 text-[11px] font-black text-black bg-transparent outline-none cursor-pointer max-w-[90px] sm:max-w-none"
-            >
-              {AVAILABLE_MODELS.map((m) => (
-                <option key={m.value} value={m.value}>
-                  {m.label}
-                </option>
-              ))}
-            </select>
-          </div>
+          {/* Web search toggle */}
+          <button
+            onClick={() => webSearchAllowed && setWebSearch((v) => !v)}
+            disabled={!webSearchAllowed}
+            title={!webSearchAllowed ? "Upgrade to Pro to use Web Search" : webSearch ? "Disable web search" : "Enable web search"}
+            className={cn(
+              "flex items-center gap-1.5 px-2.5 py-1 rounded-full border-[2px] border-black text-[11px] font-black transition-colors shadow-[2px_2px_0px_#000]",
+              !webSearchAllowed
+                ? "text-gray-400 cursor-not-allowed bg-gray-100"
+                : webSearch
+                  ? "bg-[#6C47FF] text-white shadow-none translate-x-[2px] translate-y-[2px]"
+                  : "bg-white text-black hover:bg-gray-50",
+            )}
+          >
+            <Search size={11} />
+            <span className="hidden sm:inline">Web</span>
+          </button>
 
           {/* Sources toggle — mobile only */}
           {onOpenSources && (
@@ -442,23 +423,6 @@ function ChatInner({
             onSubmit={handleSubmit}
             className="flex items-end gap-2 rounded-xl border-[2.5px] border-black bg-white px-3 py-2 shadow-[3px_3px_0px_#000] focus-within:shadow-none focus-within:translate-x-[3px] focus-within:translate-y-[3px] transition-all"
           >
-            {/* Attachment + extra action buttons */}
-            <div className="flex items-center gap-1 shrink-0 pb-0.5">
-              <button
-                type="button"
-                className="flex size-6 items-center justify-center rounded-md text-gray-400 hover:text-black hover:bg-gray-100 transition-colors"
-                aria-label="Attach file"
-              >
-                <Paperclip size={14} />
-              </button>
-              <button
-                type="button"
-                className="flex size-6 items-center justify-center rounded-md text-gray-400 hover:text-black hover:bg-gray-100 transition-colors"
-                aria-label="More options"
-              >
-                <Plus size={14} />
-              </button>
-            </div>
 
             <textarea
               ref={textareaRef}
@@ -500,11 +464,7 @@ interface ChatInterfaceProps {
   onOpenSources?: () => void;
 }
 
-type ChatModel = "gpt-4o-mini" | "gpt-4o";
 
-const isChatModel = (value: string): value is ChatModel => {
-  return value === "gpt-4o-mini" || value === "gpt-4o";
-};
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api";
@@ -521,7 +481,47 @@ export function ChatInterface({
   });
 
   if (isPending) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex flex-1 flex-col min-h-0 min-w-0 bg-[#FFFBF0]">
+        {/* Top bar skeleton */}
+        <div className="flex items-center justify-between border-b-[2px] border-black px-4 py-2 bg-[#FFFBF0] shrink-0 gap-2">
+          <div className="h-4 w-36 rounded-lg bg-black/10 animate-pulse" />
+          <div className="h-6 w-20 rounded-full bg-black/10 animate-pulse" />
+        </div>
+        {/* Messages skeleton */}
+        <div className="flex-1 min-h-0 overflow-y-auto px-5 py-6">
+          <div className="max-w-3xl mx-auto flex flex-col gap-5">
+            <div className="flex justify-end">
+              <div className="h-10 w-52 rounded-2xl rounded-tr-sm bg-[#6C47FF]/15 animate-pulse" />
+            </div>
+            <div className="flex gap-3 items-start">
+              <div className="w-7 h-7 rounded-full bg-black/10 animate-pulse shrink-0 mt-0.5" />
+              <div className="flex flex-col gap-2 flex-1">
+                <div className="h-3 w-full rounded bg-black/10 animate-pulse" />
+                <div className="h-3 w-4/5 rounded bg-black/10 animate-pulse" />
+                <div className="h-3 w-3/5 rounded bg-black/10 animate-pulse" />
+              </div>
+            </div>
+            <div className="flex justify-end">
+              <div className="h-8 w-40 rounded-2xl rounded-tr-sm bg-[#6C47FF]/15 animate-pulse" />
+            </div>
+            <div className="flex gap-3 items-start">
+              <div className="w-7 h-7 rounded-full bg-black/10 animate-pulse shrink-0 mt-0.5" />
+              <div className="flex flex-col gap-2 flex-1">
+                <div className="h-3 w-full rounded bg-black/10 animate-pulse" />
+                <div className="h-3 w-2/3 rounded bg-black/10 animate-pulse" />
+              </div>
+            </div>
+          </div>
+        </div>
+        {/* Composer skeleton */}
+        <div className="shrink-0 border-t-[2px] border-black bg-[#FFFBF0] px-4 py-3">
+          <div className="max-w-3xl mx-auto">
+            <div className="h-11 w-full rounded-xl border-[2.5px] border-black bg-white shadow-[3px_3px_0px_#000] animate-pulse" />
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (

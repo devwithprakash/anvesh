@@ -158,10 +158,10 @@ function WorkspaceCard({
   const { data: conversations } = useConversations(workspace.id);
 
   return (
-    <div className="relative group">
+    <div className="relative group h-full">
       <div
         onClick={() => router.push(`/workspace/${workspace.id}`)}
-        className="flex flex-col gap-4 rounded-2xl border-[2.5px] border-black bg-white p-5 cursor-pointer shadow-[4px_4px_0px_#000] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] transition-all"
+        className="flex flex-col gap-4 rounded-2xl border-[2.5px] border-black bg-white p-5 cursor-pointer shadow-[4px_4px_0px_#000] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] transition-all h-full"
       >
         {/* Title row */}
         <div className="flex items-start justify-between gap-2">
@@ -220,12 +220,10 @@ function WorkspaceCard({
           </div>
         </div>
 
-        {/* Description */}
-        {workspace.description && (
-          <p className="text-xs font-semibold text-gray-600 line-clamp-2 leading-relaxed">
-            {workspace.description}
-          </p>
-        )}
+        {/* Description — always reserves the same 2-line space */}
+        <p className="text-xs font-semibold text-gray-600 line-clamp-2 leading-relaxed min-h-[2.5rem]">
+          {workspace.description ?? ""}
+        </p>
 
         {/* Stats */}
         <div className="flex items-center gap-3 pt-3 border-t-[2px] border-black/10">
@@ -486,31 +484,32 @@ export default function DashboardPage() {
             ))}
           </div>
         )}
+      </main>
 
-        {/* ── Bottom decorative strip ── */}
-        {filtered.length > 0 && (
-          <div className="mt-16 pt-8 border-t-[2px] border-black/10 flex items-center justify-center gap-10 overflow-hidden pointer-events-none select-none">
-            <span className="text-3xl text-[#6C47FF] opacity-30 font-black animate-pulse">
-              ✳
+      {/* ── Footer ── */}
+      <footer className="relative z-10 border-t-[2px] border-black/10 bg-[#FFFBF0]">
+        <div className="max-w-5xl mx-auto px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center justify-center w-6 h-6 rounded-md border-[2px] border-black bg-[#6C47FF] text-white font-black text-[10px] shadow-[2px_2px_0px_#000]">
+              N
             </span>
-            <span
-              className="text-4xl text-[#FFD166] font-black opacity-50"
-              style={{ WebkitTextStroke: "1.5px black" }}
-            >
-              ✦
-            </span>
-            <span className="text-2xl text-[#FF6B6B] opacity-30 font-black">
-              ◆
-            </span>
-            <span className="text-3xl text-[#00B87C] opacity-30 font-black animate-pulse">
-              ✳
-            </span>
-            <span className="text-xl text-[#6C47FF] opacity-20 font-black">
-              ✦
+            <span className="font-black text-sm text-black">Notebook</span>
+          </div>
+          <div className="flex items-center gap-4 text-xs font-semibold text-gray-500">
+            <a href="/pricing" className="hover:text-black transition-colors">Pricing</a>
+            <span>·</span>
+            <a href="mailto:support@notebook.ai" className="hover:text-black transition-colors">Support</a>
+            <span>·</span>
+            <span className="flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#00B87C] animate-pulse" />
+              All systems operational
             </span>
           </div>
-        )}
-      </main>
+          <p className="text-xs font-semibold text-gray-400">
+            © {new Date().getFullYear()} Notebook AI
+          </p>
+        </div>
+      </footer>
 
       <CreateWorkspaceDialog open={createOpen} onOpenChange={setCreateOpen} />
     </div>

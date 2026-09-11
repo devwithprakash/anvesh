@@ -315,11 +315,6 @@ export default function PricingPage() {
                 const isCurrentPlan = isLoggedIn && currentPlanName === plan.planKey;
                 const isLoading = loadingPlan === plan.planKey;
 
-                // Override CTA label for logged-in users
-                const ctaLabel = isCurrentPlan
-                  ? "✓ Current Plan"
-                  : plan.cta;
-
                 return (
                   <motion.div
                     key={plan.name}
@@ -340,6 +335,11 @@ export default function PricingPage() {
 
                     {/* Current plan ribbon */}
                     {isCurrentPlan && !isPopular && (
+                      <div className="absolute -top-4 right-4 border-[2px] border-black bg-[#C4F0D8] px-3 py-1 rounded-full text-[11px] font-black text-black shadow-[2px_2px_0px_#000]">
+                        ✓ Active
+                      </div>
+                    )}
+                    {isCurrentPlan && isPopular && (
                       <div className="absolute -top-4 right-4 border-[2px] border-black bg-[#C4F0D8] px-3 py-1 rounded-full text-[11px] font-black text-black shadow-[2px_2px_0px_#000]">
                         ✓ Active
                       </div>
@@ -390,18 +390,17 @@ export default function PricingPage() {
                       ))}
                     </ul>
 
-                    {/* CTA */}
+                    {/* CTA — identical classes to PricingSection.tsx, no disabled attr */}
                     <button
-                      onClick={() => !isCurrentPlan && handleCtaClick(plan.planKey)}
-                      disabled={isCurrentPlan || isLoading}
-                      className={`flex items-center justify-center gap-2 w-full py-3 rounded-xl border-[2.5px] border-black ${plan.ctaBg} ${plan.ctaText} font-black text-sm shadow-[4px_4px_0px_#000] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] transition-all disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:shadow-[4px_4px_0px_#000] disabled:hover:translate-x-0 disabled:hover:translate-y-0`}
+                      onClick={() => handleCtaClick(plan.planKey)}
+                      className={`flex items-center justify-center gap-2 w-full py-3 rounded-xl border-[2.5px] border-black ${plan.ctaBg} ${plan.ctaText} font-black text-sm shadow-[4px_4px_0px_#000] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] transition-all`}
                     >
                       {isLoading ? (
                         <Loader size={14} className="animate-spin" />
                       ) : (
                         <>
-                          {ctaLabel}
-                          {!isCurrentPlan && <ArrowRight size={15} />}
+                          {isCurrentPlan ? plan.cta : plan.cta}
+                          <ArrowRight size={15} />
                         </>
                       )}
                     </button>
