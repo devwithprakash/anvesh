@@ -103,56 +103,65 @@ function AppMockup() {
           </div>
         </div>
 
-        {/* Center: Workspace overview card */}
-        <div className="flex-1 flex flex-col items-center justify-center p-3 relative overflow-hidden">
-          <div
-            className="absolute inset-0 pointer-events-none opacity-[0.04]"
-            style={{
-              backgroundImage: "radial-gradient(circle, #000 1px, transparent 1px)",
-              backgroundSize: "20px 20px",
-            }}
-          />
-          <div className="relative w-full rounded-xl border-[2px] border-black bg-white shadow-[4px_4px_0px_#000] p-4">
-            <h3 className="font-black text-sm text-black truncate">Research Project</h3>
-            <p className="text-[10px] font-semibold text-gray-400 mt-0.5 mb-3">
-              AI &amp; machine learning overview
-            </p>
-            {/* Stats */}
-            <div className="grid grid-cols-2 gap-2 mb-3">
-              {[
-                { n: "4", l: "Chats" },
-                { n: "12", l: "Sources" },
-              ].map(({ n, l }) => (
-                <div
-                  key={l}
-                  className="rounded-lg border-[1.5px] border-black bg-[#FFFBF0] py-2 text-center shadow-[2px_2px_0px_#000]"
-                >
-                  <div className="font-black text-base text-black">{n}</div>
-                  <div className="text-[9px] font-bold text-gray-500">{l}</div>
-                </div>
-              ))}
-            </div>
-            {/* CTA */}
-            <button className="w-full flex items-center justify-center gap-1.5 rounded-lg border-[2px] border-black bg-[#6C47FF] py-2 text-[10px] font-black text-white shadow-[2px_2px_0px_#000]">
-              <Plus size={10} />
-              Start new conversation
-            </button>
+        {/* Center: Chat messages */}
+        <div className="flex-1 flex flex-col min-w-0 relative overflow-hidden">
+          {/* Chat top bar */}
+          <div className="flex items-center gap-2 px-3 py-2 border-b-[1px] border-black/10 bg-[#FFFBF0] shrink-0">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#6C47FF]" />
+            <span className="text-[10px] font-black text-black truncate">Intro to AI models</span>
           </div>
 
-          {/* Recent chats */}
-          <div className="w-full mt-2 space-y-1">
-            {["Intro to formal methods", "Evaluation criteria"].map((t) => (
-              <div
-                key={t}
-                className="flex items-center gap-2 w-full rounded-lg border-[1.5px] border-black/10 bg-white px-2.5 py-1.5 hover:border-black transition-all cursor-pointer group"
-              >
-                <MessageCircle size={10} className="text-gray-400 shrink-0" />
-                <span className="flex-1 truncate text-[10px] font-bold text-black">{t}</span>
-                <ArrowRight size={10} className="text-gray-300 group-hover:text-black transition-colors shrink-0" />
+          {/* Messages */}
+          <div className="flex-1 overflow-hidden flex flex-col gap-2.5 px-3 py-3">
+            {/* User message */}
+            <div className="flex justify-end">
+              <div className="bg-[#6C47FF] text-white rounded-2xl rounded-tr-sm px-3 py-2 text-[10px] font-semibold leading-relaxed max-w-[80%]">
+                What are the key differences between supervised and unsupervised learning?
               </div>
-            ))}
+            </div>
+
+            {/* AI response */}
+            <div className="flex gap-2 items-start">
+              <div className="w-6 h-6 rounded-full bg-[#00D4AA] border-[1.5px] border-black flex items-center justify-center shrink-0 mt-0.5 shadow-[1px_1px_0px_#000]">
+                <span className="text-[8px] font-black text-black">AI</span>
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[10px] text-gray-700 leading-relaxed mb-1.5">
+                  Supervised learning uses <span className="font-bold text-black">labelled data</span> to train models, while unsupervised learning finds patterns in <span className="font-bold text-black">unlabelled data</span>.{" "}
+                  <span className="text-[#6C47FF] font-bold">[1]</span>
+                </p>
+                {/* Citation chips */}
+                <div className="flex gap-1.5 flex-wrap">
+                  <span className="inline-flex items-center gap-1 text-[9px] font-bold text-[#6C47FF] bg-[#EDE9FE] border-[1px] border-[#6C47FF]/30 rounded-md px-1.5 py-0.5">
+                    <FileText size={8} /> AI_Overview.pdf · p.12
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Second user message */}
+            <div className="flex justify-end">
+              <div className="bg-[#6C47FF] text-white rounded-2xl rounded-tr-sm px-3 py-2 text-[10px] font-semibold leading-relaxed max-w-[75%]">
+                Give me an example of each type.
+              </div>
+            </div>
+
+            {/* Second AI response — streaming effect with cursor */}
+            <div className="flex gap-2 items-start">
+              <div className="w-6 h-6 rounded-full bg-[#00D4AA] border-[1.5px] border-black flex items-center justify-center shrink-0 mt-0.5 shadow-[1px_1px_0px_#000]">
+                <span className="text-[8px] font-black text-black">AI</span>
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[10px] text-gray-700 leading-relaxed">
+                  Supervised: email spam detection. Unsupervised: customer segmentation clustering.{" "}
+                  <span className="text-[#6C47FF] font-bold">[2]</span>
+                  <span className="inline-block w-0.5 h-3 bg-[#6C47FF] ml-0.5 animate-pulse align-middle" />
+                </p>
+              </div>
+            </div>
           </div>
         </div>
+
 
         {/* Right panel: Sources panel */}
         <div className="w-[120px] shrink-0 border-l-[2px] border-black bg-white flex flex-col">
@@ -191,8 +200,13 @@ function AppMockup() {
       {/* ── Input bar at bottom ── */}
       <div className="px-3 py-2 border-t-[2px] border-black bg-[#FFFBF0]">
         <div className="flex items-center gap-2 border-[2px] border-black rounded-xl px-3 py-2 bg-white shadow-[2px_2px_0px_#000]">
-          <span className="flex-1 text-[10px] text-gray-400 font-medium">Ask anything about your sources…</span>
-          <button className="bg-[#6C47FF] border-[2px] border-black text-white rounded-lg p-1 shadow-[2px_2px_0px_#000]">
+          {/* Web search toggle */}
+          <button className="flex items-center gap-1 text-[9px] font-black text-gray-400 border-[1.5px] border-gray-200 rounded-full px-1.5 py-0.5 shrink-0 hover:border-black transition-colors">
+            <Globe size={9} />
+            <span>Web</span>
+          </button>
+          <span className="flex-1 text-[10px] text-gray-400 font-medium">Ask anything…</span>
+          <button className="bg-[#6C47FF] border-[2px] border-black text-white rounded-lg p-1 shadow-[2px_2px_0px_#000] shrink-0">
             <SendHorizontal size={11} />
           </button>
         </div>
@@ -211,7 +225,7 @@ function SourceChips() {
 
   return (
     <>
-      {/* Float keyframe injected once */}
+      {/* chipFloat keyframe for the floating pill animation */}
       <style>{`
         @keyframes chipFloat {
           0%, 100% { transform: translateY(0px); }
@@ -220,32 +234,16 @@ function SourceChips() {
       `}</style>
 
       <div className="absolute right-[-128px] top-1/2 -translate-y-1/2 hidden xl:flex flex-col items-start gap-2.5 select-none">
-        {/* Dashed curved bracket connector */}
-        <svg
-          className="absolute left-[-24px] top-2 pointer-events-none"
-          width="26"
-          height="112"
-          viewBox="0 0 26 112"
-          fill="none"
-        >
-          <path
-            d="M22 8 C 4 8, 4 56, 22 56 C 4 56, 4 104, 22 104"
-            stroke="#000"
-            strokeWidth="1.8"
-            strokeDasharray="4 3"
-            fill="none"
-            strokeLinecap="round"
-          />
-          {/* Arrowhead pointing right at top */}
-          <polygon points="22,4 17,10 27,10" fill="#000" />
-        </svg>
 
+        {/* Chips render first — naturally on top */}
         {chips.map((chip, i) => (
           <motion.div
             key={chip.label}
             {...slideRight(0.7 + i * 0.15)}
             style={{
               animation: `chipFloat ${chip.floatDur} ease-in-out ${chip.floatDelay} infinite`,
+              position: "relative",
+              zIndex: 2,
             }}
             className={`flex items-center gap-2 px-3.5 py-2 rounded-full border-[2px] ${chip.border} ${chip.bg} shadow-[2px_2px_0px_#000] text-[11px] font-black text-black whitespace-nowrap`}
           >
@@ -253,6 +251,37 @@ function SourceChips() {
             {chip.label}
           </motion.div>
         ))}
+
+        {/* Dashed curved bracket — draws itself in on first render, then flows */}
+        <svg
+          className="absolute left-[-24px] top-2 pointer-events-none"
+          style={{ zIndex: 1 }}
+          width="26"
+          height="112"
+          viewBox="0 0 26 112"
+          fill="none"
+        >
+          <motion.path
+            d="M22 8 C 4 8, 4 56, 22 56 C 4 56, 4 104, 22 104"
+            stroke="#000"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeDasharray="4 3"
+            fill="none"
+            initial={{ pathLength: 0, opacity: 0 }}
+            animate={{ pathLength: 1, opacity: 1 }}
+            transition={{ duration: 0.9, ease: "easeInOut", delay: 0.65 }}
+          />
+          {/* Arrowhead fades in after path finishes drawing */}
+          <motion.polygon
+            points="22,4 17,10 27,10"
+            fill="#000"
+            initial={{ opacity: 0, scale: 0 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.25, delay: 1.45, ease: "backOut" }}
+            style={{ transformOrigin: "22px 8px" }}
+          />
+        </svg>
 
         {/* Sparkle top */}
         <motion.span
