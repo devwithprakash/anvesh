@@ -260,6 +260,7 @@ function ChatInner({
       credentials: "include",
       body: {
         conversationId,
+        webSearch,
       }
     }),
   });
@@ -318,7 +319,7 @@ function ChatInner({
     /* flex-col + min-h-0 is critical: makes the inner scroll area shrink properly */
     <div className="flex flex-1 flex-col min-h-0 min-w-0 bg-[#FFFBF0]">
       {/* ── Top bar ── */}
-      <div className="flex items-center justify-between border-b-[2px] border-black px-3 sm:px-4 py-2 bg-[#FFFBF0] shrink-0 gap-2">
+      <div className="flex items-center justify-between border-b-[2px] border-black px-3 sm:px-4 py-4 bg-[#FFFBF0] shrink-0 gap-2">
         {/* Left: mobile panel toggles + title */}
         <div className="flex items-center gap-2 min-w-0">
           {/* Chats toggle — mobile only */}
@@ -340,26 +341,8 @@ function ChatInner({
           </span>
         </div>
 
-        {/* Right: web search + model + sources toggle */}
+        {/* Right: sources toggle */}
         <div className="flex items-center gap-2 shrink-0">
-          {/* Web search toggle */}
-          <button
-            onClick={() => webSearchAllowed && setWebSearch((v) => !v)}
-            disabled={!webSearchAllowed}
-            title={!webSearchAllowed ? "Upgrade to Pro to use Web Search" : webSearch ? "Disable web search" : "Enable web search"}
-            className={cn(
-              "flex items-center gap-1.5 px-2.5 py-1 rounded-full border-[2px] border-black text-[11px] font-black transition-colors shadow-[2px_2px_0px_#000]",
-              !webSearchAllowed
-                ? "text-gray-400 cursor-not-allowed bg-gray-100"
-                : webSearch
-                  ? "bg-[#6C47FF] text-white shadow-none translate-x-[2px] translate-y-[2px]"
-                  : "bg-white text-black hover:bg-gray-50",
-            )}
-          >
-            <Search size={11} />
-            <span className="hidden sm:inline">Web</span>
-          </button>
-
           {/* Sources toggle — mobile only */}
           {onOpenSources && (
             <button
@@ -423,6 +406,30 @@ function ChatInner({
             onSubmit={handleSubmit}
             className="flex items-end gap-2 rounded-xl border-[2.5px] border-black bg-white px-3 py-2 shadow-[3px_3px_0px_#000] focus-within:shadow-none focus-within:translate-x-[3px] focus-within:translate-y-[3px] transition-all"
           >
+            {/* Web Search toggle on left side of input bar */}
+            <button
+              type="button"
+              onClick={() => webSearchAllowed && setWebSearch((v) => !v)}
+              disabled={!webSearchAllowed}
+              title={
+                !webSearchAllowed
+                  ? "Upgrade to Pro to use Web Search"
+                  : webSearch
+                  ? "Disable web search"
+                  : "Enable web search"
+              }
+              className={cn(
+                "flex items-center gap-1.5 px-2.5 py-1 rounded-lg border-[1.5px] border-black text-[11px] font-black transition-all shrink-0 mb-0.5 shadow-[1.5px_1.5px_0px_#000]",
+                !webSearchAllowed
+                  ? "text-gray-400 cursor-not-allowed bg-gray-100 border-gray-300 shadow-none"
+                  : webSearch
+                  ? "bg-[#6C47FF] text-white"
+                  : "bg-[#FFFBF0] text-black hover:bg-gray-100"
+              )}
+            >
+              <Globe size={12} />
+              <span className="hidden sm:inline">Web</span>
+            </button>
 
             <textarea
               ref={textareaRef}

@@ -220,9 +220,15 @@ function WorkspaceCard({
           </div>
         </div>
 
-        {/* Description — always reserves the same 2-line space */}
-        <p className="text-xs font-semibold text-gray-600 line-clamp-2 leading-relaxed min-h-[2.5rem]">
-          {workspace.description ?? ""}
+        {/* Description */}
+        <p
+          className={`text-xs line-clamp-2 leading-relaxed min-h-[2.5rem] ${
+            workspace.description
+              ? "font-semibold text-gray-600"
+              : "font-medium text-gray-400 italic"
+          }`}
+        >
+          {workspace.description || "No description provided."}
         </p>
 
         {/* Stats */}
