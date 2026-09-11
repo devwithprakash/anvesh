@@ -32,10 +32,10 @@ export default function Navbar() {
   };
 
   const navLinks = [
-    { label: "Features", href: "#features" },
-    { label: "How it works", href: "#how-it-works" },
-    { label: "Pricing", href: "#pricing" },
-    { label: "Faq", href: "#faq" },
+    { label: "Features", href: "/#features" },
+    { label: "How it works", href: "/#how-it-works" },
+    { label: "Pricing", href: "/pricing" },
+    { label: "Faq", href: "/#faq" },
     ...(user ? [{ label: "Dashboard", href: "/dashboard" }] : []),
   ];
 

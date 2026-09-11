@@ -107,10 +107,8 @@ export function PlanBanner() {
 
   const handleUpgrade = async (planName: "PRO" | "PREMIUM") => {
     try {
-      console.log("Inside the handle upgrade")
       const result = await checkout.mutateAsync(planName);
 
-      console.log("checkout result: ", result);
       openRazorpayModal(result);
     } catch (error) {
       console.error("Checkout failed:", error);
