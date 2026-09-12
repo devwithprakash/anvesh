@@ -6,12 +6,106 @@ import {
   MessageCircle,
   Search,
   Layers,
+  FileText,
+  Globe,
+  StickyNote,
+  SendHorizontal,
+  Sparkles,
 } from "lucide-react";
 
+/* ─── Mini visual demos for each step ────────────────────── */
+
+function AddSourcesDemo() {
+  return (
+    <div className="mb-5 rounded-xl border-[1.5px] border-dashed border-black/40 bg-white/60 p-3">
+      {/* Drop zone */}
+      <div className="flex items-center justify-center gap-2 mb-2.5">
+        <FolderOpen size={16} className="text-gray-400" />
+        <span className="text-[9px] font-bold text-gray-400">Drop files here or browse</span>
+      </div>
+      {/* Mini file pills */}
+      <div className="flex flex-wrap gap-1.5">
+        {[
+          { label: "notes.pdf", icon: <FileText size={9} />, color: "bg-red-50 border-red-200" },
+          { label: "arxiv.org", icon: <Globe size={9} />, color: "bg-amber-50 border-amber-200" },
+          { label: "lecture.md", icon: <StickyNote size={9} />, color: "bg-blue-50 border-blue-200" },
+        ].map((f) => (
+          <span
+            key={f.label}
+            className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md border text-[8px] font-bold text-gray-600 ${f.color}`}
+          >
+            {f.icon}
+            {f.label}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function AskAnythingDemo() {
+  return (
+    <div className="mb-5 rounded-xl border-[1.5px] border-black bg-white p-2 shadow-[2px_2px_0px_#000]">
+      <div className="flex items-center gap-2">
+        <span className="flex-1 text-[9px] text-gray-700 font-semibold truncate">
+          What are the key findings in chapter 3?
+        </span>
+        <div className="flex items-center justify-center w-5 h-5 rounded-md bg-[#6C47FF] border-[1.5px] border-black shadow-[1.5px_1.5px_0px_#000] shrink-0">
+          <SendHorizontal size={9} className="text-white" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function GroundedAnswersDemo() {
+  return (
+    <div className="mb-5 rounded-xl border-[1.5px] border-black bg-white p-2.5 shadow-[2px_2px_0px_#000]">
+      {/* AI avatar + response */}
+      <div className="flex items-start gap-2 mb-2">
+        <div className="w-5 h-5 rounded-full bg-[#00D4AA] border-[1.5px] border-black flex items-center justify-center shrink-0 mt-0.5 shadow-[1px_1px_0px_#000]">
+          <Sparkles size={8} className="text-white" />
+        </div>
+        <div className="min-w-0">
+          <div className="h-1 w-full rounded-full bg-gray-200 mb-1" />
+          <div className="h-1 w-4/5 rounded-full bg-gray-200 mb-1" />
+          <div className="h-1 w-3/5 rounded-full bg-gray-200" />
+        </div>
+      </div>
+      {/* Citation badges */}
+      <div className="flex items-center gap-1.5 pl-7">
+        <span className="text-[7px] font-bold text-[#6C47FF] bg-[#EDE9FE] px-1.5 py-0.5 rounded border border-[#C4B5FD]">[1] pg.12</span>
+        <span className="text-[7px] font-bold text-[#6C47FF] bg-[#EDE9FE] px-1.5 py-0.5 rounded border border-[#C4B5FD]">[2] pg.34</span>
+      </div>
+    </div>
+  );
+}
+
+function GoDeeperDemo() {
+  return (
+    <div className="mb-5 flex flex-wrap gap-1.5">
+      {[
+        { label: "Tell me more →", color: "bg-[#EDE9FE] border-[#C4B5FD]" },
+        { label: "Compare with Ch.4", color: "bg-[#FFF8E1] border-amber-200" },
+        { label: "Summarize all", color: "bg-[#EAFFF6] border-[#86EFAC]" },
+      ].map((chip) => (
+        <span
+          key={chip.label}
+          className={`inline-flex items-center px-2 py-1 rounded-lg border-[1.5px] border-black bg-white shadow-[2px_2px_0px_#000] text-[8px] font-bold text-gray-700`}
+        >
+          {chip.label}
+        </span>
+      ))}
+    </div>
+  );
+}
+
+/* ─── Steps data ─────────────────────────────────────────── */
 const steps = [
   {
     number: "01",
-    icon: <FolderOpen size={32} />,
+    icon: <FolderOpen size={28} />,
+    demo: <AddSourcesDemo />,
     title: "Add your sources",
     desc: "Upload PDFs, docs, notes, or paste links to the content you care about.",
     bg: "bg-[#FFF9E6]",
@@ -20,7 +114,8 @@ const steps = [
   },
   {
     number: "02",
-    icon: <MessageCircle size={32} />,
+    icon: <MessageCircle size={28} />,
+    demo: <AskAnythingDemo />,
     title: "Ask anything",
     desc: "Ask natural-language questions about your workspace.",
     bg: "bg-[#EDE9FE]",
@@ -29,7 +124,8 @@ const steps = [
   },
   {
     number: "03",
-    icon: <Search size={32} />,
+    icon: <Search size={28} />,
+    demo: <GroundedAnswersDemo />,
     title: "Get grounded answers",
     desc: "Receive structured answers with citations from your sources.",
     bg: "bg-[#DCFCE7]",
@@ -38,7 +134,8 @@ const steps = [
   },
   {
     number: "04",
-    icon: <Layers size={32} />,
+    icon: <Layers size={28} />,
+    demo: <GoDeeperDemo />,
     title: "Go deeper",
     desc: "Explore follow-ups, related insights, and keep building your knowledge.",
     bg: "bg-[#FFE4E1]",
@@ -47,7 +144,7 @@ const steps = [
   },
 ];
 
-/* Dashed arrow connector between cards */
+/* ─── Dashed arrow connector ─────────────────────────────── */
 function DashedArrow() {
   return (
     <div className="hidden lg:flex items-center shrink-0 w-10">
@@ -120,10 +217,10 @@ export default function HowItWorksSection() {
                 whileInView="visible"
                 viewport={{ once: true }}
                 whileHover={{ y: -5, transition: { duration: 0.15 } }}
-                className={`flex-1 w-full ${step.bg} border-[2.5px] border-black rounded-2xl p-6 shadow-[5px_5px_0px_#000] hover:shadow-[7px_7px_0px_#000] transition-shadow`}
+                className={`flex-1 w-full ${step.bg} border-[2.5px] border-black rounded-2xl p-5 shadow-[5px_5px_0px_#000] hover:shadow-[7px_7px_0px_#000] transition-shadow`}
               >
                 {/* Number badge + Icon row */}
-                <div className="flex items-center gap-3 mb-5">
+                <div className="flex items-center gap-3 mb-4">
                   <span
                     className={`inline-flex items-center justify-center w-9 h-9 rounded-xl border-[2px] border-black ${step.numberBg} text-black text-xs font-black shadow-[2px_2px_0px_#000]`}
                   >
@@ -135,6 +232,9 @@ export default function HowItWorksSection() {
                     {step.icon}
                   </div>
                 </div>
+
+                {/* Visual demo area */}
+                {step.demo}
 
                 <h3 className="text-[1.05rem] font-black text-black mb-2">{step.title}</h3>
                 <p className="text-sm font-semibold text-gray-700 leading-relaxed">{step.desc}</p>
