@@ -1,6 +1,31 @@
-﻿import type { ReactNode } from "react";
+﻿"use client"
 
-export default function AuthLayout({ children }: { children: ReactNode }) {
+import { authClient } from "@/lib/auth-client";
+import { useRouter } from "next/navigation";
+import { useEffect, type ReactNode } from "react";
+
+export default function AuthLayout({
+  children,
+}: {
+  children: ReactNode;
+}) {
+  const router = useRouter();
+
+  const { data: session, isPending } = authClient.useSession();
+
+  useEffect(() => {
+    if (!isPending && session?.user) {
+      router.replace("/dashboard");
+    }
+  }, [session, isPending, router]);
+
+  if (isPending) {
+    return null;
+  }
+
+  if (session?.user) {
+    return null;
+  }
   return (
     <div className="min-h-screen bg-[#FFFBF0] flex flex-col">
       <header className="w-full border-b-[3px] border-black bg-[#FFFBF0]">
@@ -9,7 +34,9 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
             <span className="inline-flex items-center justify-center w-9 h-9 rounded-lg border-2 border-black bg-[#6C47FF] text-white font-black text-sm shadow-[3px_3px_0px_#000] select-none">
               N
             </span>
-            <span className="font-black text-lg text-black tracking-tight">Notebook</span>
+            <span className="font-black text-lg text-black tracking-tight">
+              Notebook
+            </span>
           </a>
         </div>
       </header>
