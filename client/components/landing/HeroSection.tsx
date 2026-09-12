@@ -7,211 +7,235 @@ import {
   FileText,
   Globe,
   StickyNote,
-  SendHorizontal,
   Sparkles,
-  MessageCircle,
-  NotebookPen,
-  Zap,
-  Settings,
-  Plus,
-  UserCircle,
 } from "lucide-react";
 
 /* ─── Framer Motion helpers ──────────────────────────────── */
 const fadeUp = (delay = 0) => ({
   initial: { opacity: 0, y: 32 },
-  animate: { opacity: 1, y: 0, transition: { duration: 0.55, ease: "easeOut", delay } as any },
+  animate: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.55, ease: "easeOut", delay } as any,
+  },
 });
 
 const scaleIn = (delay = 0) => ({
   initial: { opacity: 0, scale: 0.93, y: 20 },
-  animate: { opacity: 1, scale: 1, y: 0, transition: { duration: 0.6, ease: "easeOut", delay } as any },
-});
-
-const slideRight = (delay = 0) => ({
-  initial: { opacity: 0, x: 36 },
-  animate: { opacity: 1, x: 0, transition: { duration: 0.55, ease: "easeOut", delay } as any },
+  animate: {
+    opacity: 1,
+    scale: 1,
+    y: 0,
+    transition: { duration: 0.6, ease: "easeOut", delay } as any,
+  },
 });
 
 const fadePop = (delay = 0) => ({
   initial: { opacity: 0, scale: 0.4 },
-  animate: { opacity: 1, scale: 1, transition: { duration: 0.4, ease: "backOut", delay } as any },
+  animate: {
+    opacity: 1,
+    scale: 1,
+    transition: { duration: 0.4, ease: "backOut", delay } as any,
+  },
 });
 
-/* ─── App Mockup (pixel-faithful to reference) ───────────── */
-function AppMockup() {
+/* ─── Source cards data ──────────────────────────────────── */
+const sources = [
+  {
+    icon: <FileText size={14} />,
+    label: "PDFs & Docs",
+    file: "research-paper.pdf",
+    bg: "bg-[#FFE8E8]",
+    delay: 0.4,
+    rotate: "-rotate-2",
+  },
+  {
+    icon: <Globe size={14} />,
+    label: "Web Pages",
+    file: "arxiv.org/abs/2401...",
+    bg: "bg-[#FFF8E1]",
+    delay: 0.55,
+    rotate: "rotate-1",
+  },
+  {
+    icon: <StickyNote size={14} />,
+    label: "Your Notes",
+    file: "lecture-notes.md",
+    bg: "bg-[#E8F4FF]",
+    delay: 0.7,
+    rotate: "rotate-2",
+  },
+];
+
+/* ─── Flowing Dots (animated particles) ──────────────────── */
+function FlowDots({ delay = 0 }: { delay?: number }) {
   return (
-    <motion.div
-      {...scaleIn(0.3)}
-      className="relative w-full max-w-[600px] rounded-2xl border-[3px] border-black bg-white shadow-[8px_8px_0px_#000] overflow-hidden"
-    >
-      {/* ── Header bar ── */}
-      <div className="flex items-center justify-between px-4 py-3 border-b-[2px] border-black bg-white">
-        {/* Left: logo + title */}
-        <div className="flex items-center gap-2">
-          <span className="inline-flex items-center justify-center w-7 h-7 rounded-lg border-[2px] border-black bg-[#6C47FF] text-white text-[11px] font-black shadow-[2px_2px_0px_#000]">
-            N
-          </span>
-          <span className="font-black text-sm text-black">Notebook</span>
-        </div>
-        {/* Center: workspace dropdown */}
-        <div className="flex items-center gap-1.5 text-xs font-bold text-black bg-gray-100 border-[2px] border-black rounded-lg px-3 py-1 shadow-[2px_2px_0px_#000]">
-          My Workspace
-          <svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="black" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
-        </div>
-        {/* Right: Research Assistant label */}
-        <div className="text-right">
-          <div className="flex items-center gap-1 font-black text-sm text-black">
-            Research Assistant
-            <Sparkles size={13} className="text-yellow-400" />
-          </div>
-          <p className="text-[10px] text-gray-400 font-medium">Ask anything about your sources</p>
-        </div>
-        {/* New chat button */}
-        <button className="flex items-center gap-1 text-[11px] font-bold border-[2px] border-black rounded-lg px-2.5 py-1.5 bg-white shadow-[2px_2px_0px_#000] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all whitespace-nowrap">
-          <StickyNote size={12} /> New chat
-        </button>
-      </div>
-
-      {/* ── Body: sidebar + chat ── */}
-      <div className="flex" style={{ height: 360 }}>
-        {/* Sidebar */}
-        <div className="w-[148px] border-r-[2px] border-black bg-[#FAFAFA] flex flex-col py-3 gap-0.5 shrink-0">
-          {[
-            { icon: <FileText size={14} />, label: "Sources" },
-            { icon: <MessageCircle size={14} />, label: "Chat", active: true },
-            { icon: <NotebookPen size={14} />, label: "Notes" },
-            { icon: <Zap size={14} />, label: "Prompts" },
-            { icon: <Settings size={14} />, label: "Settings" },
-          ].map((item) => (
-            <div
-              key={item.label}
-              className={`flex items-center gap-2.5 px-3 py-2 mx-2 rounded-lg text-xs font-bold cursor-pointer transition-colors ${
-                item.active
-                  ? "bg-[#EDE9FE] text-[#6C47FF]"
-                  : "text-gray-600 hover:bg-gray-100"
-              }`}
-            >
-              {item.icon}
-              {item.label}
-            </div>
-          ))}
-
-          <div className="mt-auto mx-2">
-            <button className="w-full flex items-center gap-1.5 text-[11px] font-bold text-gray-500 border-[2px] border-dashed border-gray-300 rounded-lg px-2.5 py-2 hover:border-black hover:text-black transition-colors">
-              <Plus size={12} />
-              New Workspace
-            </button>
-          </div>
-        </div>
-
-        {/* Chat panel */}
-        <div className="flex-1 flex flex-col min-w-0">
-          {/* User question bubble */}
-          <div className="px-4 pt-4 pb-2">
-            <div className="flex items-start justify-between gap-2">
-              <div className="flex-1 bg-[#6C47FF] text-white rounded-2xl rounded-tr-sm px-3.5 py-2.5 text-xs font-semibold leading-relaxed max-w-[75%]">
-                What are the main principles of formal methods?
-              </div>
-              <div className="w-8 h-8 rounded-full bg-gray-200 border-[2px] border-black flex items-center justify-center shrink-0 mt-0.5">
-                <UserCircle size={20} className="text-gray-500" />
-              </div>
-            </div>
-          </div>
-
-          {/* AI response */}
-          <div className="flex-1 px-4 pb-2 overflow-y-auto">
-            <div className="flex gap-2.5 items-start">
-              {/* AI avatar */}
-              <div className="w-8 h-8 rounded-full bg-[#00D4AA] border-[2px] border-black flex items-center justify-center shrink-0 mt-0.5 shadow-[2px_2px_0px_#000]">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z" fill="black"/>
-                </svg>
-              </div>
-
-              {/* Response card */}
-              <div className="flex-1 min-w-0">
-                <p className="text-[11.5px] text-gray-700 leading-relaxed mb-2.5">
-                  Formal methods are mathematically based techniques used for the specification, design, development, and verification of software and hardware systems.{" "}
-                  <span className="text-[#6C47FF] font-bold">[1]</span>
-                </p>
-
-                {/* Section 1 */}
-                <p className="text-[11.5px] font-black text-black mb-1">1. Mathematics Foundations</p>
-                <ul className="mb-2.5 space-y-0.5">
-                  <li className="flex gap-1.5 text-[11px] text-gray-600">
-                    <span className="text-gray-400 mt-0.5">•</span>
-                    <span>Use mathematical models to precisely describe systems and their behavior. <span className="text-[#6C47FF] font-bold">[1]</span></span>
-                  </li>
-                </ul>
-
-                {/* Section 2 */}
-                <p className="text-[11.5px] font-black text-black mb-1">2. Formal Specification</p>
-                <ul className="mb-3 space-y-0.5">
-                  <li className="flex gap-1.5 text-[11px] text-gray-600">
-                    <span className="text-gray-400 mt-0.5">•</span>
-                    <span>Specify requirements using formal notations like Z, VDM, or Event-B. <span className="text-[#6C47FF] font-bold">[2]</span></span>
-                  </li>
-                  <li className="flex gap-1.5 text-[11px] text-gray-600">
-                    <span className="text-gray-400 mt-0.5">•</span>
-                    <span>Eliminates ambiguity and inconsistencies. <span className="text-[#6C47FF] font-bold">[1]</span></span>
-                  </li>
-                </ul>
-
-                {/* Sources row */}
-                <div className="flex items-center justify-between gap-3 pt-2 border-t-[1.5px] border-gray-200">
-                  <div className="space-y-0.5">
-                    <p className="text-[10px] text-gray-500">
-                      <span className="text-[#6C47FF] font-bold">[1]</span> Software Engineering.pdf — Page 52
-                    </p>
-                    <p className="text-[10px] text-gray-500">
-                      <span className="text-[#6C47FF] font-bold">[2]</span> Formal Methods.pdf — Page 62
-                    </p>
-                  </div>
-                  <button className="text-[10.5px] font-black border-[2px] border-black rounded-lg px-3 py-1.5 bg-white shadow-[2px_2px_0px_#000] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all whitespace-nowrap shrink-0">
-                    View sources
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Input bar */}
-          <div className="px-4 py-3 border-t-[2px] border-black">
-            <div className="flex items-center gap-2 border-[2px] border-black rounded-xl px-3 py-2.5 bg-white shadow-[2px_2px_0px_#000]">
-              <span className="flex-1 text-[11.5px] text-gray-400 font-medium">Ask a follow-up...</span>
-              <button className="bg-[#6C47FF] border-[2px] border-black text-white rounded-lg p-1.5 shadow-[2px_2px_0px_#000] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
-                <SendHorizontal size={13} />
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </motion.div>
+    <div className="flex justify-center items-center gap-3 py-3">
+      {[0, 1, 2].map((i) => (
+        <motion.div
+          key={i}
+          initial={{ opacity: 0, scale: 0 }}
+          animate={{
+            opacity: [0, 0.6, 0],
+            scale: [0.5, 1, 0.5],
+            y: [0, 6, 0],
+          }}
+          transition={
+            {
+              duration: 2.2,
+              ease: "easeInOut",
+              delay: delay + i * 0.3,
+              repeat: Infinity,
+            } as any
+          }
+          className="w-1.5 h-1.5 rounded-full bg-[#6C47FF]"
+        />
+      ))}
+    </div>
   );
 }
 
-/* ─── Floating Source Chips ──────────────────────────────── */
-function SourceChips() {
-  const chips = [
-    { icon: <FileText size={14} />, label: "PDFs + Docs", bg: "bg-[#FFE8E8]", delay: 0.7 },
-    { icon: <Globe size={14} />, label: "Web Pages",   bg: "bg-[#FFF8E1]", delay: 0.85 },
-    { icon: <StickyNote size={14} />, label: "Notes",        bg: "bg-[#E8F4FF]", delay: 1.0 },
-  ];
-
+/* ─── Hero Visual (replaces old AppMockup) ───────────────── */
+function HeroVisual() {
   return (
-    <div className="absolute right-[-120px] top-1/2 -translate-y-1/2 hidden xl:flex flex-col gap-3">
-      {chips.map((chip) => (
+    <motion.div
+      {...scaleIn(0.3)}
+      className="relative w-full max-w-[520px] flex flex-col items-center"
+    >
+      {/* ── Source cards row ── */}
+      <div className="flex flex-wrap justify-center gap-2.5 sm:gap-3 w-full">
+        {sources.map((src) => (
+          <motion.div
+            key={src.label}
+            {...fadePop(src.delay)}
+            className={`${src.bg} ${src.rotate} flex-1 min-w-[110px] max-w-[140px] rounded-lg border-[2px] border-black px-2.5 py-2 shadow-[3px_3px_0px_#000] hover:shadow-[5px_5px_0px_#000] hover:-translate-y-1 transition-all`}
+          >
+            <div className="flex items-center gap-1.5 mb-1.5">
+              <div className="inline-flex items-center justify-center w-6 h-6 rounded-md border-[1.5px] border-black bg-white shadow-[1.5px_1.5px_0px_#000]">
+                {src.icon}
+              </div>
+              <span className="text-[10px] font-black text-black leading-tight">
+                {src.label}
+              </span>
+            </div>
+            {/* Simulated text lines */}
+            <div className="space-y-1">
+              <div className="h-1 w-full rounded-full bg-black/10" />
+              <div className="h-1 w-3/4 rounded-full bg-black/10" />
+            </div>
+            <p className="text-[8px] text-gray-500 font-medium mt-1.5 truncate">
+              {src.file}
+            </p>
+          </motion.div>
+        ))}
+      </div>
+
+      {/* ── Flow: sources → orb ── */}
+      <FlowDots delay={1.0} />
+
+      {/* ── AI Synthesis Orb ── */}
+      <motion.div
+        {...scaleIn(0.85)}
+        className="relative flex items-center justify-center my-1"
+      >
+        {/* Outer pulse ring */}
         <motion.div
-          key={chip.label}
-          {...slideRight(chip.delay)}
-          className={`flex items-center gap-2 px-3 py-2 rounded-xl border-[2.5px] border-black ${chip.bg} shadow-[4px_4px_0px_#000] text-xs font-black text-black whitespace-nowrap`}
+          animate={{
+            scale: [1, 1.6, 1],
+            opacity: [0.25, 0, 0.25],
+          }}
+          transition={
+            {
+              duration: 3,
+              ease: "easeInOut",
+              repeat: Infinity,
+            } as any
+          }
+          className="absolute w-20 h-20 rounded-full bg-[#6C47FF]/20"
+        />
+        {/* Inner pulse ring */}
+        <motion.div
+          animate={{
+            scale: [1, 1.3, 1],
+            opacity: [0.15, 0, 0.15],
+          }}
+          transition={
+            {
+              duration: 3,
+              ease: "easeInOut",
+              delay: 0.5,
+              repeat: Infinity,
+            } as any
+          }
+          className="absolute w-20 h-20 rounded-full bg-[#6C47FF]/15"
+        />
+        {/* Orb */}
+        <div className="relative w-16 h-16 rounded-full border-[3px] border-black bg-[#6C47FF] shadow-[4px_4px_0px_#000] flex items-center justify-center z-10">
+          <Sparkles size={24} className="text-white" />
+        </div>
+        {/* "AI Synthesis" label */}
+        <motion.div
+          {...fadeUp(1.0)}
+          className="absolute -right-28 top-1/2 -translate-y-1/2 bg-white border-[2px] border-black rounded-lg px-2.5 py-1 shadow-[2px_2px_0px_#000] whitespace-nowrap hidden sm:block"
         >
-          {chip.icon}
-          {chip.label}
+          <span className="text-[10px] font-black text-[#6C47FF]">
+            AI Synthesis
+          </span>
         </motion.div>
-      ))}
-    </div>
+      </motion.div>
+
+      {/* ── Flow: orb → insight ── */}
+      <FlowDots delay={1.5} />
+
+      {/* ── Grounded Insight Card ── */}
+      <motion.div
+        {...fadeUp(1.1)}
+        className="w-full max-w-[400px] rounded-xl border-[2.5px] border-black bg-white p-4 shadow-[5px_5px_0px_#000]"
+      >
+        {/* Card header */}
+        <div className="flex items-center gap-2 mb-3">
+          <div className="inline-flex items-center justify-center w-7 h-7 rounded-lg border-[2px] border-black bg-[#EAFFF6] shadow-[2px_2px_0px_#000]">
+            <Sparkles size={13} className="text-[#00B87C]" />
+          </div>
+          <span className="text-xs font-black text-black">
+            Grounded Insight
+          </span>
+        </div>
+
+        {/* Generated answer with citation */}
+        <p className="text-[12.5px] text-gray-700 leading-relaxed mb-3 font-medium">
+          &ldquo;Formal methods are mathematically based techniques used for the
+          specification, design, and verification of software
+          systems...&rdquo;{" "}
+          <span className="text-[#6C47FF] font-bold text-[11px]">[1]</span>
+        </p>
+
+        {/* Source reference */}
+        <div className="flex items-center gap-2 mb-3">
+          <span className="text-[10px] text-gray-500 font-medium">
+            <span className="text-[#6C47FF] font-bold">[1]</span>{" "}
+            Software-Engineering.pdf — Page 52
+          </span>
+        </div>
+
+        {/* Quality badges */}
+        <div className="flex items-center gap-4 pt-2.5 border-t-[1.5px] border-gray-200">
+          {[
+            { label: "Grounded", color: "bg-[#00B87C]" },
+            { label: "Cited", color: "bg-[#6C47FF]" },
+            { label: "Accurate", color: "bg-[#FFB800]" },
+          ].map((tag) => (
+            <span
+              key={tag.label}
+              className="flex items-center gap-1.5 text-[10px] font-bold text-gray-600"
+            >
+              <span className={`w-1.5 h-1.5 rounded-full ${tag.color}`} />
+              {tag.label}
+            </span>
+          ))}
+        </div>
+      </motion.div>
+    </motion.div>
   );
 }
 
@@ -301,8 +325,7 @@ export default function HeroSection() {
 
         {/* ── RIGHT ── */}
         <div className="flex-1 w-full flex justify-center relative">
-          <AppMockup />
-          <SourceChips />
+          <HeroVisual />
         </div>
       </div>
     </section>
