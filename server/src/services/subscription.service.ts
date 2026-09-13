@@ -12,8 +12,6 @@ import {
 import { getFreePlan } from "../repositories/workspace.repository.js";
 import { NotFoundError, ValidationError } from "../types/app-error.js";
 
-// ── Get subscription status ──────────────────────────────────────────────────
-
 export async function getSubscriptionStatus(userId: string) {
   const subscription = await findActiveSubscriptionByUserId(userId);
 
@@ -62,15 +60,14 @@ export async function getSubscriptionStatus(userId: string) {
   };
 }
 
-// ── List plans ───────────────────────────────────────────────────────────────
-
 export async function listPlans() {
   return getPlansFromRepo();
 }
 
-// ── Initiate checkout ────────────────────────────────────────────────────────
-
-export async function initiateCheckout(userId: string, planName: string) {
+export async function initiateCheckout(
+  userId: string,
+  planName: "PRO" | "PREMIUM",
+) {
   const plan = await getPlanByName(planName);
   if (!plan) {
     throw new ValidationError(`Plan "${planName}" not found`);
@@ -90,12 +87,16 @@ export async function initiateCheckout(userId: string, planName: string) {
 
   const razorpay = getRazorpayClient();
 
+  const razorpayPlanIds = {
+    PRO: process.env.RAZORPAY_PRO_PLAN_ID,
+    PREMIUM: process.env.RAZORPAY_PREMIUM_PLAN_ID,
+  };
+
   // Create Razorpay subscription
-  const razorpayPlanId = process.env.RAZORPAY_PLAN_ID;
+  const razorpayPlanId = razorpayPlanIds[planName];
   if (!razorpayPlanId) {
     throw new Error("RAZORPAY_PLAN_ID not configured");
   }
-
 
   const subscription = await razorpay.subscriptions.create({
     plan_id: razorpayPlanId,
@@ -115,8 +116,6 @@ export async function initiateCheckout(userId: string, planName: string) {
     amount: plan.price,
   };
 }
-
-// ── Cancel subscription ──────────────────────────────────────────────────────
 
 export async function cancelSubscription(userId: string) {
   const subscription = await findActiveSubscriptionByUserId(userId);
@@ -144,10 +143,7 @@ export async function cancelSubscription(userId: string) {
   return { message: "Subscription cancelled successfully" };
 }
 
-// ── Webhook handler ──────────────────────────────────────────────────────────
-
 export async function handleWebhookEvent(rawBody: string, signature: string) {
-
   const isValid = verifyWebhookSignature(rawBody, signature);
   if (!isValid) {
     throw new ValidationError("Invalid webhook signature");
@@ -164,7 +160,6 @@ export async function handleWebhookEvent(rawBody: string, signature: string) {
 
   const razorpaySubscriptionId = subscriptionEntity.id as string;
   const notes = subscriptionEntity.notes ?? {};
-
 
   switch (event) {
     case "subscription.activated": {
@@ -239,7 +234,6 @@ export async function handleWebhookEvent(rawBody: string, signature: string) {
     default:
       console.log(`Unhandled webhook event: ${event}`);
   }
-
 
   return { received: true };
 }

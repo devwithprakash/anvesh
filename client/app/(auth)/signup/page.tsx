@@ -5,8 +5,8 @@ import { motion } from "framer-motion";
 import { Eye, EyeOff, ArrowRight, Mail, Lock, User } from "lucide-react";
 import Link from "next/link";
 import { signUp } from "@/features/auth/auth";
-import {useRouter} from "next/navigation"
-
+import { useRouter } from "next/navigation";
+import { authClient } from "@/lib/auth-client";
 
 const fadeUp = (delay = 0) => ({
   initial: { opacity: 0, y: 24 },
@@ -28,12 +28,13 @@ const fadeIn = (delay = 0) => ({
 export default function SignUpPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [form, setForm] = useState({
     name: "",
     email: "",
     password: "",
   });
-  const router = useRouter()
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,6 +48,20 @@ export default function SignUpPage() {
       console.error(error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleGoogleSignUp = async () => {
+    setGoogleLoading(true);
+    try {
+      await authClient.signIn.social({
+        provider: "google",
+        callbackURL: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`,
+      });
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setGoogleLoading(false);
     }
   };
 
@@ -71,6 +86,7 @@ export default function SignUpPage() {
           {/* Google Sign-up */}
           <motion.div {...fadeIn(0.05)}>
             <button
+              onClick={handleGoogleSignUp}
               type="button"
               className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl border-[3px] border-black bg-white font-black text-sm text-black shadow-[4px_4px_0px_#000] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] transition-all"
             >

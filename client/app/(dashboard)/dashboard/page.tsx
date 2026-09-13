@@ -253,7 +253,6 @@ function WorkspaceCard({
 // ─── Dashboard Page ───────────────────────────────────────────────────────────
 
 export default function DashboardPage() {
-  const { workspaces } = useAppState();
   const [createOpen, setCreateOpen] = useState(false);
   const [search, setSearch] = useState("");
 
@@ -405,50 +404,8 @@ export default function DashboardPage() {
                 </button>
               </div>
             </div>
-
-            {/* Decorative "what you can do" row below */}
-            <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
-              {[
-                {
-                  color: "#EDE9FE",
-                  border: "#6C47FF",
-                  icon: "📚",
-                  title: "Add Sources",
-                  desc: "PDFs, websites, YouTube — bring all your knowledge together.",
-                },
-                {
-                  color: "#FFF9E6",
-                  border: "#FFD166",
-                  icon: "🤖",
-                  title: "Chat with AI",
-                  desc: "Ask questions and get cited answers grounded in your sources.",
-                },
-                {
-                  color: "#F0FFF8",
-                  border: "#00B87C",
-                  icon: "✨",
-                  title: "Stay Organised",
-                  desc: "Multiple workspaces keep topics and projects neatly separated.",
-                },
-              ].map((item) => (
-                <div
-                  key={item.title}
-                  className="rounded-xl border-[2px] border-black p-4 shadow-[3px_3px_0px_#000]"
-                  style={{ backgroundColor: item.color }}
-                >
-                  <div className="text-2xl mb-2">{item.icon}</div>
-                  <p className="font-black text-sm text-black mb-1">
-                    {item.title}
-                  </p>
-                  <p className="text-xs font-semibold text-gray-600 leading-relaxed">
-                    {item.desc}
-                  </p>
-                </div>
-              ))}
-            </div>
           </div>
         ) : filtered.length === 0 && search ? (
-          /* No search results */
           <div className="flex flex-col items-center justify-center gap-5 py-24 text-center">
             <div className="flex size-16 items-center justify-center rounded-2xl border-[3px] border-black bg-white shadow-[4px_4px_0px_#000]">
               <Search size={24} className="text-black" />
@@ -502,9 +459,16 @@ export default function DashboardPage() {
             <span className="font-black text-sm text-black">Notebook</span>
           </div>
           <div className="flex items-center gap-4 text-xs font-semibold text-gray-500">
-            <a href="/pricing" className="hover:text-black transition-colors">Pricing</a>
+            <a href="/pricing" className="hover:text-black transition-colors">
+              Pricing
+            </a>
             <span>·</span>
-            <a href="mailto:support@notebook.ai" className="hover:text-black transition-colors">Support</a>
+            <a
+              href="mailto:support@notebook.ai"
+              className="hover:text-black transition-colors"
+            >
+              Support
+            </a>
             <span>·</span>
             <span className="flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-[#00B87C] animate-pulse" />

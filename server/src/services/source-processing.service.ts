@@ -196,8 +196,7 @@ export async function embedAndIndexSource(
   source: SourceRecord,
   chunks: SourceChunkRecord[],
 ) {
-
-  const safeChunks = chunks.flatMap(splitOversizedChunk)
+  const safeChunks = chunks.flatMap(splitOversizedChunk);
 
   const batchSize = 50;
   const records: PineconeRecord<VectorMetadata>[] = [];

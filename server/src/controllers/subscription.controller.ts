@@ -47,13 +47,9 @@ export async function handleWebhook(
   req: Request,
   res: Response,
 ): Promise<void> {
-
-
   const signature = req.headers["x-razorpay-signature"] as string;
 
-
   if (!signature) {
-
     res.status(400).json({
       error: "Missing signature header",
     });

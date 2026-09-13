@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { Eye, EyeOff, ArrowRight, Mail, Lock } from "lucide-react";
 import Link from "next/link";
 import { signIn } from "@/features/auth/auth";
+import { authClient } from "@/lib/auth-client";
 
 const fadeUp = (delay = 0) => ({
   initial: { opacity: 0, y: 24 },
@@ -26,6 +27,7 @@ const fadeIn = (delay = 0) => ({
 export default function SignInPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [form, setForm] = useState({ email: "", password: "" });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -40,6 +42,20 @@ export default function SignInPage() {
       console.error(error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    setGoogleLoading(true);
+    try {
+      await authClient.signIn.social({
+        provider: "google",
+        callbackURL: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`,
+      });
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setGoogleLoading(false);
     }
   };
 
@@ -63,6 +79,7 @@ export default function SignInPage() {
           {/* Google Sign-in */}
           <motion.div {...fadeIn(0.05)}>
             <button
+              onClick={handleGoogleSignIn}
               type="button"
               className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl border-[3px] border-black bg-white font-black text-sm text-black shadow-[4px_4px_0px_#000] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] transition-all"
             >
@@ -135,7 +152,10 @@ export default function SignInPage() {
                 <label className="block text-sm font-black text-black">
                   Password
                 </label>
-                <Link href="/forgot-password" className="text-xs font-black text-[#6C47FF] hover:underline">
+                <Link
+                  href="/forgot-password"
+                  className="text-xs font-black text-[#6C47FF] hover:underline"
+                >
                   Forgot password?
                 </Link>
               </div>

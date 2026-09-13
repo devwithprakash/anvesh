@@ -3,7 +3,6 @@ import { createCheckout, cancelSubscription } from "./api";
 import { subscriptionKeys } from "./queries";
 
 export function useCreateCheckout() {
-  console.log("Inside query handler")
   const queryClient = useQueryClient();
 
   return useMutation({
