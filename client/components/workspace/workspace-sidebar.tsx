@@ -41,7 +41,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useAppState } from "@/components/providers/app-provider";
-import { CreateWorkspaceDialog } from "@/components/workspace/create-workspace-dialog";
+import { CreateWorkspaceDialog } from "@/components/workspace/workspace-dialog";
 
 interface WorkspaceSidebarProps {
   activeWorkspaceId?: string;

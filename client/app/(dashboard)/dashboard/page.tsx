@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { formatDistanceToNow } from "date-fns";
 import {
@@ -13,9 +13,8 @@ import {
   Sparkles,
   BookOpen,
 } from "lucide-react";
-import { useAppState } from "@/components/providers/app-provider";
 import { AppNavbar } from "@/components/workspace/app-navbar";
-import { CreateWorkspaceDialog } from "@/components/workspace/create-workspace-dialog";
+import { WorkspaceDialog } from "@/components/workspace/workspace-dialog";
 import { PlanBanner } from "@/components/workspace/plan-banner";
 import { type Workspace } from "@/lib/mock-data";
 import { useWorkspaces } from "@/features/workspace/queries";
@@ -133,9 +132,11 @@ function FloatingSymbols() {
 function WorkspaceCard({
   workspace,
   onDelete,
+  handleEditWorkspace,
 }: {
   workspace: Workspace;
   onDelete: (id: string) => void;
+  handleEditWorkspace: (workspace: Workspace) => void;
 }) {
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -203,6 +204,12 @@ function WorkspaceCard({
                   >
                     Open
                   </button>
+                  <button
+                    onClick={() => handleEditWorkspace(workspace)}
+                    className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs font-bold hover:bg-gray-100 transition-colors"
+                  >
+                    Edit
+                  </button>
 
                   <button
                     onClick={() => {
@@ -255,6 +262,9 @@ function WorkspaceCard({
 export default function DashboardPage() {
   const [createOpen, setCreateOpen] = useState(false);
   const [search, setSearch] = useState("");
+  const [editingWorkspace, setEditingWorkspace] = useState<Workspace | null>(
+    null,
+  );
 
   const { data: workspacesList, error } = useWorkspaces();
   const deleteWorkspace = useDeleteWorkspace();
@@ -264,6 +274,24 @@ export default function DashboardPage() {
       await deleteWorkspace.mutateAsync(workspaceId);
     } catch (error) {
       console.error(error);
+    }
+  };
+
+  const handleCreateWorkspace = () => {
+    setEditingWorkspace(null);
+    setCreateOpen(true);
+  };
+
+  const handleEditWorkspace = (workspace: Workspace) => {
+    setEditingWorkspace(workspace);
+    setCreateOpen(true);
+  };
+
+  const handleDialogChange = (open: boolean) => {
+    setCreateOpen(open);
+
+    if (!open) {
+      setEditingWorkspace(null);
     }
   };
 
@@ -341,7 +369,7 @@ export default function DashboardPage() {
             />
           </div>
           <button
-            onClick={() => setCreateOpen(true)}
+            onClick={handleCreateWorkspace}
             className="flex items-center gap-2 rounded-xl border-[2.5px] border-black bg-[#6C47FF] px-4 h-10 text-sm font-black text-white shadow-[3px_3px_0px_#000] hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px] transition-all"
           >
             <Plus size={16} />
@@ -443,6 +471,7 @@ export default function DashboardPage() {
                 key={ws.id}
                 workspace={ws}
                 onDelete={handleDeleteWorkspace}
+                handleEditWorkspace={handleEditWorkspace}
               />
             ))}
           </div>
@@ -481,7 +510,11 @@ export default function DashboardPage() {
         </div>
       </footer>
 
-      <CreateWorkspaceDialog open={createOpen} onOpenChange={setCreateOpen} />
+      <WorkspaceDialog
+        workspace={editingWorkspace}
+        open={createOpen}
+        onOpenChange={handleDialogChange}
+      />
     </div>
   );
 }

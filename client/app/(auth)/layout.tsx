@@ -32,10 +32,10 @@ export default function AuthLayout({
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center">
           <a href="/" className="flex items-center gap-2.5 shrink-0">
             <span className="inline-flex items-center justify-center w-9 h-9 rounded-lg border-2 border-black bg-[#6C47FF] text-white font-black text-sm shadow-[3px_3px_0px_#000] select-none">
-              N
+              A
             </span>
             <span className="font-black text-lg text-black tracking-tight">
-              Notebook
+              Anvesh
             </span>
           </a>
         </div>
@@ -46,7 +46,7 @@ export default function AuthLayout({
       </main>
 
       <footer className="border-t-[3px] border-black bg-[#FFFBF0] py-4 text-center text-xs font-bold text-black/50">
-        © {new Date().getFullYear()} Notebook. All rights reserved.
+        © {new Date().getFullYear()} Anvesh. All rights reserved.
       </footer>
     </div>
   );

@@ -4,10 +4,16 @@ export type Workspace = {
   description?: string;
   defaultModel: string;
   createdAt: string;
-  sourceCount?: number
+  sourceCount?: number;
 };
 
 export type CreateWorkspaceInput = {
+  title: string;
+  description?: string;
+  defaultModel: string;
+};
+export type UpdateWorkspaceInput = {
+  workspaceId: string;
   title: string;
   description?: string;
   defaultModel: string;

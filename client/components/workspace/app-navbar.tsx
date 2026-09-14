@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronDown, LogOut, Settings, Plus } from "lucide-react";
 import { useAppState } from "@/components/providers/app-provider";
-import { CreateWorkspaceDialog } from "@/components/workspace/create-workspace-dialog";
+import { WorkspaceDialog } from "@/components/workspace/workspace-dialog";
 import { PlanBadge } from "@/components/workspace/plan-banner";
 import { authClient } from "@/lib/auth-client";
 import { signOut } from "@/features/auth/auth";
@@ -155,7 +155,7 @@ export function AppNavbar({ activeWorkspaceId }: AppNavbarProps) {
         </div>
       </nav>
 
-      <CreateWorkspaceDialog open={createOpen} onOpenChange={setCreateOpen} />
+      <WorkspaceDialog open={createOpen} onOpenChange={setCreateOpen} />
     </>
   );
 }

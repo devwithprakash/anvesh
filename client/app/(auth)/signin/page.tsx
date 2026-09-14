@@ -71,7 +71,7 @@ export default function SignInPage() {
             Welcome back 👋
           </h1>
           <p className="text-sm font-semibold text-white/80 mt-1">
-            Sign in to your Notebook account
+            Sign in to your Anvesh account
           </p>
         </div>
 

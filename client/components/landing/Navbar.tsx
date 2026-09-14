@@ -54,10 +54,10 @@ export default function Navbar() {
           className="flex items-center gap-2.5 shrink-0"
         >
           <span className="inline-flex items-center justify-center w-9 h-9 rounded-lg border-2 border-black bg-[#6C47FF] text-white font-black text-sm shadow-[3px_3px_0px_#000] select-none">
-            N
+            A
           </span>
           <span className="font-black text-lg text-black tracking-tight">
-            Notebook
+            Anvesh
           </span>
         </motion.a>
 
