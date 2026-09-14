@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useEffect, useState } from "react";
+import {useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAppState } from "@/components/providers/app-provider";
 import { AppNavbar } from "@/components/workspace/app-navbar";
