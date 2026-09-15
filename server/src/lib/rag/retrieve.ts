@@ -52,13 +52,13 @@ export async function retrieveWorkspaceContext(
 
   const vectors = await embedTexts(labelled.map((q) => q.text));
 
-  // chunks
+  // top_k chunks of every query 
   const resultsPerQuery = await Promise.all(
     vectors.map((v) => queryWorkspaceVectors(workspaceId, v, RAG_TOP_K)),
   );
 
 
-  //typeof of hits:
+  //typeof of resultsPerQuery:
   // [
   //  {
   //     id: "cmt63f0h80007poil3d9pify3",
@@ -68,6 +68,8 @@ export async function retrieveWorkspaceContext(
   //     metadata: [Object],
   //   },
   // ];
+
+  // which query produced which results
   const rankedLists = labelled.map((q, i) => ({
     label: q.label,
     hits: resultsPerQuery[i] ?? [],

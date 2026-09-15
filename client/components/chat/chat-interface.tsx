@@ -240,17 +240,17 @@ function ChatInner({
   onOpenChats,
   onOpenSources,
 }: ChatInnerProps) {
-  const { conversations,  } = useAppState();
-  const {data: sources} = useSources(workspaceId)
-  const { data: subStatus } = useSubscriptionStatus();
-  const webSearchAllowed = subStatus?.plan?.webSearchEnabled ?? false;
-
   const [input, setInput] = useState("");
   const [webSearch, setWebSearch] = useState(false);
 
+  const { conversations } = useAppState();
+  const { data: sources } = useSources(workspaceId);
+  const { data: subStatus } = useSubscriptionStatus();
+  
+  const webSearchAllowed = subStatus?.plan?.webSearchEnabled ?? false;
+
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
-
 
   const { messages, sendMessage, status, stop, error } = useChat({
     id: conversationId,
@@ -261,7 +261,7 @@ function ChatInner({
       body: {
         conversationId,
         webSearch,
-      }
+      },
     }),
   });
 
@@ -415,16 +415,16 @@ function ChatInner({
                 !webSearchAllowed
                   ? "Upgrade to Pro to use Web Search"
                   : webSearch
-                  ? "Disable web search"
-                  : "Enable web search"
+                    ? "Disable web search"
+                    : "Enable web search"
               }
               className={cn(
                 "flex items-center gap-1.5 px-2.5 py-1 rounded-lg border-[1.5px] border-black text-[11px] font-black transition-all shrink-0 mb-0.5 shadow-[1.5px_1.5px_0px_#000]",
                 !webSearchAllowed
                   ? "text-gray-400 cursor-not-allowed bg-gray-100 border-gray-300 shadow-none"
                   : webSearch
-                  ? "bg-[#6C47FF] text-white"
-                  : "bg-[#FFFBF0] text-black hover:bg-gray-100"
+                    ? "bg-[#6C47FF] text-white"
+                    : "bg-[#FFFBF0] text-black hover:bg-gray-100",
               )}
             >
               <Globe size={12} />
@@ -470,8 +470,6 @@ interface ChatInterfaceProps {
   /** Called on mobile to open the Sources drawer */
   onOpenSources?: () => void;
 }
-
-
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api";

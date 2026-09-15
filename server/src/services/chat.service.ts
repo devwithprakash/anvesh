@@ -179,9 +179,11 @@ export async function streamWorkspaceChat(
   await updateAiQueryUsageRecord(userId, plan.maxAiQueries);
 
   const workspace = await getWorkspaceByIdForUser(workspaceId, userId);
+
   const requestedModel = input.model ?? workspace.defaultModel;
   const chatModel =
     CHAT_MODELS.find((model) => model === requestedModel) ?? CHAT_MODEL;
+
   const webSearchEnabled =
     input.webSearch === true &&
     plan.webSearchEnabled === true &&
@@ -192,7 +194,7 @@ export async function streamWorkspaceChat(
   if (!userText) {
     throw new ValidationError("A user message is required");
   }
-
+  // get the conversation, if not exist then first create and then get
   const conversation = await resolveConversation(
     workspaceId,
     input.conversationId,
@@ -228,6 +230,7 @@ export async function streamWorkspaceChat(
     webSearchEnabled,
   });
 
+  // Limit conversation history, give only recent RECENT_MESSAGE_WINDOW=12 messages for context
   const contextMessages =
     conversation.summary && input.messages.length > RECENT_MESSAGE_WINDOW
       ? input.messages.slice(-RECENT_MESSAGE_WINDOW)
@@ -248,10 +251,10 @@ export async function streamWorkspaceChat(
                   .string()
                   .describe("The search query for current web information"),
               }),
+
               execute: async ({ query }) => {
-                const results = await searchWeb(query);
-                webSearchResults = results;
-                return formatTavilyResultsForPrompt(results);
+                webSearchResults = await searchWeb(query);
+                return formatTavilyResultsForPrompt(webSearchResults);
               },
             }),
           }
@@ -261,14 +264,14 @@ export async function streamWorkspaceChat(
         model: openai(chatModel),
         system: systemPrompt,
         messages: await convertToModelMessages(contextMessages),
+
         ...(tools !== undefined && {
           tools,
         }),
         stopWhen: webSearchEnabled ? isStepCount(3) : undefined,
       });
 
-      const usage = await result.usage;
-
+      // stream the result to frontend
       writer.merge(toUIMessageStream({ stream: result.stream }));
     },
     onFinish: async ({ responseMessage, isAborted }) => {
@@ -316,7 +319,7 @@ export async function streamWorkspaceChat(
           userId,
         });
       }
-
+      //Learn user memories
       void addMemoriesFromMessages(
         userId,
         [
@@ -333,6 +336,7 @@ export async function streamWorkspaceChat(
     },
   });
 
+  // send streamed HTTP response to frontend
   await pipeUIMessageStreamToResponse({
     response: res,
     stream,

@@ -2,20 +2,6 @@ import { MemoryClient } from "mem0ai";
 
 let client: MemoryClient | null = null;
 
-export function getMem0Client() {
-  const apiKey = process.env.MEM0_API_KEY?.trim();
-
-  if (!apiKey) {
-    throw new Error("MEM0_API_KEY is not configured");
-  }
-
-  if (!client) {
-    client = new MemoryClient({ apiKey });
-  }
-
-  return client;
-}
-
 export type Mem0Message = {
   role: "user" | "assistant";
   content: string;
@@ -55,6 +41,20 @@ function mapMemory(record: {
     categories: record.categories,
     source,
   };
+}
+
+export function getMem0Client() {
+  const apiKey = process.env.MEM0_API_KEY?.trim();
+
+  if (!apiKey) {
+    throw new Error("MEM0_API_KEY is not configured");
+  }
+
+  if (!client) {
+    client = new MemoryClient({ apiKey });
+  }
+
+  return client;
 }
 
 export async function listUserMemories(userId: string) {
@@ -122,6 +122,7 @@ export async function addMemoriesFromMessages(
     return;
   }
 
+  // mem0 will analyze whether there are memories worth storing
   await getMem0Client().add(messages, {
     userId,
     infer: true,
