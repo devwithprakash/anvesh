@@ -1,6 +1,6 @@
 // Mock data for UI development - no API integration
 
-export type SourceType = "PDF" | "WEBSITE" | "YOUTUBE" | "TEXT" | "MARKDOWN";
+export type SourceType = "FILE" | "WEBSITE" | "YOUTUBE" | "TEXT" | "MARKDOWN";
 export type SourceStatus = "PENDING" | "PROCESSING" | "READY" | "FAILED";
 
 export interface Workspace {
@@ -194,14 +194,14 @@ The system you're using right now implements advanced RAG with query rewriting, 
         {
           sourceId: "src-1",
           sourceTitle: "Attention Is All You Need",
-          sourceType: "PDF",
+          sourceType: "FILE",
           chunkIndex: 3,
           text: "The transformer architecture uses self-attention mechanisms to process sequences in parallel...",
         },
         {
           sourceId: "src-2",
           sourceTitle: "RAG Survey 2024",
-          sourceType: "PDF",
+          sourceType: "FILE",
           chunkIndex: 7,
           text: "Retrieval-augmented generation combines parametric and non-parametric memory...",
         },
@@ -288,7 +288,7 @@ export const MOCK_SOURCES: Record<string, Source[]> = {
     {
       id: "src-1",
       workspaceId: "ws-1",
-      type: "PDF",
+      type: "FILE",
       title: "Attention Is All You Need",
       status: "READY",
       createdAt: "2026-08-20T10:00:00Z",
@@ -296,7 +296,7 @@ export const MOCK_SOURCES: Record<string, Source[]> = {
     {
       id: "src-2",
       workspaceId: "ws-1",
-      type: "PDF",
+      type: "FILE",
       title: "RAG Survey 2024",
       status: "READY",
       createdAt: "2026-08-20T10:05:00Z",
@@ -330,7 +330,7 @@ export const MOCK_SOURCES: Record<string, Source[]> = {
     {
       id: "src-6",
       workspaceId: "ws-1",
-      type: "PDF",
+      type: "FILE",
       title: "BERT: Pre-training of Deep Bidirectional Transformers",
       status: "PROCESSING",
       createdAt: "2026-08-25T22:00:00Z",
@@ -357,7 +357,7 @@ export const MOCK_SOURCES: Record<string, Source[]> = {
     {
       id: "src-9",
       workspaceId: "ws-2",
-      type: "PDF",
+      type: "FILE",
       title: "Product Strategy Q4 2026",
       status: "READY",
       createdAt: "2026-08-22T09:00:00Z",
@@ -384,7 +384,7 @@ export const MOCK_SOURCES: Record<string, Source[]> = {
     {
       id: "src-12",
       workspaceId: "ws-3",
-      type: "PDF",
+      type: "FILE",
       title: "SPQR: A History of Ancient Rome",
       status: "READY",
       createdAt: "2026-08-24T09:00:00Z",
@@ -403,7 +403,7 @@ export const MOCK_SOURCES: Record<string, Source[]> = {
     {
       id: "src-14",
       workspaceId: "ws-4",
-      type: "PDF",
+      type: "FILE",
       title: "Service Agreement Draft",
       status: "READY",
       createdAt: "2026-08-25T11:00:00Z",
@@ -411,7 +411,7 @@ export const MOCK_SOURCES: Record<string, Source[]> = {
     {
       id: "src-15",
       workspaceId: "ws-4",
-      type: "PDF",
+      type: "FILE",
       title: "NDA Template",
       status: "READY",
       createdAt: "2026-08-25T11:05:00Z",

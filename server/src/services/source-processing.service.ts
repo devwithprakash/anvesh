@@ -38,6 +38,7 @@ type SourceMetadata = {
 
 async function extractSourceText(source: SourceRecord) {
   const text = source.content?.trim();
+
   if (text) {
     return {
       text,
@@ -46,28 +47,46 @@ async function extractSourceText(source: SourceRecord) {
     };
   }
 
-  if (source.type === "PDF") {
-    const metadata =
-      source.metadata &&
-      typeof source.metadata === "object" &&
-      !Array.isArray(source.metadata)
-        ? (source.metadata as SourceMetadata)
-        : {};
-    if (!metadata.fileUrl) {
-      throw new Error("PDF source is missing fileUrl metadata");
-    }
+  const metadata =
+    source.metadata &&
+    typeof source.metadata === "object" &&
+    !Array.isArray(source.metadata)
+      ? (source.metadata as SourceMetadata)
+      : {};
 
+  if (!metadata.fileUrl) {
+    throw new Error(`Source ${source.id} is missing fileUrl metadata`);
+  }
+
+  if (source.type === "PDF") {
     const extracted = await extractPdfFromCloudinary({
       fileUrl: metadata.fileUrl,
       ...(metadata.publicId !== undefined && {
         publicId: metadata.publicId,
       }),
-      resourceType: metadata.resourceType ?? "image",
+      resourceType: metadata.resourceType ?? "raw",
     });
+
     return {
       text: extracted.text,
       pageCount: extracted.pageCount,
       pages: extracted.pages,
+    };
+  }
+
+  if (source.type === "TEXT") {
+    const response = await fetch(metadata.fileUrl);
+
+    if (!response.ok) {
+      throw new Error(`Failed to download text source: ${response.status}`);
+    }
+
+    const buffer = Buffer.from(await response.arrayBuffer());
+
+    return {
+      text: buffer.toString("utf-8").trim(),
+      pageCount: undefined,
+      pages: undefined,
     };
   }
 

@@ -6,8 +6,6 @@ const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
 const apiKey = process.env.CLOUDINARY_API_KEY;
 const apiSecret = process.env.CLOUDINARY_API_SECRET;
 
-
-
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME as string,
   api_key: process.env.CLOUDINARY_API_KEY as string,
@@ -53,7 +51,7 @@ export function getSignedCloudinaryDownloadUrl(
   });
 }
 
-export async function uploadPdfToCloudinary(
+export async function uploadFileToCloudinary(
   buffer: Buffer,
   fileName: string,
 ): Promise<CloudinaryUploadResult> {
@@ -61,7 +59,7 @@ export async function uploadPdfToCloudinary(
     const uploadStream = cloudinary.uploader.upload_stream(
       {
         resource_type: "raw",
-        folder: "notebook/pdfs",
+        folder: "notebook/files",
         public_id: fileName,
       },
       (error, result) => {
@@ -73,8 +71,7 @@ export async function uploadPdfToCloudinary(
         resolve(result);
       },
     );
-    
-    
+
     Readable.from(buffer).pipe(uploadStream);
   });
 
@@ -83,6 +80,6 @@ export async function uploadPdfToCloudinary(
     publicId: result.public_id,
     bytes: result.bytes,
     originalFileName: fileName,
-    resourceType: result.resource_type === "image" ? "image" : "raw",
+    resourceType: result.resource_type,
   };
 }

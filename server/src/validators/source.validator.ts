@@ -45,7 +45,7 @@ export const createMarkdownSourceSchema = z.object({
 export const createSourceSchema = z.discriminatedUnion("type", [
     createTextSourceSchema,
     createMarkdownSourceSchema,
-]);
+]); 
 
 export const importWebsiteSchema = z.object({
     url: z.string().trim().url("Enter a valid URL"),

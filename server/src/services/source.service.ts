@@ -1,4 +1,4 @@
-import { uploadPdfToCloudinary } from "../lib/cloudinary.js";
+import { uploadFileToCloudinary } from "../lib/cloudinary.js";
 import { scrapeWebsite } from "../lib/external/firecrawl.js";
 import { extractPdfFromBuffer } from "../lib/pdf.js";
 import { enqueueSourceProcessing } from "../lib/events/source-events.js";
@@ -117,7 +117,7 @@ export async function createTextOrMarkdownSource(
   );
 }
 
-export async function uploadPdfSource(
+export async function uploadFileSource(
   workspaceId: string,
   userId: string,
   file: Express.Multer.File,
@@ -125,25 +125,26 @@ export async function uploadPdfSource(
 ) {
   await getWorkspaceByIdForUser(workspaceId, userId);
 
-  const upload = await uploadPdfToCloudinary(file.buffer, file.originalname);
+  const upload = await uploadFileToCloudinary(file.buffer, file.originalname);
 
-  let content: string | null = null;
-  let pageCount: number | undefined;
+  const extension = file.originalname
+    .toLowerCase()
+    .slice(file.originalname.lastIndexOf("."));
 
-  try {
-    const extracted = await extractPdfFromBuffer(file.buffer);
-    content = extracted.text;
-    pageCount = extracted.pageCount;
-  } catch {
-    // Inngest will retry extraction from Cloudinary if upload-time parse fails.
-  }
+  const sourceType =
+    extension === ".pdf" ? "PDF" : extension === ".md" ? "MARKDOWN" : "TEXT";
+
+  const originalNameWithoutExtension = file.originalname.replace(
+    /\.[^/.]+$/,
+    "",
+  );
 
   return createAndProcessSource(
     {
       workspaceId,
-      type: "PDF",
-      title: title?.trim() || file.originalname.replace(/\.pdf$/i, ""),
-      content,
+      type: sourceType,
+      title: title?.trim() || originalNameWithoutExtension,
+      content: null,
       status: "PENDING",
       metadata: {
         fileUrl: upload.secureUrl,
@@ -151,12 +152,11 @@ export async function uploadPdfSource(
         fileSize: upload.bytes,
         publicId: upload.publicId,
         resourceType: upload.resourceType,
-        pageCount,
       },
     },
     userId,
   );
-}
+} 
 
 export async function importWebsiteSource(
   workspaceId: string,

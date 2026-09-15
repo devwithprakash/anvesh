@@ -2,15 +2,16 @@ import { api } from "@/lib/api/client";
 import {
   DeleteSource,
   Source,
-  UploadPdfSource,
+  UploadFileSource,
+  UploadTextInput,
   UploadWebsiteInput,
   UploadYoutubeInput,
 } from "./types";
 
-export async function uploadPdfSource({
+export async function uploadFileSource({
   workspaceId,
   formData,
-}: UploadPdfSource) {
+}: UploadFileSource) {
   return api(`/workspaces/${workspaceId}/sources/upload`, {
     method: "POST",
     data: formData,
@@ -32,6 +33,16 @@ export async function uploadYoutubeSource({
   data,
 }: UploadYoutubeInput) {
   return api(`/workspaces/${workspaceId}/sources/import/youtube`, {
+    method: "POST",
+    data,
+  });
+}
+
+export async function uploadTextSource({
+  workspaceId,
+  data,
+}: UploadTextInput) {
+  return api(`/workspaces/${workspaceId}/sources`, {
     method: "POST",
     data,
   });

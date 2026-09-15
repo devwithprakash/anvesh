@@ -16,25 +16,23 @@ import {
 } from "lucide-react";
 import { YoutubeLogo, TextT } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
-import { useAppState } from "@/components/providers/app-provider";
 import { type SourceType, type Source } from "@/lib/mock-data";
 import {
   useDeleteSource,
-  useUploadPdfSource,
+  useUploadFileSource,
+  useUploadTextSource,
   useUploadWebsiteSource,
   useUploadYoutubeSource,
 } from "@/features/source/mutations";
 import { useSources } from "@/features/source/queries";
 
-// ─── Source type metadata ─────────────────────────────────────────────────────
-
 const SOURCE_META: Record<
   SourceType,
   { icon: React.ReactNode; label: string; accent: string; bg: string }
 > = {
-  PDF: {
+  FILE: {
     icon: <FileText size={14} />,
-    label: "PDF",
+    label: "FILE",
     accent: "text-[#FF6B6B]",
     bg: "bg-[#FFE8E8]",
   },
@@ -64,8 +62,6 @@ const SOURCE_META: Record<
   },
 };
 
-// ─── Status badge ─────────────────────────────────────────────────────────────
-
 function StatusBadge({ status }: { status: Source["status"] }) {
   if (status === "READY")
     return (
@@ -91,8 +87,6 @@ function StatusBadge({ status }: { status: Source["status"] }) {
     </span>
   );
 }
-
-// ─── Sources Panel ────────────────────────────────────────────────────────────
 
 interface SourcesPanelProps {
   workspaceId: string;
@@ -128,7 +122,6 @@ export function SourcesPanel({ workspaceId, onClose }: SourcesPanelProps) {
 
   return (
     <div className="flex h-full w-full md:w-[260px] shrink-0 flex-col border-l-[3px] border-black bg-[#FFFBF0]">
-      {/* Header */}
       <div className="flex items-center justify-between px-3 py-3.5 border-b-[2px] border-black">
         <div className="flex items-center gap-1.5">
           <span className="font-black text-xs text-black uppercase tracking-wide">
@@ -158,7 +151,6 @@ export function SourcesPanel({ workspaceId, onClose }: SourcesPanelProps) {
         </div>
       </div>
 
-      {/* Add source button */}
       <div className="px-2.5 pt-2.5 pb-1.5">
         <button
           onClick={() => setAddOpen(true)}
@@ -169,7 +161,6 @@ export function SourcesPanel({ workspaceId, onClose }: SourcesPanelProps) {
         </button>
       </div>
 
-      {/* Source list */}
       <div className="flex-1 min-h-0 overflow-y-auto px-2.5 py-1">
         {sourceList.length === 0 ? (
           <div className="flex flex-col items-center justify-center gap-2.5 py-10 text-center">
@@ -179,7 +170,7 @@ export function SourcesPanel({ workspaceId, onClose }: SourcesPanelProps) {
             <div>
               <p className="text-xs font-black text-black">No sources</p>
               <p className="text-[10px] font-semibold text-gray-500 mt-0.5">
-                Add PDFs, websites or videos
+                Add files, websites or videos
               </p>
             </div>
           </div>
@@ -192,7 +183,6 @@ export function SourcesPanel({ workspaceId, onClose }: SourcesPanelProps) {
                   key={src.id}
                   className="group relative flex items-center gap-2 rounded-lg border-[2px] border-black bg-white px-2.5 py-2 shadow-[2px_2px_0px_#000]"
                 >
-                  {/* Type icon badge */}
                   <div
                     className={cn(
                       "flex size-6 shrink-0 items-center justify-center rounded-md border-[1.5px] border-black",
@@ -202,7 +192,6 @@ export function SourcesPanel({ workspaceId, onClose }: SourcesPanelProps) {
                     <span className={meta.accent}>{meta.icon}</span>
                   </div>
 
-                  {/* Content */}
                   <div className="flex min-w-0 flex-1 flex-col gap-0.5">
                     <span className="truncate text-[11px] font-black text-black leading-tight">
                       {src.title}
@@ -217,7 +206,6 @@ export function SourcesPanel({ workspaceId, onClose }: SourcesPanelProps) {
                     </div>
                   </div>
 
-                  {/* Actions */}
                   <div className="relative shrink-0">
                     <button
                       onClick={() =>
@@ -257,7 +245,6 @@ export function SourcesPanel({ workspaceId, onClose }: SourcesPanelProps) {
         )}
       </div>
 
-      {/* Footer stats */}
       {sourceList.length > 0 && (
         <div className="border-t-[2px] border-black px-3 py-1.5">
           <p className="text-[9px] font-black text-gray-400 uppercase tracking-wide">
@@ -266,7 +253,6 @@ export function SourcesPanel({ workspaceId, onClose }: SourcesPanelProps) {
         </div>
       )}
 
-      {/* Add Source Dialog */}
       {addOpen && (
         <AddSourceDialog
           setAddOpen={setAddOpen}
@@ -278,8 +264,6 @@ export function SourcesPanel({ workspaceId, onClose }: SourcesPanelProps) {
   );
 }
 
-// ─── Add Source Dialog ────────────────────────────────────────────────────────
-
 function AddSourceDialog({
   onClose,
   setAddOpen,
@@ -289,9 +273,10 @@ function AddSourceDialog({
   setAddOpen: React.Dispatch<React.SetStateAction<boolean>>;
   workspaceId: string;
 }) {
-  const { addSource } = useAppState();
-  const [tab, setTab] = useState<"pdf" | "website" | "youtube" | "text">("pdf");
-  const [pdfFile, setPdfFile] = useState<File | null>(null);
+  const [tab, setTab] = useState<"file" | "website" | "youtube" | "text">(
+    "file",
+  );
+  const [file, setFile] = useState<File | null>(null);
   const [websiteUrl, setWebsiteUrl] = useState("");
   const [websiteTitle, setWebsiteTitle] = useState("");
   const [youtubeUrl, setYoutubeUrl] = useState("");
@@ -300,45 +285,57 @@ function AddSourceDialog({
   const [textContent, setTextContent] = useState("");
   const [textType, setTextType] = useState<"TEXT" | "MARKDOWN">("TEXT");
 
-  const createPdfSource = useUploadPdfSource();
+  const createFileSource = useUploadFileSource();
   const createWebsiteSource = useUploadWebsiteSource();
   const createYoutubeSource = useUploadYoutubeSource();
-
-  const simulateAdd = (partial: Partial<Source>) => {
-    addSource(workspaceId, {
-      id: `src-${Date.now()}`,
-      workspaceId,
-      type: "TEXT",
-      title: "New Source",
-      status: "PENDING",
-      createdAt: new Date().toISOString(),
-      ...partial,
-    } as Source);
-    onClose();
-  };
+  const createTextSource = useUploadTextSource();
 
   const tabs: { id: typeof tab; label: string; icon: React.ReactNode }[] = [
-    { id: "pdf", label: "PDF", icon: <FileText size={13} /> },
+    { id: "file", label: "FILE", icon: <FileText size={13} /> },
     { id: "website", label: "Website", icon: <Globe size={13} /> },
     { id: "youtube", label: "YouTube", icon: <YoutubeLogo size={13} /> },
     { id: "text", label: "Text", icon: <TextT size={13} /> },
   ];
 
-  const handlePdfSourceUpload = async () => {
+  const ALLOWED_FILE_TYPES = [".pdf", ".txt", ".md"];
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files?.[0];
+
+    if (!selectedFile) return;
+
+    const extension = "." + selectedFile.name.split(".").pop()?.toLowerCase();
+
+    if (!ALLOWED_FILE_TYPES.includes(extension)) {
+      // show your toast/error
+      console.log("Only PDF, TEXT and MARKDOWN files are allowed");
+      return;
+    }
+
+    if (selectedFile.size > 10 * 1024 * 1024) {
+      // show your toast/error
+      console.log("File is too large must be under 10 MB");
+      return;
+    }
+
+    setFile(selectedFile);
+  };
+
+  const handleFileSourceUpload = async () => {
     try {
-      if (!pdfFile) {
+      if (!file) {
         return;
       }
 
       const formData = new FormData();
-      formData.append("file", pdfFile);
+      formData.append("file", file);
 
-      const response = await createPdfSource.mutateAsync({
+      const response = await createFileSource.mutateAsync({
         workspaceId,
         formData,
       });
       setAddOpen(false);
-      console.log("Response of pdf source: ", response);
+      console.log("Response of file source: ", response);
     } catch (error) {
       console.error(error);
     }
@@ -388,14 +385,40 @@ function AddSourceDialog({
     }
   };
 
+  const handleTextSourceUpload = async () => {
+    if (!textTitle.trim()) {
+      console.log("Title is required");
+      return;
+    }
+
+    if (!textContent.trim()) {
+      console.log("Text content is required");
+      return;
+    }
+
+    const textData = {
+      type: textType,
+      title: textTitle,
+      content: textContent,
+    };
+
+    try {
+      const response = await createTextSource.mutateAsync({
+        workspaceId,
+        data: textData,
+      });
+      setAddOpen(false);
+      console.log("Response of text source: ", response);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Backdrop */}
       <div className="absolute inset-0 bg-black/20" onClick={onClose} />
 
-      {/* Dialog */}
       <div className="relative w-full max-w-lg rounded-2xl border-[3px] border-black bg-white shadow-[8px_8px_0px_#000]">
-        {/* Header */}
         <div className="flex items-center justify-between border-b-[2px] border-black px-5 py-4">
           <h2 className="font-black text-base text-black">Add source</h2>
           <button
@@ -406,7 +429,6 @@ function AddSourceDialog({
           </button>
         </div>
 
-        {/* Tabs */}
         <div className="flex border-b-[2px] border-black">
           {tabs.map((t) => (
             <button
@@ -425,60 +447,64 @@ function AddSourceDialog({
           ))}
         </div>
 
-        {/* Content */}
         <div className="p-5">
-          {tab === "pdf" && (
+          {tab === "file" && (
             <div className="flex flex-col gap-4">
               <label
-                htmlFor="pdf-file"
+                htmlFor="file-upload"
                 className={cn(
                   "flex flex-col items-center justify-center rounded-xl border-[2.5px] border-dashed px-6 py-10 cursor-pointer transition-all",
-                  pdfFile
+                  file
                     ? "border-[#6C47FF] bg-[#EDE9FE]"
                     : "border-black/30 hover:border-black hover:bg-gray-50",
                 )}
               >
                 <FileText size={32} className="text-[#FF6B6B] mb-2" />
-                {pdfFile ? (
+
+                {file ? (
                   <>
-                    <p className="text-sm font-black text-black">
-                      {pdfFile.name}
-                    </p>
+                    <p className="text-sm font-black text-black">{file.name}</p>
+
                     <p className="text-xs font-semibold text-gray-500 mt-0.5">
-                      {(pdfFile.size / 1024 / 1024).toFixed(2)} MB
+                      {(file.size / 1024 / 1024).toFixed(2)} MB
                     </p>
                   </>
                 ) : (
                   <>
                     <p className="text-sm font-black text-black">
-                      Drop PDF here or click
+                      Drop file here or click
                     </p>
+
                     <p className="text-xs font-semibold text-gray-500 mt-0.5">
-                      Max 10 MB
+                      PDF, TXT, or MD · Max 10 MB
                     </p>
                   </>
                 )}
+
                 <input
-                  id="pdf-file"
+                  id="file-upload"
                   type="file"
-                  accept=".pdf"
+                  accept=".pdf,.txt,.md"
                   className="sr-only"
-                  onChange={(e) => setPdfFile(e.target.files?.[0] ?? null)}
+                  onChange={handleFileChange}
                 />
               </label>
-              {pdfFile && (
+
+              {file && (
                 <button
-                  onClick={() => setPdfFile(null)}
+                  onClick={() => setFile(null)}
                   className="flex items-center gap-1.5 text-xs font-bold text-gray-500 hover:text-black"
                 >
-                  <X size={12} /> Remove file
+                  <X size={12} />
+                  Remove file
                 </button>
               )}
+
               <NbButton
-                onClick={() => pdfFile && handlePdfSourceUpload()}
-                disabled={!pdfFile}
+                onClick={() => file && handleFileSourceUpload()}
+                disabled={!file}
               >
-                Upload PDF
+                Upload File
               </NbButton>
             </div>
           )}
@@ -533,7 +559,6 @@ function AddSourceDialog({
 
           {tab === "text" && (
             <div className="flex flex-col gap-3">
-              {/* Type toggle */}
               <div className="flex gap-2">
                 {(["TEXT", "MARKDOWN"] as const).map((t) => (
                   <button
@@ -569,16 +594,7 @@ function AddSourceDialog({
                 />
               </div>
               <NbButton
-                onClick={() =>
-                  textTitle &&
-                  textContent &&
-                  simulateAdd({
-                    type: textType,
-                    title: textTitle,
-                    content: textContent,
-                    status: "READY",
-                  })
-                }
+                onClick={handleTextSourceUpload}
                 disabled={!textTitle || !textContent}
               >
                 Add text
@@ -590,8 +606,6 @@ function AddSourceDialog({
     </div>
   );
 }
-
-// ─── Reusable neo-brutalist primitives ───────────────────────────────────────
 
 function NbInput({
   label,

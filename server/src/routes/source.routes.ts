@@ -8,13 +8,13 @@ import {
   importWebsite,
   importYoutube,
   listSources,
-  uploadPdf,
+  uploadFile,
 } from "../controllers/source.controller.js";
-import { uploadSinglePdf } from "../middleware/upload-middleware.js";
+import { uploadSingleFile } from "../middleware/upload-middleware.js";
 
 export const sourceRoutes = Router({ mergeParams: true });
 
-sourceRoutes.post("/upload", uploadSinglePdf, asyncHandler(uploadPdf));
+sourceRoutes.post("/upload", uploadSingleFile, asyncHandler(uploadFile));
 
 sourceRoutes.post("/import/website", asyncHandler(importWebsite));
 sourceRoutes.post("/import/youtube", asyncHandler(importYoutube));

@@ -1,9 +1,8 @@
-export type UploadPdfSource = {
+export type UploadFileSource = {
   workspaceId: string;
   title?: string;
   formData: FormData;
 };
-
 
 export type ExternalSource = {
   url: string;
@@ -20,11 +19,22 @@ export type UploadYoutubeInput = {
   data: ExternalSource;
 };
 
-export type GetSources = {
-  workspaceId: string
-}
+export type TextSource = {
+  type: "TEXT" | "MARKDOWN";
+  title: string;
+  content: string;
+};
 
-export type SourceType = "PDF" | "WEBSITE" | "YOUTUBE" | "TEXT" | "MARKDOWN";
+export type UploadTextInput = {
+  workspaceId: string;
+  data: TextSource;
+};
+
+export type GetSources = {
+  workspaceId: string;
+};
+
+export type SourceType = "FILE" | "WEBSITE" | "YOUTUBE" | "TEXT" | "MARKDOWN";
 
 export type SourceStatus = "PENDING" | "PROCESSING" | "READY" | "FAILED";
 
@@ -49,6 +59,6 @@ export interface Source {
 }
 
 export interface DeleteSource {
-    workspaceId: string;
-    sourceId: string
+  workspaceId: string;
+  sourceId: string;
 }
