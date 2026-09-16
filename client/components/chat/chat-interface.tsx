@@ -6,15 +6,12 @@ import { useChat } from "@ai-sdk/react";
 import { useState, useRef, useEffect } from "react";
 import {
   Send,
-  Search,
   Sparkles,
   FileText,
   Globe,
   Square,
   MessageSquare,
   BookOpen,
-  Paperclip,
-  Plus,
 } from "lucide-react";
 import { YoutubeLogo, TextT } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";

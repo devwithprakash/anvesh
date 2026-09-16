@@ -212,7 +212,8 @@ export async function streamWorkspaceChat(
     searchUserMemories(userId, userText),
   ]);
 
-  const citations = retrievedChunks.chunks.map((chunk) => ({
+  const citations = retrievedChunks.chunks.map((chunk, index) => ({
+    id: String(index + 1),
     sourceId: chunk.sourceId,
     sourceTitle: chunk.sourceTitle,
     sourceType: chunk.sourceType,
@@ -260,6 +261,11 @@ export async function streamWorkspaceChat(
           }
         : undefined;
 
+      writer.write({
+        type: "data-citations",
+        data: citations,
+      });
+
       const result = streamText({
         model: openai(chatModel),
         system: systemPrompt,
@@ -284,10 +290,9 @@ export async function streamWorkspaceChat(
         return;
       }
 
-      console.log("Final assistant response:", assistantText);
-
       const webCitations = webSearchResults
-        ? webSearchResults.results.map((result) => ({
+        ? webSearchResults.results.map((result, index) => ({
+            id: `W${index + 1}`,
             sourceType: "WEB" as const,
             sourceTitle: result.title,
             url: result.url,
