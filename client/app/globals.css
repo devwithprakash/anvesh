@@ -131,3 +131,16 @@
     @apply font-sans;
   }
 }
+
+.anvesh-logo { width: 42px; height: 42px; cursor: pointer; overflow: visible; }
+.anvesh-shadow { transition: transform 0.35s cubic-bezier(.34,1.56,.64,1); transform-origin: 100px 100px; }
+.anvesh-body { transition: transform 0.35s cubic-bezier(.34,1.56,.64,1); transform-origin: 100px 100px; }
+.anvesh-handle { transition: transform 0.4s ease; transform-origin: 118px 118px; }
+
+.anvesh-logo:hover .anvesh-shadow { transform: translate(6px, 6px); }
+.anvesh-logo:hover .anvesh-body { transform: translate(-3px, -3px) rotate(-3deg); }
+.anvesh-logo:hover .anvesh-handle { transform: rotate(18deg); }
+
+@media (prefers-reduced-motion: reduce) {
+  .anvesh-shadow, .anvesh-body, .anvesh-handle { transition: none; }
+}
