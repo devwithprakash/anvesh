@@ -16,7 +16,6 @@ export type TavilySearchResponse = {
 let client: ReturnType<typeof tavily> | null = null;
 
 export async function searchWeb(query: string): Promise<TavilySearchResponse> {
-  console.log("Inside the searchweb")
   const apiKey = process.env.TAVILY_API_KEY?.trim();
   if (!apiKey) {
     throw new Error("TAVILY_API_KEY is not configured");
@@ -32,7 +31,6 @@ export async function searchWeb(query: string): Promise<TavilySearchResponse> {
     includeAnswer: true,
   });
 
-  console.log("Tavily web search response: ", response)
 
   return {
     query,

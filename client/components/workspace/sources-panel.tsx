@@ -27,12 +27,18 @@ import {
 import { useSources } from "@/features/source/queries";
 
 const SOURCE_META: Record<
-  SourceType,
+  string,
   { icon: React.ReactNode; label: string; accent: string; bg: string }
 > = {
   FILE: {
     icon: <FileText size={14} />,
     label: "FILE",
+    accent: "text-[#FF6B6B]",
+    bg: "bg-[#FFE8E8]",
+  },
+  PDF: {
+    icon: <FileText size={14} />,
+    label: "PDF",
     accent: "text-[#FF6B6B]",
     bg: "bg-[#FFE8E8]",
   },
@@ -177,7 +183,12 @@ export function SourcesPanel({ workspaceId, onClose }: SourcesPanelProps) {
         ) : (
           <div className="flex flex-col gap-1.5 py-1">
             {sourceList.map((src) => {
-              const meta = SOURCE_META[src.type];
+              const meta = SOURCE_META[src.type] || {
+                icon: <FileText size={14} />,
+                label: src.type || "Document",
+                accent: "text-gray-500",
+                bg: "bg-gray-100",
+              };
               return (
                 <div
                   key={src.id}

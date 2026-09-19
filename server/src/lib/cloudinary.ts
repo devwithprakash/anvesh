@@ -36,13 +36,6 @@ export function getSignedCloudinaryDownloadUrl(
     return null;
   }
 
-  cloudinary.config({
-    cloud_name: cloudName,
-    api_key: apiKey,
-    api_secret: apiSecret,
-    secure: true,
-  });
-
   return cloudinary.url(publicId, {
     resource_type: resourceType,
     type: "upload",
@@ -61,13 +54,20 @@ export async function uploadFileToCloudinary(
         resource_type: "raw",
         folder: "notebook/files",
         public_id: fileName,
+        access_mode: "public",
       },
       (error, result) => {
         if (error) {
           reject(error);
           return;
         }
-
+        console.log("Cloudinary upload:", {
+          publicId: result?.public_id,
+          resourceType: result?.resource_type,
+          type: result?.type,
+          accessMode: result?.access_mode,
+          secureUrl: result?.secure_url,
+        });
         resolve(result);
       },
     );

@@ -79,7 +79,6 @@ export async function retrieveWorkspaceContext(
     .slice(0, 5)
     .filter((chunk) => chunk.bestScore >= RAG_MIN_SCORE);
 
-  console.log("Ranked chunks: ", chunks);
 
   return {
     queries: { original: userQuery, rewritten, stepBack, hyde, subQueries },

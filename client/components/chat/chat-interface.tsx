@@ -261,52 +261,52 @@ function toUIMessagesWithCitations(raw: any[] = []): {
  * This is the primary way citations are displayed — works regardless
  * of whether the model wrote [1] markers inside the response text.
  */
-function CitationFooter({
-  citations,
-}: {
-  citations: Record<string, Citation>;
-}) {
-  const items = Object.values(citations);
-  if (items.length === 0) return null;
+// function CitationFooter({
+//   citations,
+// }: {
+//   citations: Record<string, Citation>;
+// }) {
+//   const items = Object.values(citations);
+//   if (items.length === 0) return null;
 
-  // Deduplicate: same document can be cited by multiple numbers
-  const seen = new Set<string>();
-  const unique = items.filter((c) => {
-    const key = c.sourceId ?? c.id;
-    if (seen.has(key)) return false;
-    seen.add(key);
-    return true;
-  });
+//   // Deduplicate: same document can be cited by multiple numbers
+//   const seen = new Set<string>();
+//   const unique = items.filter((c) => {
+//     const key = c.sourceId ?? c.id;
+//     if (seen.has(key)) return false;
+//     seen.add(key);
+//     return true;
+//   });
 
-  return (
-    <div className="mt-2 flex flex-wrap gap-1.5">
-      {unique.map((citation) => {
-        const icon =
-          CITATION_ICONS[citation.sourceType] ?? (
-            <FileText size={10} className="text-gray-500" />
-          );
-        const isWeb = citation.sourceType === "WEB";
-        const label = isWeb
-          ? citation.url ?? citation.sourceTitle
-          : citation.sourceTitle;
+//   return (
+//     <div className="mt-2 flex flex-wrap gap-1.5">
+//       {unique.map((citation) => {
+//         const icon =
+//           CITATION_ICONS[citation.sourceType] ?? (
+//             <FileText size={10} className="text-gray-500" />
+//           );
+//         const isWeb = citation.sourceType === "WEB";
+//         const label = isWeb
+//           ? citation.url ?? citation.sourceTitle
+//           : citation.sourceTitle;
 
-        return (
-          <span
-            key={citation.id}
-            title={citation.excerpt ?? citation.sourceTitle}
-            className="inline-flex items-center gap-1 rounded-md border-[1.5px] border-black/20 bg-[#FFFBF0] px-2 py-1 text-[10px] font-bold text-gray-600 shadow-[1px_1px_0px_rgba(0,0,0,0.08)] hover:border-[#6C47FF] hover:text-[#6C47FF] cursor-default transition-colors max-w-[180px]"
-          >
-            {icon}
-            <span className="truncate">{label}</span>
-            {citation.page && (
-              <span className="text-gray-400 shrink-0">p.{citation.page}</span>
-            )}
-          </span>
-        );
-      })}
-    </div>
-  );
-}
+//         return (
+//           <span
+//             key={citation.id}
+//             title={citation.excerpt ?? citation.sourceTitle}
+//             className="inline-flex items-center gap-1 rounded-md border-[1.5px] border-black/20 bg-[#FFFBF0] px-2 py-1 text-[10px] font-bold text-gray-600 shadow-[1px_1px_0px_rgba(0,0,0,0.08)] hover:border-[#6C47FF] hover:text-[#6C47FF] cursor-default transition-colors max-w-[180px]"
+//           >
+//             {icon}
+//             <span className="truncate">{label}</span>
+//             {citation.page && (
+//               <span className="text-gray-400 shrink-0">p.{citation.page}</span>
+//             )}
+//           </span>
+//         );
+//       })}
+//     </div>
+//   );
+// }
 
 function AIMessage({
   message,
@@ -329,7 +329,7 @@ function AIMessage({
         <div className="rounded-xl rounded-tl-sm border-[2px] border-black bg-white px-3 py-2.5 shadow-[2px_2px_0px_#000]">
           <FormattedText text={text} citations={citations} />
         </div>
-        {citations && <CitationFooter citations={citations} />}
+        {/* {citations && <CitationFooter citations={citations} />} */}
       </div>
     </div>
   );
