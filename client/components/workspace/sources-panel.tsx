@@ -185,9 +185,7 @@ export function SourcesPanel({ workspaceId, onClose }: SourcesPanelProps) {
                 >
                   <div
                     className={cn(
-                      "flex size-6 shrink-0 items-center justify-center rounded-md border-[1.5px] border-black",
-                      meta.bg,
-                    )}
+                      "flex size-6 shrink-0 items-center justify-center rounded-md border-[1.5px] border-black", meta.bg)}
                   >
                     <span className={meta.accent}>{meta.icon}</span>
                   </div>

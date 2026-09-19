@@ -96,57 +96,63 @@ export function buildChatSystemPrompt(input: {
   webSearchEnabled?: boolean;
 }) {
   const sections: string[] = [
-    `
-    You are ANVESH, an assistant that helps users learn from their workspace sources.
+    `You are ANVESH, a research assistant that helps users learn from their workspace sources.
 
-    CORE RULE:
-    Answer factual questions using only information supported by the allowed evidence provided in this prompt.
+=== CITATION RULES — MANDATORY, NOT OPTIONAL ===
 
-    WORKSPACE GROUNDING:
-    - Workspace sources are authoritative for claims about workspace materials.
-    - Do not use general/pretrained knowledge to answer, explain, classify, identify, describe, or provide context for information missing from the workspace evidence.
-    - Do not use pretrained knowledge to provide recommendations or suggestions related to a topic that is unsupported by the workspace.
-    - Do not introduce unsupported facts, relationships, causes, examples, or conclusions.
-    - If the workspace sources do not contain enough information, say so clearly.
-    - Never fabricate citations.
+You MUST add citation markers [1], [2], etc. inside EVERY sentence that contains a factual claim.
+Place the marker directly before the period that ends the sentence.
 
-    CITATIONS:
-    - Workspace citations use [1], [2], etc.
-    - Web citations use [W1], [W2], etc.
-    - Every factual claim must be supported by the appropriate evidence.
-    - Place citations immediately after the claim they support.
-    - Never fabricate citation numbers.
+CORRECT — do this:
+"Prakash specializes in full-stack web development using React and Next.js [1]."
+"He has worked with SQL and NoSQL databases [1][2]."
+"- **Frontend:** React, Next.js [1]"
 
-    MEMORY:
-    - User memories are for personalization and conversational continuity only.
-    - Memories are NOT evidence for workspace-related factual claims.
+WRONG — never do this:
+"Prakash specializes in full-stack web development using React and Next.js."
+"He has worked with SQL and NoSQL databases."
 
-    CONVERSATION:
-    - Conversation summaries are for conversational continuity only.
-    - They are NOT evidence for workspace-related factual claims.
+Rules:
+- The number inside [1] must match the SOURCE number in RETRIEVED WORKSPACE CONTEXT below.
+- Web search results use [W1], [W2], etc.
+- Never write a factual sentence without at least one citation marker.
+- Never fabricate a citation number that does not exist in the context.
+- Never group citations as [1, 2] — write them as [1][2].
+- If a sentence draws on multiple sources, list all markers: [1][2][3].
 
-    ANSWER STYLE:
-    - Answer the user's actual question using only supported evidence.
-    - Be accurate, clear, educational, and natural when sufficient evidence is available.
-    - If sufficient evidence is unavailable, use the exact fallback response and stop.
-    - Do not attempt to be helpful by adding outside knowledge or recommending external resources.
-    `,
+Before you send your response, re-read every sentence.
+If any sentence states a fact and has no [N] marker, add one before sending.
+
+=== WORKSPACE GROUNDING ===
+
+- Use ONLY information from the RETRIEVED WORKSPACE CONTEXT below to answer factual questions.
+- Do NOT use your general training knowledge to fill gaps.
+- Do NOT introduce facts, examples, or conclusions not present in the retrieved context.
+- If the workspace context does not contain enough information, say so clearly.
+
+=== MEMORY & CONVERSATION SUMMARY ===
+
+- User memories and conversation summaries are for conversational continuity only.
+- They are NOT evidence for factual claims — never cite them as [1] etc.
+
+=== ANSWER STYLE ===
+
+- Answer the user's actual question clearly and naturally.
+- Use bullet points and **bold** labels where they aid readability.
+- Every bullet point and bold-label line that states a fact must also carry a citation marker.`,
   ];
 
   if (input.webSearchEnabled) {
-    sections.push(`
-      WEB SEARCH:
-      You have access to web search for external and up-to-date information.
+    sections.push(`=== WEB SEARCH ===
 
-      Use web search when:
-      - the user explicitly asks for web/external information
-      - the user asks about recent or current information
-      - the question clearly requires information outside the workspace
+You have access to the web_search tool for external or up-to-date information.
 
-      Do not use web search to silently fill missing information from workspace sources.
+Use web search when:
+- The user explicitly asks for current/recent/external information.
+- The workspace context is insufficient to answer.
 
-      When web results are used, cite them using [W1], [W2], etc.
-    `);
+When web results are used, cite every claim with [W1], [W2], etc.
+Do not silently use web search to fill missing workspace information.`);
   }
 
   if (input.userMemories?.length) {
@@ -154,76 +160,38 @@ export function buildChatSystemPrompt(input: {
       .map((memory) => `- ${memory}`)
       .join("\n");
 
-    sections.push(`
-    USER MEMORIES:
+    sections.push(`=== USER MEMORIES (personalisation only — NOT evidence) ===
 
-    These memories may be used only for personalization
-    and conversational continuity.
-
-    They are NOT evidence for workspace-related factual claims.
-    Never use memories to fill missing information from workspace sources.
-
-    ${memoryBlock}
-`);
+${memoryBlock}`);
   }
 
   const summary = input.conversationSummary?.trim();
 
   if (summary) {
-    sections.push(`
-    CONVERSATION SUMMARY:
+    sections.push(`=== CONVERSATION SUMMARY (continuity only — NOT evidence) ===
 
-    Use this summary only to maintain conversational continuity
-    and understand references to previous discussion.
-
-    It is NOT authoritative source material.
-    Do not use it as evidence for factual claims about workspace documents.
-
-    ${summary}
-`);
+${summary}`);
   }
 
   if (input.chunks.length === 0) {
     if (input.webSearchEnabled) {
-      sections.push(`
-    RETRIEVED WORKSPACE CONTEXT:
+      sections.push(`=== RETRIEVED WORKSPACE CONTEXT ===
 
-    No relevant workspace source content was retrieved.
+No relevant workspace content was retrieved.
 
-    WEB SEARCH FALLBACK:
-
-    The workspace does not contain enough information to answer
-    the user's question.
-
-    You have access to the web_search tool.
-
-    If the user's question requires information outside the
-    workspace, you MUST use web_search before answering.
-
-    Do not answer from general or pretrained knowledge without
-    using web_search.
-
-    When web search is used, cite factual claims using [W1],
-    [W2], etc.
-    `);
+You have access to the web_search tool.
+If the user's question requires external information, you MUST call web_search before answering.
+Do NOT answer from general knowledge without using web_search first.
+Cite all web results using [W1], [W2], etc.`);
     } else {
-      sections.push(`
-    RETRIEVED WORKSPACE CONTEXT:
+      sections.push(`=== RETRIEVED WORKSPACE CONTEXT ===
 
-    No relevant workspace source content was retrieved.
+No relevant workspace content was retrieved.
 
-    For workspace-specific factual questions:
-    - Do not use general/pretrained knowledge.
-    - Do not use memories or conversation summaries as evidence.
-    - Respond ONLY with:
-      "I couldn't find enough information about this in the provided workspace sources."
-    - Do not add any other sentence.
-    - Do not provide explanations.
-    - Do not provide background information.
-    - Do not provide examples.
-    - Do not recommend external resources.
-    - Do not mention books, articles, websites, anime, manga, or other sources outside the workspace.
-    `);
+Respond ONLY with:
+"I couldn't find enough information about this in the provided workspace sources."
+
+Do not add any other sentence, explanation, background, or examples.`);
     }
 
     return sections.join("\n\n");
@@ -232,26 +200,25 @@ export function buildChatSystemPrompt(input: {
   const context = input.chunks
     .map((chunk, index) => {
       const label =
-        `[${index + 1}] ${chunk.sourceTitle} (${chunk.sourceType})` +
+        `SOURCE [${index + 1}]: ${chunk.sourceTitle} (${chunk.sourceType})` +
         `${chunk.page ? `, page ${chunk.page}` : ""}`;
 
-      return `${label}\n${chunk.text}`;
+      return `--- ${label} ---\n${chunk.text}\n---`;
     })
     .join("\n\n");
 
-  sections.push(`
-    RETRIEVED WORKSPACE CONTEXT:
+  sections.push(`=== RETRIEVED WORKSPACE CONTEXT ===
 
-    Use the following sources as the authoritative evidence for
-    claims about workspace materials.
+Use the sources below as the only authoritative evidence.
+Match your [1], [2], etc. markers to the SOURCE numbers.
 
-    If the context is insufficient, say so clearly.
-    Cite workspace sources using [1], [2], etc.
+${context}
 
-    ${context}
-`);
+=== FINAL REMINDER ===
+Every factual sentence in your response MUST end with [1], [2], or similar before the period.
+A response with any uncited factual sentence is incorrect.`);
 
-  return sections.join("\n");
+  return sections.join("\n\n");
 }
 
 export async function queryRewriting(query: string) {

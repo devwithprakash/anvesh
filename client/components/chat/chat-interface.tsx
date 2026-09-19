@@ -3,7 +3,7 @@
 import * as React from "react";
 import { UIMessage, DefaultChatTransport } from "ai";
 import { useChat } from "@ai-sdk/react";
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect } from "react";
 import {
   Send,
   Sparkles,
@@ -130,7 +130,7 @@ function FormattedText({
         if (line.startsWith("**") && line.endsWith("**") && line.length > 4)
           return (
             <p key={i} className="font-black text-black">
-              {line.slice(2, -2)}
+              {formatInline(line.slice(2, -2), citations)}
             </p>
           );
         if (line.startsWith("- "))
@@ -253,6 +253,61 @@ function toUIMessagesWithCitations(raw: any[] = []): {
   return { messages, citationsByMessage };
 }
 
+// ─── Citation footer ──────────────────────────────────────────────────────────
+
+/**
+ * Renders a row of source-chip badges below an AI message bubble.
+ * Deduplicates by sourceId so the same document only appears once.
+ * This is the primary way citations are displayed — works regardless
+ * of whether the model wrote [1] markers inside the response text.
+ */
+function CitationFooter({
+  citations,
+}: {
+  citations: Record<string, Citation>;
+}) {
+  const items = Object.values(citations);
+  if (items.length === 0) return null;
+
+  // Deduplicate: same document can be cited by multiple numbers
+  const seen = new Set<string>();
+  const unique = items.filter((c) => {
+    const key = c.sourceId ?? c.id;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+
+  return (
+    <div className="mt-2 flex flex-wrap gap-1.5">
+      {unique.map((citation) => {
+        const icon =
+          CITATION_ICONS[citation.sourceType] ?? (
+            <FileText size={10} className="text-gray-500" />
+          );
+        const isWeb = citation.sourceType === "WEB";
+        const label = isWeb
+          ? citation.url ?? citation.sourceTitle
+          : citation.sourceTitle;
+
+        return (
+          <span
+            key={citation.id}
+            title={citation.excerpt ?? citation.sourceTitle}
+            className="inline-flex items-center gap-1 rounded-md border-[1.5px] border-black/20 bg-[#FFFBF0] px-2 py-1 text-[10px] font-bold text-gray-600 shadow-[1px_1px_0px_rgba(0,0,0,0.08)] hover:border-[#6C47FF] hover:text-[#6C47FF] cursor-default transition-colors max-w-[180px]"
+          >
+            {icon}
+            <span className="truncate">{label}</span>
+            {citation.page && (
+              <span className="text-gray-400 shrink-0">p.{citation.page}</span>
+            )}
+          </span>
+        );
+      })}
+    </div>
+  );
+}
+
 function AIMessage({
   message,
   citations,
@@ -269,11 +324,12 @@ function AIMessage({
         <Sparkles size={12} className="text-[#6C47FF]" />
       </div>
 
-      {/* Bubble */}
+      {/* Bubble + citation footer */}
       <div className="flex-1 min-w-0 max-w-[85%]">
         <div className="rounded-xl rounded-tl-sm border-[2px] border-black bg-white px-3 py-2.5 shadow-[2px_2px_0px_#000]">
           <FormattedText text={text} citations={citations} />
         </div>
+        {citations && <CitationFooter citations={citations} />}
       </div>
     </div>
   );
@@ -374,14 +430,13 @@ function ChatInner({
   const [webSearch, setWebSearch] = useState(false);
 
   // Citations from loaded historical messages + accumulated from streaming
-  const [citationsMap, setCitationsMap] = useState<
-    Record<string, Record<string, Citation>>
-  >(initialCitationsMap);
+  const [citationsMap, setCitationsMap] =
+    useState<Record<string, Record<string, Citation>>>(initialCitationsMap);
 
   const { conversations } = useAppState();
   const { data: sources } = useSources(workspaceId);
   const { data: subStatus } = useSubscriptionStatus();
-  
+
   const webSearchAllowed = subStatus?.plan?.webSearchEnabled ?? false;
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -398,22 +453,61 @@ function ChatInner({
         webSearch,
       },
     }),
+    // onFinish fires once the full assistant message is received (including
+    // any custom data-* annotation parts the server appended after the text
+    // stream). Destructure { message } from the event object — this SDK
+    // version passes an event, not a bare UIMessage.
+    onFinish({ message }: { message: UIMessage }) {
+      if (message.role !== "assistant") return;
+
+      const dataParts = message.parts.filter(
+        (p: UIMessage["parts"][number]) =>
+          p.type.startsWith("data-") && Array.isArray((p as any).data),
+      );
+
+      if (dataParts.length === 0) return;
+
+      const allCitations: Citation[] = [];
+      for (const dp of dataParts) {
+        const arr = (dp as any).data;
+        if (Array.isArray(arr)) {
+          for (const item of arr) {
+            if (item && typeof item === "object" && item.id && item.sourceTitle) {
+              allCitations.push(item as Citation);
+            }
+          }
+        }
+      }
+
+      if (allCitations.length > 0) {
+        setCitationsMap((prev) => ({
+          ...prev,
+          [message.id]: buildCitationMap(allCitations),
+        }));
+      }
+    },
   });
 
-  // Extract citations from streaming data parts whenever messages update.
-  // The server sends citations as a custom data part: { type: "data", data: [...] }
-  // which the AI SDK surfaces on the message as parts with type "data".
+  // Belt-and-suspenders: if onFinish above doesn't surface the data-citations
+  // part (SDK version dependent), this effect catches it by running once when
+  // status transitions from streaming/submitted → ready.
+  const prevStatusRef = useRef(status);
   useEffect(() => {
+    const wasStreaming =
+      prevStatusRef.current === "streaming" ||
+      prevStatusRef.current === "submitted";
+    prevStatusRef.current = status;
+
+    if (!wasStreaming || status !== "ready") return;
+
     const lastMsg = messages[messages.length - 1];
     if (!lastMsg || lastMsg.role !== "assistant") return;
 
     const dataParts = lastMsg.parts.filter(
       (p) => p.type.startsWith("data-") && Array.isArray((p as any).data),
     );
-
     if (dataParts.length === 0) return;
 
-    // The server sends a single data-citations part with the full array
     const allCitations: Citation[] = [];
     for (const dp of dataParts) {
       const arr = (dp as any).data;
@@ -427,13 +521,12 @@ function ChatInner({
     }
 
     if (allCitations.length > 0) {
-      const map = buildCitationMap(allCitations);
       setCitationsMap((prev) => ({
         ...prev,
-        [lastMsg.id]: map,
+        [lastMsg.id]: buildCitationMap(allCitations),
       }));
     }
-  }, [messages]);
+  }, [status, messages]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

@@ -252,7 +252,6 @@ export async function streamWorkspaceChat(
                   .string()
                   .describe("The search query for current web information"),
               }),
-
               execute: async ({ query }) => {
                 webSearchResults = await searchWeb(query);
                 return formatTavilyResultsForPrompt(webSearchResults);
@@ -261,34 +260,42 @@ export async function streamWorkspaceChat(
           }
         : undefined;
 
-      writer.write({
-        type: "data-citations",
-        data: citations,
-      });
-
       const result = streamText({
         model: openai(chatModel),
         system: systemPrompt,
         messages: await convertToModelMessages(contextMessages),
-
-        ...(tools !== undefined && {
-          tools,
-        }),
+        ...(tools !== undefined && { tools }),
         stopWhen: webSearchEnabled ? isStepCount(3) : undefined,
       });
 
-      // stream the result to frontend
+      // Pipe to frontend AND drain the stream fully before continuing
       writer.merge(toUIMessageStream({ stream: result.stream }));
+      await result.consumeStream(); // ✅ waits until LLM is fully done
+
+      const webCitations = webSearchResults
+        ? webSearchResults.results.map((r, index) => ({
+            id: `W${index + 1}`,
+            sourceType: "WEB" as const,
+            sourceTitle: r.title,
+            url: r.url,
+            excerpt: r.content.slice(0, 280),
+          }))
+        : [];
+
+      const allCitations = [...citations, ...webCitations];
+
+      // ✅ Now the stream is done, message exists, safe to write citations
+      writer.write({
+        type: "data-citations",
+        data: allCitations,
+      });
     },
+
     onFinish: async ({ responseMessage, isAborted }) => {
-      if (isAborted) {
-        return;
-      }
+      if (isAborted) return;
 
       const assistantText = getTextFromUIMessage(responseMessage).trim();
-      if (!assistantText) {
-        return;
-      }
+      if (!assistantText) return;
 
       const webCitations = webSearchResults
         ? webSearchResults.results.map((result, index) => ({
@@ -299,6 +306,7 @@ export async function streamWorkspaceChat(
             excerpt: result.content.slice(0, 280),
           }))
         : [];
+
       const allCitations = [...citations, ...webCitations];
 
       await createMessageRecord({
@@ -324,7 +332,7 @@ export async function streamWorkspaceChat(
           userId,
         });
       }
-      //Learn user memories
+
       void addMemoriesFromMessages(
         userId,
         [
