@@ -48,11 +48,16 @@ export interface GetMessageInputSchema {
 }
 
 export interface Citation {
+  id: string;
   sourceId: string;
+  sourceTitle: string;
+  sourceType: string;
   chunkId?: string;
-  content?: string;
+  chunkIndex?: number;
   page?: number;
+  excerpt?: string;
   score?: number;
+  url?: string;
 }
 
 export interface GetMessageOutputSchema {

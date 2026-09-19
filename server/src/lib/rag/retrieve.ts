@@ -2,7 +2,7 @@ import type {
   RecordMetadata,
   ScoredPineconeRecord,
 } from "@pinecone-database/pinecone";
-import { CHAT_MODEL, RAG_TOP_K } from "../ai/ai-config.js";
+import { CHAT_MODEL, RAG_MIN_SCORE, RAG_TOP_K } from "../ai/ai-config.js";
 import { embedTexts } from "../ai/indexing.js";
 import openai from "../ai/openai.js";
 import { queryWorkspaceVectors } from "../pinecone.js";
@@ -75,7 +75,9 @@ export async function retrieveWorkspaceContext(
   }));
 
   const fused = await reciprocalRankFusion(rankedLists);
-  const chunks = fused.slice(0, 5);
+  const chunks = fused
+    .slice(0, 5)
+    .filter((chunk) => chunk.bestScore >= RAG_MIN_SCORE);
 
   console.log("Ranked chunks: ", chunks);
 
@@ -353,8 +355,12 @@ export async function reciprocalRankFusion(
         fused.set(h.id, {
           id: h.id,
           text: h.metadata?.text ?? "",
-          source: h.metadata?.source ?? null,
+          sourceId: h.metadata?.sourceId ?? null,
+          sourceTitle: h.metadata?.sourceTitle ?? "",
+          sourceType: h.metadata?.sourceType ?? "",
+          chunkId: h.metadata?.chunkId ?? null,
           chunkIndex: h.metadata?.chunkIndex ?? null,
+          page: h.metadata?.page ?? undefined,
           bestScore: h.score ?? 0,
           rrfScore: contribution,
           matchedBy: [label],
