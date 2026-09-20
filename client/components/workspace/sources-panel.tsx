@@ -13,10 +13,11 @@ import {
   AlertTriangle,
   Loader,
   X,
+  AlertCircle,
 } from "lucide-react";
 import { YoutubeLogo, TextT } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
-import { type SourceType, type Source } from "@/lib/mock-data";
+import { type Source } from "@/lib/mock-data";
 import {
   useDeleteSource,
   useUploadFileSource,
@@ -96,7 +97,6 @@ function StatusBadge({ status }: { status: Source["status"] }) {
 
 interface SourcesPanelProps {
   workspaceId: string;
-  /** When provided, a close (×) button is shown — used by mobile slide-over */
   onClose?: () => void;
 }
 
@@ -196,7 +196,9 @@ export function SourcesPanel({ workspaceId, onClose }: SourcesPanelProps) {
                 >
                   <div
                     className={cn(
-                      "flex size-6 shrink-0 items-center justify-center rounded-md border-[1.5px] border-black", meta.bg)}
+                      "flex size-6 shrink-0 items-center justify-center rounded-md border-[1.5px] border-black",
+                      meta.bg,
+                    )}
                   >
                     <span className={meta.accent}>{meta.icon}</span>
                   </div>
@@ -293,11 +295,22 @@ function AddSourceDialog({
   const [textTitle, setTextTitle] = useState("");
   const [textContent, setTextContent] = useState("");
   const [textType, setTextType] = useState<"TEXT" | "MARKDOWN">("TEXT");
+  const [fileError, setFileError] = useState<string | null>(null);
+  const [websiteError, setWebsiteError] = useState<string | null>(null);
+  const [youtubeError, setYoutubeError] = useState<string | null>(null);
+  const [textTitleError, setTextTitleError] = useState<string | null>(null);
+  const [textContentError, setTextContentError] = useState<string | null>(null);
 
   const createFileSource = useUploadFileSource();
   const createWebsiteSource = useUploadWebsiteSource();
   const createYoutubeSource = useUploadYoutubeSource();
   const createTextSource = useUploadTextSource();
+
+  const isUploading =
+    createFileSource.isPending ||
+    createWebsiteSource.isPending ||
+    createYoutubeSource.isPending ||
+    createTextSource.isPending;
 
   const tabs: { id: typeof tab; label: string; icon: React.ReactNode }[] = [
     { id: "file", label: "FILE", icon: <FileText size={13} /> },
@@ -308,6 +321,17 @@ function AddSourceDialog({
 
   const ALLOWED_FILE_TYPES = [".pdf", ".txt", ".md"];
 
+  const YOUTUBE_HOSTS = [
+    "youtube.com",
+    "www.youtube.com",
+    "m.youtube.com",
+    "music.youtube.com",
+    "youtu.be",
+  ];
+
+  const MAX_TEXT_CHARS = 100_000; // match your backend limit
+  const MAX_TITLE_CHARS = 200;
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
 
@@ -316,18 +340,84 @@ function AddSourceDialog({
     const extension = "." + selectedFile.name.split(".").pop()?.toLowerCase();
 
     if (!ALLOWED_FILE_TYPES.includes(extension)) {
-      // show your toast/error
-      console.log("Only PDF, TEXT and MARKDOWN files are allowed");
+      setFile(null);
+      setFileError("Only PDF, TXT, and MD files are allowed.");
+      e.target.value = "";
       return;
     }
 
     if (selectedFile.size > 10 * 1024 * 1024) {
-      // show your toast/error
-      console.log("File is too large must be under 10 MB");
+      setFile(null);
+      setFileError("File is too large. It must be under 10 MB.");
+      e.target.value = "";
       return;
     }
 
+    setFileError(null);
     setFile(selectedFile);
+  };
+
+  const normalizeUrl = (input: string) => {
+    const trimmed = input.trim();
+    if (!trimmed) return "";
+    return /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+  };
+
+  const validateWebsiteUrl = (input: string): string | null => {
+    if (!input.trim()) return "Please enter a website URL.";
+
+    try {
+      const url = new URL(normalizeUrl(input));
+
+      if (!["http:", "https:"].includes(url.protocol)) {
+        return "URL must start with http:// or https://";
+      }
+      // needs a real domain like example.com (rejects "https://abc")
+      if (!url.hostname.includes(".")) {
+        return "Please enter a valid website URL.";
+      }
+      return null;
+    } catch {
+      return "Please enter a valid website URL.";
+    }
+  };
+
+  const validateYoutubeUrl = (input: string): string | null => {
+    if (!input.trim()) return "Please enter a YouTube URL.";
+
+    try {
+      const url = new URL(normalizeUrl(input));
+
+      if (!YOUTUBE_HOSTS.includes(url.hostname)) {
+        return "Please enter a valid YouTube link.";
+      }
+
+      const isShortLink =
+        url.hostname === "youtu.be" && url.pathname.length > 1;
+      const hasVideoParam = !!url.searchParams.get("v");
+      const isPathVideo = /^\/(shorts|embed|live)\/[\w-]+/.test(url.pathname);
+
+      if (!isShortLink && !hasVideoParam && !isPathVideo) {
+        return "This link doesn't point to a specific video.";
+      }
+      return null;
+    } catch {
+      return "Please enter a valid YouTube link.";
+    }
+  };
+
+  const validateText = (title: string, content: string) => {
+    const errors: { title?: string; content?: string } = {};
+
+    if (!title.trim()) errors.title = "Please enter a title.";
+    else if (title.trim().length > MAX_TITLE_CHARS)
+      errors.title = `Title must be under ${MAX_TITLE_CHARS} characters.`;
+
+    if (!content.trim()) errors.content = "Please enter some content.";
+    else if (content.length > MAX_TEXT_CHARS)
+      errors.content = `Content is too long. Max ${MAX_TEXT_CHARS.toLocaleString()} characters.`;
+
+    return errors;
   };
 
   const handleFileSourceUpload = async () => {
@@ -350,76 +440,94 @@ function AddSourceDialog({
     }
   };
 
-  const handleWebisteSourceUpload = async () => {
+  const handleWebsiteSourceUpload = async () => {
+    const error = validateWebsiteUrl(websiteUrl);
+    if (error) {
+      setWebsiteError(error);
+      return;
+    }
+
+    setWebsiteError(null);
+
     try {
-      if (!websiteUrl) {
-        return;
-      }
-
-      const websiteData = {
-        url: websiteUrl,
-        title: websiteTitle,
-      };
-
-      const response = await createWebsiteSource.mutateAsync({
+      await createWebsiteSource.mutateAsync({
         workspaceId,
-        data: websiteData,
+        data: {
+          url: normalizeUrl(websiteUrl),
+          title: websiteTitle.trim() || undefined,
+        },
       });
+
+      setWebsiteUrl("");
+      setWebsiteTitle("");
       setAddOpen(false);
-      console.log("Response of website source: ", response);
-    } catch (error) {
-      console.error(error);
+    } catch (err) {
+      console.error(err);
+      setWebsiteError(
+        err instanceof Error && err.message
+          ? err.message
+          : "Couldn't add this website. Please try again.",
+      );
     }
   };
 
   const handleYoutubeSourceUpload = async () => {
     try {
-      if (!youtubeUrl) {
+      const error = validateYoutubeUrl(youtubeUrl);
+
+      if (error) {
+        setYoutubeError(error);
         return;
       }
 
-      const youtubeData = {
-        url: youtubeUrl,
-        title: youtubeTitle,
-      };
+      setYoutubeError(null);
 
       const response = await createYoutubeSource.mutateAsync({
         workspaceId,
-        data: youtubeData,
+        data: {
+          url: normalizeUrl(websiteUrl),
+          title: youtubeTitle.trim() || undefined,
+        },
       });
+      setYoutubeUrl("");
+      setYoutubeTitle("");
       setAddOpen(false);
       console.log("Response of youtube source: ", response);
     } catch (error) {
       console.error(error);
+      setWebsiteError(
+        error instanceof Error && error.message
+          ? error.message
+          : "Couldn't import this video. Please try again.",
+      );
     }
   };
 
   const handleTextSourceUpload = async () => {
-    if (!textTitle.trim()) {
-      console.log("Title is required");
-      return;
-    }
-
-    if (!textContent.trim()) {
-      console.log("Text content is required");
-      return;
-    }
-
-    const textData = {
-      type: textType,
-      title: textTitle,
-      content: textContent,
-    };
+    const errors = validateText(textTitle, textContent);
+    setTextTitleError(errors.title ?? null);
+    setTextContentError(errors.content ?? null);
+    if (errors.title || errors.content) return;
 
     try {
-      const response = await createTextSource.mutateAsync({
+      await createTextSource.mutateAsync({
         workspaceId,
-        data: textData,
+        data: {
+          title: textTitle.trim(),
+          content: textContent,
+          type: textType,
+        },
       });
+      setTextTitle("");
+      setTextContent("");
       setAddOpen(false);
-      console.log("Response of text source: ", response);
-    } catch (error) {
-      console.error(error);
+    } catch (err) {
+      console.error(err);
+      setTextContentError(
+        err instanceof Error && err.message
+          ? err.message
+          : "Couldn't add this text. Please try again.",
+      );
     }
   };
 
@@ -463,9 +571,11 @@ function AddSourceDialog({
                 htmlFor="file-upload"
                 className={cn(
                   "flex flex-col items-center justify-center rounded-xl border-[2.5px] border-dashed px-6 py-10 cursor-pointer transition-all",
-                  file
-                    ? "border-[#6C47FF] bg-[#EDE9FE]"
-                    : "border-black/30 hover:border-black hover:bg-gray-50",
+                  fileError
+                    ? "border-red-500 bg-red-50"
+                    : file
+                      ? "border-[#6C47FF] bg-[#EDE9FE]"
+                      : "border-black/30 hover:border-black hover:bg-gray-50",
                 )}
               >
                 <FileText size={32} className="text-[#FF6B6B] mb-2" />
@@ -496,12 +606,28 @@ function AddSourceDialog({
                   accept=".pdf,.txt,.md"
                   className="sr-only"
                   onChange={handleFileChange}
+                  aria-invalid={!!fileError}
+                  aria-describedby={fileError ? "file-error" : undefined}
                 />
               </label>
 
+              {fileError && (
+                <p
+                  id="file-error"
+                  role="alert"
+                  className="flex items-center gap-1.5 text-xs font-bold text-red-600"
+                >
+                  <AlertCircle size={14} />
+                  {fileError}
+                </p>
+              )}
+
               {file && (
                 <button
-                  onClick={() => setFile(null)}
+                  onClick={() => {
+                    setFile(null);
+                    setFileError(null);
+                  }}
                   className="flex items-center gap-1.5 text-xs font-bold text-gray-500 hover:text-black"
                 >
                   <X size={12} />
@@ -511,9 +637,22 @@ function AddSourceDialog({
 
               <NbButton
                 onClick={() => file && handleFileSourceUpload()}
-                disabled={!file}
+                disabled={!file || isUploading}
               >
-                Upload File
+                {isUploading ? (
+                  <span
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 8,
+                    }}
+                  >
+                    <span className="spinner" aria-hidden="true" />
+                    Uploading...
+                  </span>
+                ) : (
+                  "Upload File"
+                )}
               </NbButton>
             </div>
           )}
@@ -525,7 +664,11 @@ function AddSourceDialog({
                 type="url"
                 placeholder="https://example.com/article"
                 value={websiteUrl}
-                onChange={(e) => setWebsiteUrl(e.target.value)}
+                error={websiteError}
+                onChange={(e) => {
+                  setWebsiteUrl(e.target.value);
+                  if (websiteError) setWebsiteError(null);
+                }}
               />
               <NbInput
                 label="Title (optional)"
@@ -534,10 +677,23 @@ function AddSourceDialog({
                 onChange={(e) => setWebsiteTitle(e.target.value)}
               />
               <NbButton
-                onClick={() => websiteUrl && handleWebisteSourceUpload()}
-                disabled={!websiteUrl}
+                onClick={handleWebsiteSourceUpload}
+                disabled={!websiteUrl.trim() || isUploading}
               >
-                Import website
+                {isUploading ? (
+                  <span
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 8,
+                    }}
+                  >
+                    <span className="spinner" aria-hidden="true" />
+                    Importing...
+                  </span>
+                ) : (
+                  "Import Webiste"
+                )}
               </NbButton>
             </div>
           )}
@@ -549,7 +705,11 @@ function AddSourceDialog({
                 type="url"
                 placeholder="https://youtube.com/watch?v=..."
                 value={youtubeUrl}
-                onChange={(e) => setYoutubeUrl(e.target.value)}
+                error={youtubeError}
+                onChange={(e) => {
+                  setYoutubeUrl(e.target.value);
+                  if (youtubeError) setYoutubeError(null);
+                }}
               />
               <NbInput
                 label="Title (optional)"
@@ -558,10 +718,17 @@ function AddSourceDialog({
                 onChange={(e) => setYoutubeTitle(e.target.value)}
               />
               <NbButton
-                onClick={() => youtubeUrl && handleYoutubeSourceUpload()}
-                disabled={!youtubeUrl}
+                onClick={handleYoutubeSourceUpload}
+                disabled={!youtubeUrl.trim() || isUploading}
               >
-                Import YouTube
+                {isUploading ? (
+                  <span className="inline-flex items-center gap-2">
+                    <span className="spinner" aria-hidden="true" />
+                    Importing...
+                  </span>
+                ) : (
+                  "Import YouTube"
+                )}
               </NbButton>
             </div>
           )}
@@ -588,25 +755,83 @@ function AddSourceDialog({
                 label="Title *"
                 placeholder="Source title"
                 value={textTitle}
-                onChange={(e) => setTextTitle(e.target.value)}
+                error={textTitleError}
+                onChange={(e) => {
+                  setTextTitle(e.target.value);
+                  if (textTitleError) setTextTitleError(null);
+                }}
               />
+
               <div className="flex flex-col gap-1">
-                <label className="text-xs font-black text-black uppercase tracking-wide">
+                <label
+                  htmlFor="text-content"
+                  className="text-xs font-black text-black uppercase tracking-wide"
+                >
                   Content *
                 </label>
                 <textarea
+                  id="text-content"
                   placeholder="Paste your content here…"
                   value={textContent}
-                  onChange={(e) => setTextContent(e.target.value)}
+                  onChange={(e) => {
+                    setTextContent(e.target.value);
+                    if (textContentError) setTextContentError(null);
+                  }}
                   rows={5}
-                  className="w-full rounded-xl border-[2px] border-black bg-white px-3 py-2 text-sm font-semibold text-black placeholder:text-gray-400 shadow-[2px_2px_0px_#000] outline-none focus:shadow-none focus:translate-x-[2px] focus:translate-y-[2px] transition-all resize-none"
+                  aria-invalid={!!textContentError}
+                  aria-describedby={
+                    textContentError ? "text-content-error" : undefined
+                  }
+                  className={cn(
+                    "w-full rounded-xl border-[2px] bg-white px-3 py-2 text-sm font-semibold text-black placeholder:text-gray-400 outline-none transition-all resize-none",
+                    "focus:shadow-none focus:translate-x-[2px] focus:translate-y-[2px]",
+                    textContentError
+                      ? "border-red-500 bg-red-50 shadow-[2px_2px_0px_#ef4444]"
+                      : "border-black shadow-[2px_2px_0px_#000]",
+                  )}
                 />
+                <div className="flex items-start justify-between gap-2">
+                  {textContentError ? (
+                    <p
+                      id="text-content-error"
+                      role="alert"
+                      className="flex items-center gap-1.5 text-xs font-bold text-red-600"
+                    >
+                      <AlertCircle size={14} />
+                      {textContentError}
+                    </p>
+                  ) : (
+                    <span />
+                  )}
+                  <span className="text-xs font-semibold text-gray-400 shrink-0">
+                    {textContent.length.toLocaleString()} /{" "}
+                    {MAX_TEXT_CHARS.toLocaleString()}
+                  </span>
+                </div>
               </div>
+
               <NbButton
                 onClick={handleTextSourceUpload}
-                disabled={!textTitle || !textContent}
+                disabled={
+                  !textTitle.trim() ||
+                  !textContent.trim() ||
+                  createTextSource.isPending
+                }
               >
-                Add text
+                {isUploading ? (
+                  <span
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 8,
+                    }}
+                  >
+                    <span className="spinner" aria-hidden="true" />
+                    Uploading...
+                  </span>
+                ) : (
+                  "Add Text"
+                )}
               </NbButton>
             </div>
           )}
@@ -616,19 +841,50 @@ function AddSourceDialog({
   );
 }
 
-function NbInput({
-  label,
-  ...props
-}: React.InputHTMLAttributes<HTMLInputElement> & { label: string }) {
+type NbInputProps = React.InputHTMLAttributes<HTMLInputElement> & {
+  label: string;
+  error?: string | null;
+};
+
+function NbInput({ label, error, className, id, ...props }: NbInputProps) {
+  const generatedId = React.useId();
+  const inputId = id ?? generatedId;
+  const errorId = `${inputId}-error`;
+
   return (
     <div className="flex flex-col gap-1">
-      <label className="text-xs font-black text-black uppercase tracking-wide">
+      <label
+        htmlFor={inputId}
+        className="text-xs font-black text-black uppercase tracking-wide"
+      >
         {label}
       </label>
+
       <input
         {...props}
-        className="h-10 w-full rounded-xl border-[2px] border-black bg-white px-3 text-sm font-semibold text-black placeholder:text-gray-400 shadow-[2px_2px_0px_#000] outline-none focus:shadow-none focus:translate-x-[2px] focus:translate-y-[2px] transition-all"
+        id={inputId}
+        aria-invalid={!!error}
+        aria-describedby={error ? errorId : undefined}
+        className={cn(
+          "h-10 w-full rounded-xl border-[2px] bg-white px-3 text-sm font-semibold text-black placeholder:text-gray-400 outline-none transition-all",
+          "focus:shadow-none focus:translate-x-[2px] focus:translate-y-[2px]",
+          error
+            ? "border-red-500 bg-red-50 shadow-[2px_2px_0px_#ef4444]"
+            : "border-black shadow-[2px_2px_0px_#000]",
+          className,
+        )}
       />
+
+      {error && (
+        <p
+          id={errorId}
+          role="alert"
+          className="flex items-center gap-1.5 text-xs font-bold text-red-600"
+        >
+          <AlertCircle size={14} />
+          {error}
+        </p>
+      )}
     </div>
   );
 }
