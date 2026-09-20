@@ -143,7 +143,7 @@ async function resolveConversation(
  * 2. Save user message to Postgres
  * 3. Parallel: Pinecone RAG retrieval + Mem0 memory search
  * 4. Build system prompt and stream model response via AI SDK
- * 5. On finish: save assistant message, citations, title, summary job, Mem0 learning
+ * 5. On finish: save assistant message, title, summary job, Mem0 learning
  *
  * @param res - Express response (streamed via `pipeUIMessageStreamToResponse`)
  * @param workspaceId - Workspace whose sources to search
@@ -212,18 +212,6 @@ export async function streamWorkspaceChat(
     searchUserMemories(userId, userText),
   ]);
 
-  const citations = retrievedChunks.chunks.map((chunk, index) => ({
-    id: String(index + 1),
-    sourceId: chunk.sourceId,
-    sourceTitle: chunk.sourceTitle,
-    sourceType: chunk.sourceType,
-    chunkId: chunk.chunkId,
-    chunkIndex: chunk.chunkIndex,
-    page: chunk.page,
-    excerpt: chunk.text.slice(0, 280),
-    score: chunk.score,
-  }));
-
   const systemPrompt = buildChatSystemPrompt({
     chunks: retrievedChunks.chunks,
     conversationSummary: conversation.summary,
@@ -271,24 +259,6 @@ export async function streamWorkspaceChat(
       // Pipe to frontend AND drain the stream fully before continuing
       writer.merge(toUIMessageStream({ stream: result.stream }));
       await result.consumeStream(); // ✅ waits until LLM is fully done
-
-      const webCitations = webSearchResults
-        ? webSearchResults.results.map((r, index) => ({
-            id: `W${index + 1}`,
-            sourceType: "WEB" as const,
-            sourceTitle: r.title,
-            url: r.url,
-            excerpt: r.content.slice(0, 280),
-          }))
-        : [];
-
-      const allCitations = [...citations, ...webCitations];
-
-      // ✅ Now the stream is done, message exists, safe to write citations
-      writer.write({
-        type: "data-citations",
-        data: allCitations,
-      });
     },
 
     onFinish: async ({ responseMessage, isAborted }) => {
@@ -297,23 +267,10 @@ export async function streamWorkspaceChat(
       const assistantText = getTextFromUIMessage(responseMessage).trim();
       if (!assistantText) return;
 
-      const webCitations = webSearchResults
-        ? webSearchResults.results.map((result, index) => ({
-            id: `W${index + 1}`,
-            sourceType: "WEB" as const,
-            sourceTitle: result.title,
-            url: result.url,
-            excerpt: result.content.slice(0, 280),
-          }))
-        : [];
-
-      const allCitations = [...citations, ...webCitations];
-
       await createMessageRecord({
         conversationId: conversation.id,
         role: "ASSISTANT",
         content: assistantText,
-        citations: allCitations,
       });
 
       await touchConversation(conversation.id);

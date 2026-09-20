@@ -7,121 +7,20 @@ import { useState, useRef, useEffect } from "react";
 import {
   Send,
   Sparkles,
-  FileText,
   Globe,
   Square,
   MessageSquare,
   BookOpen,
 } from "lucide-react";
-import { YoutubeLogo, TextT } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { useAppState } from "@/components/providers/app-provider";
-import { Citation } from "@/features/conversation/types";
 import { useMessages } from "@/features/conversation/queries";
 import { useSources } from "@/features/source/queries";
 import { useSubscriptionStatus } from "@/features/subscription/queries";
 
-// ─── Citation chip ────────────────────────────────────────────────────────────
 
-const CITATION_ICONS: Record<string, React.ReactNode> = {
-  PDF: <FileText size={10} className="text-[#FF6B6B]" />,
-  WEBSITE: <Globe size={10} className="text-blue-600" />,
-  YOUTUBE: <YoutubeLogo size={10} className="text-red-600" />,
-  TEXT: <TextT size={10} className="text-[#00B87C]" />,
-  MARKDOWN: <TextT size={10} className="text-[#6C47FF]" />,
-};
 
-function InlineCitation({
-  citation,
-  label,
-}: {
-  citation: Citation;
-  label: string;
-}) {
-  const [open, setOpen] = useState(false);
-  const timeoutRef = useRef<ReturnType<typeof setTimeout>>(null);
-
-  const handleEnter = () => {
-    if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    setOpen(true);
-  };
-  const handleLeave = () => {
-    timeoutRef.current = setTimeout(() => setOpen(false), 150);
-  };
-
-  const icon = CITATION_ICONS[citation.sourceType] ?? (
-    <FileText size={10} className="text-gray-500" />
-  );
-  const isWeb = citation.sourceType === "WEB";
-
-  return (
-    <span
-      className="relative inline-block"
-      onMouseEnter={handleEnter}
-      onMouseLeave={handleLeave}
-    >
-      {/* Badge */}
-      <span className="inline-flex items-center gap-0.5 rounded-md border-[1.5px] border-black bg-[#EDE9FE] px-1 py-0 text-[10px] font-black text-[#6C47FF] shadow-[1px_1px_0px_#000] cursor-default align-baseline mx-0.5 leading-none">
-        {icon}
-        <span>[{label}]</span>
-      </span>
-
-      {/* Hover popover */}
-      {open && (
-        <span
-          className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-50"
-          onMouseEnter={handleEnter}
-          onMouseLeave={handleLeave}
-        >
-          <span className="block w-64 rounded-lg border-[2px] border-black bg-white px-3 py-2.5 shadow-[3px_3px_0px_#000] text-left">
-            {/* Header */}
-            <span className="flex items-center gap-1.5 mb-1.5">
-              {icon}
-              <span className="text-[11px] font-black text-black truncate">
-                {citation.sourceTitle}
-              </span>
-            </span>
-
-            {/* Meta row */}
-            <span className="flex items-center gap-2 text-[10px] text-gray-500 font-semibold mb-1.5">
-              <span className="rounded bg-gray-100 px-1 py-0.5 border border-gray-200">
-                {isWeb ? "Web" : citation.sourceType}
-              </span>
-              {citation.page && <span>Page {citation.page}</span>}
-              {citation.score != null && (
-                <span>Score {(citation.score * 100).toFixed(0)}%</span>
-              )}
-            </span>
-
-            {/* Excerpt */}
-            {citation.excerpt && (
-              <span className="block text-[11px] text-gray-600 leading-snug line-clamp-3 font-medium">
-                &ldquo;{citation.excerpt}&rdquo;
-              </span>
-            )}
-
-            {/* Web URL */}
-            {isWeb && citation.url && (
-              <span className="block text-[10px] text-[#6C47FF] font-bold mt-1 truncate">
-                {citation.url}
-              </span>
-            )}
-          </span>
-          {/* Arrow */}
-          <span className="absolute left-1/2 -translate-x-1/2 -bottom-1 w-2 h-2 rotate-45 border-r-[2px] border-b-[2px] border-black bg-white" />
-        </span>
-      )}
-    </span>
-  );
-}
-
-function FormattedText({
-  text,
-  citations,
-}: {
-  text: string;
-  citations?: Record<string, Citation>;
-}) {
+function FormattedText({ text }: { text: string }) {
   const lines = text.split("\n");
   return (
     <div className="flex flex-col gap-1">
@@ -130,14 +29,14 @@ function FormattedText({
         if (line.startsWith("**") && line.endsWith("**") && line.length > 4)
           return (
             <p key={i} className="font-black text-black">
-              {formatInline(line.slice(2, -2), citations)}
+              {formatInline(line.slice(2, -2))}
             </p>
           );
         if (line.startsWith("- "))
           return (
             <div key={i} className="flex gap-2 text-sm">
               <span className="text-gray-400 mt-0.5 shrink-0">•</span>
-              <span>{formatInline(line.slice(2), citations)}</span>
+              <span>{formatInline(line.slice(2))}</span>
             </div>
           );
         if (/^\d+\.\s/.test(line))
@@ -147,13 +46,13 @@ function FormattedText({
                 {line.match(/^\d+/)?.[0]}.
               </span>
               <span>
-                {formatInline(line.replace(/^\d+\.\s/, ""), citations)}
+                {formatInline(line.replace(/^\d+\.\s/, ""))}
               </span>
             </div>
           );
         return (
           <p key={i} className="text-sm leading-relaxed">
-            {formatInline(line, citations)}
+            {formatInline(line)}
           </p>
         );
       })}
@@ -161,36 +60,18 @@ function FormattedText({
   );
 }
 
-/**
- * Parse inline markdown bold and citation references like [1], [2], [W1].
- * When a citation reference matches a key in the citations map, render
- * an interactive InlineCitation badge; otherwise render the raw text.
- */
-function formatInline(
-  text: string,
-  citations?: Record<string, Citation>,
-): React.ReactNode {
-  // Split on bold (**...**) and citation references ([1], [W1], etc.)
-  const parts = text.split(/(\*\*[^*]+\*\*|\[W?\d+\])/g);
+/** Parse inline markdown bold. */
+function formatInline(text: string): React.ReactNode {
+  // Split on bold (**...**)
+  const parts = text.split(/(\*\*[^*]+\*\*)/g);
 
   return parts.map((part, i) => {
-    // Bold
     if (part.startsWith("**") && part.endsWith("**")) {
       return (
         <strong key={i} className="font-black">
           {part.slice(2, -2)}
         </strong>
       );
-    }
-
-    // Citation reference like [1], [2], [W1], [W2]
-    const citationMatch = part.match(/^\[(W?\d+)\]$/);
-    if (citationMatch && citations) {
-      const label = citationMatch[1]; // "1", "2", "W1", etc.
-      const citation = citations[label];
-      if (citation) {
-        return <InlineCitation key={i} citation={citation} label={label} />;
-      }
     }
 
     return part;
@@ -223,98 +104,15 @@ function getTextContent(message: UIMessage): string {
     .join("");
 }
 
-/** Build a citation lookup map keyed by citation id/label → Citation */
-function buildCitationMap(
-  citations: Citation[] | undefined | null,
-): Record<string, Citation> {
-  if (!citations?.length) return {};
-  const map: Record<string, Citation> = {};
-  for (const c of citations) {
-    map[c.id] = c;
-  }
-  return map;
+function toUIMessages(raw: any[] = []): UIMessage[] {
+  return raw.map((m) => ({
+    id: m.id,
+    role: m.role.toLowerCase() as "user" | "assistant",
+    parts: [{ type: "text", text: m.content }],
+  }));
 }
 
-function toUIMessagesWithCitations(raw: any[] = []): {
-  messages: UIMessage[];
-  citationsByMessage: Record<string, Record<string, Citation>>;
-} {
-  const citationsByMessage: Record<string, Record<string, Citation>> = {};
-  const messages: UIMessage[] = raw.map((m) => {
-    if (m.citations?.length) {
-      citationsByMessage[m.id] = buildCitationMap(m.citations);
-    }
-    return {
-      id: m.id,
-      role: m.role.toLowerCase() as "user" | "assistant",
-      parts: [{ type: "text", text: m.content }],
-    };
-  });
-  return { messages, citationsByMessage };
-}
-
-// ─── Citation footer ──────────────────────────────────────────────────────────
-
-/**
- * Renders a row of source-chip badges below an AI message bubble.
- * Deduplicates by sourceId so the same document only appears once.
- * This is the primary way citations are displayed — works regardless
- * of whether the model wrote [1] markers inside the response text.
- */
-// function CitationFooter({
-//   citations,
-// }: {
-//   citations: Record<string, Citation>;
-// }) {
-//   const items = Object.values(citations);
-//   if (items.length === 0) return null;
-
-//   // Deduplicate: same document can be cited by multiple numbers
-//   const seen = new Set<string>();
-//   const unique = items.filter((c) => {
-//     const key = c.sourceId ?? c.id;
-//     if (seen.has(key)) return false;
-//     seen.add(key);
-//     return true;
-//   });
-
-//   return (
-//     <div className="mt-2 flex flex-wrap gap-1.5">
-//       {unique.map((citation) => {
-//         const icon =
-//           CITATION_ICONS[citation.sourceType] ?? (
-//             <FileText size={10} className="text-gray-500" />
-//           );
-//         const isWeb = citation.sourceType === "WEB";
-//         const label = isWeb
-//           ? citation.url ?? citation.sourceTitle
-//           : citation.sourceTitle;
-
-//         return (
-//           <span
-//             key={citation.id}
-//             title={citation.excerpt ?? citation.sourceTitle}
-//             className="inline-flex items-center gap-1 rounded-md border-[1.5px] border-black/20 bg-[#FFFBF0] px-2 py-1 text-[10px] font-bold text-gray-600 shadow-[1px_1px_0px_rgba(0,0,0,0.08)] hover:border-[#6C47FF] hover:text-[#6C47FF] cursor-default transition-colors max-w-[180px]"
-//           >
-//             {icon}
-//             <span className="truncate">{label}</span>
-//             {citation.page && (
-//               <span className="text-gray-400 shrink-0">p.{citation.page}</span>
-//             )}
-//           </span>
-//         );
-//       })}
-//     </div>
-//   );
-// }
-
-function AIMessage({
-  message,
-  citations,
-}: {
-  message: UIMessage;
-  citations?: Record<string, Citation>;
-}) {
+function AIMessage({ message }: { message: UIMessage }) {
   const text = getTextContent(message);
 
   return (
@@ -324,12 +122,11 @@ function AIMessage({
         <Sparkles size={12} className="text-[#6C47FF]" />
       </div>
 
-      {/* Bubble + citation footer */}
+      {/* Bubble */}
       <div className="flex-1 min-w-0 max-w-[85%]">
         <div className="rounded-xl rounded-tl-sm border-[2px] border-black bg-white px-3 py-2.5 shadow-[2px_2px_0px_#000]">
-          <FormattedText text={text} citations={citations} />
+          <FormattedText text={text} />
         </div>
-        {/* {citations && <CitationFooter citations={citations} />} */}
       </div>
     </div>
   );
@@ -337,13 +134,7 @@ function AIMessage({
 
 // ─── Streaming bubble ─────────────────────────────────────────────────────────
 
-function StreamingBubble({
-  text,
-  citations,
-}: {
-  text: string;
-  citations?: Record<string, Citation>;
-}) {
+function StreamingBubble({ text }: { text: string }) {
   return (
     <div className="flex items-start gap-2">
       <div className="flex size-7 shrink-0 items-center justify-center rounded-full border-[2px] border-black bg-[#EDE9FE] shadow-[1px_1px_0px_#000]">
@@ -352,7 +143,7 @@ function StreamingBubble({
       <div className="rounded-xl rounded-tl-sm border-[2px] border-black bg-white px-3 py-2.5 shadow-[2px_2px_0px_#000] text-sm text-gray-700 leading-relaxed max-w-[85%]">
         {text ? (
           <>
-            <FormattedText text={text} citations={citations} />
+            <FormattedText text={text} />
             <span className="inline-block w-0.5 h-3.5 ml-0.5 bg-[#6C47FF] animate-pulse align-text-bottom" />
           </>
         ) : (
@@ -415,23 +206,17 @@ function EmptyChat({ onSuggestion }: { onSuggestion: (q: string) => void }) {
 
 interface ChatInnerProps extends ChatInterfaceProps {
   initialMessages: UIMessage[];
-  initialCitationsMap: Record<string, Record<string, Citation>>;
 }
 
 function ChatInner({
   workspaceId,
   conversationId,
   initialMessages,
-  initialCitationsMap,
   onOpenChats,
   onOpenSources,
 }: ChatInnerProps) {
   const [input, setInput] = useState("");
   const [webSearch, setWebSearch] = useState(false);
-
-  // Citations from loaded historical messages + accumulated from streaming
-  const [citationsMap, setCitationsMap] =
-    useState<Record<string, Record<string, Citation>>>(initialCitationsMap);
 
   const { conversations } = useAppState();
   const { data: sources } = useSources(workspaceId);
@@ -453,80 +238,7 @@ function ChatInner({
         webSearch,
       },
     }),
-    // onFinish fires once the full assistant message is received (including
-    // any custom data-* annotation parts the server appended after the text
-    // stream). Destructure { message } from the event object — this SDK
-    // version passes an event, not a bare UIMessage.
-    onFinish({ message }: { message: UIMessage }) {
-      if (message.role !== "assistant") return;
-
-      const dataParts = message.parts.filter(
-        (p: UIMessage["parts"][number]) =>
-          p.type.startsWith("data-") && Array.isArray((p as any).data),
-      );
-
-      if (dataParts.length === 0) return;
-
-      const allCitations: Citation[] = [];
-      for (const dp of dataParts) {
-        const arr = (dp as any).data;
-        if (Array.isArray(arr)) {
-          for (const item of arr) {
-            if (item && typeof item === "object" && item.id && item.sourceTitle) {
-              allCitations.push(item as Citation);
-            }
-          }
-        }
-      }
-
-      if (allCitations.length > 0) {
-        setCitationsMap((prev) => ({
-          ...prev,
-          [message.id]: buildCitationMap(allCitations),
-        }));
-      }
-    },
   });
-
-  // Belt-and-suspenders: if onFinish above doesn't surface the data-citations
-  // part (SDK version dependent), this effect catches it by running once when
-  // status transitions from streaming/submitted → ready.
-  const prevStatusRef = useRef(status);
-  useEffect(() => {
-    const wasStreaming =
-      prevStatusRef.current === "streaming" ||
-      prevStatusRef.current === "submitted";
-    prevStatusRef.current = status;
-
-    if (!wasStreaming || status !== "ready") return;
-
-    const lastMsg = messages[messages.length - 1];
-    if (!lastMsg || lastMsg.role !== "assistant") return;
-
-    const dataParts = lastMsg.parts.filter(
-      (p) => p.type.startsWith("data-") && Array.isArray((p as any).data),
-    );
-    if (dataParts.length === 0) return;
-
-    const allCitations: Citation[] = [];
-    for (const dp of dataParts) {
-      const arr = (dp as any).data;
-      if (Array.isArray(arr)) {
-        for (const item of arr) {
-          if (item && typeof item === "object" && item.id && item.sourceTitle) {
-            allCitations.push(item as Citation);
-          }
-        }
-      }
-    }
-
-    if (allCitations.length > 0) {
-      setCitationsMap((prev) => ({
-        ...prev,
-        [lastMsg.id]: buildCitationMap(allCitations),
-      }));
-    }
-  }, [status, messages]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -573,11 +285,6 @@ function ChatInner({
   const streamingText = streamingMessage
     ? getTextContent(streamingMessage)
     : "";
-
-  // Get citations for the currently streaming message
-  const streamingCitations = streamingMessage
-    ? citationsMap[streamingMessage.id]
-    : undefined;
 
   const convTitle = conversations[workspaceId]?.find(
     (c) => c.id === conversationId,
@@ -648,15 +355,14 @@ function ChatInner({
                 <AIMessage
                   key={msg.id}
                   message={msg}
-                  citations={citationsMap[msg.id]}
                 />
               ),
             )}
             {isStreaming && (
               <StreamingBubble
                 text={streamingText}
-                citations={streamingCitations}
               />
+
             )}
             {error && (
               <div className="text-xs font-semibold text-red-500 text-center py-2">
@@ -806,8 +512,7 @@ export function ChatInterface({
     );
   }
 
-  const { messages: initialMessages, citationsByMessage } =
-    toUIMessagesWithCitations(conversationMessages ?? []);
+  const initialMessages = toUIMessages(conversationMessages ?? []);
 
   return (
     <ChatInner
@@ -815,7 +520,6 @@ export function ChatInterface({
       workspaceId={workspaceId}
       conversationId={conversationId}
       initialMessages={initialMessages}
-      initialCitationsMap={citationsByMessage}
       onOpenChats={onOpenChats}
       onOpenSources={onOpenSources}
     />

@@ -6,7 +6,6 @@ export const messageSelect = {
   conversationId: true,
   role: true,
   content: true,
-  citations: true,
   createdAt: true,
 } as const;
 
@@ -18,7 +17,6 @@ export type CreateMessageData = {
   conversationId: string;
   role: MessageRecord["role"];
   content: string;
-  citations?: Prisma.InputJsonValue;
 };
 
 export function findMessagesByConversationId(conversationId: string) {
@@ -41,9 +39,6 @@ export function createMessageRecord(data: CreateMessageData) {
       conversationId: data.conversationId,
       role: data.role,
       content: data.content,
-      ...(data.citations !== undefined && {
-        citations: data.citations,
-      }),
     },
     select: messageSelect,
   });

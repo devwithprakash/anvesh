@@ -28,16 +28,7 @@ export interface Message {
   conversationId: string;
   role: "USER" | "ASSISTANT";
   content: string;
-  citations?: Citation[];
   createdAt: string;
-}
-
-export interface Citation {
-  sourceId: string;
-  sourceTitle: string;
-  sourceType: SourceType;
-  chunkIndex: number;
-  text: string;
 }
 
 export interface Source {
@@ -190,22 +181,6 @@ export const MOCK_MESSAGES: Record<string, Message[]> = {
 - More cost-effective than fine-tuning for knowledge-intensive tasks
 
 The system you're using right now implements advanced RAG with query rewriting, HyDE (Hypothetical Document Embeddings), and Reciprocal Rank Fusion for better retrieval quality.`,
-      citations: [
-        {
-          sourceId: "src-1",
-          sourceTitle: "Attention Is All You Need",
-          sourceType: "FILE",
-          chunkIndex: 3,
-          text: "The transformer architecture uses self-attention mechanisms to process sequences in parallel...",
-        },
-        {
-          sourceId: "src-2",
-          sourceTitle: "RAG Survey 2024",
-          sourceType: "FILE",
-          chunkIndex: 7,
-          text: "Retrieval-augmented generation combines parametric and non-parametric memory...",
-        },
-      ],
       createdAt: "2026-08-25T15:01:00Z",
     },
     {
@@ -244,15 +219,6 @@ The system you're using right now implements advanced RAG with query rewriting, 
 - Incremental updates can leave stale vectors
 
 The current system addresses several of these with conversation summarization (every 8 messages) and Reciprocal Rank Fusion across multiple query variants.`,
-      citations: [
-        {
-          sourceId: "src-3",
-          sourceTitle: "Production ML Systems",
-          sourceType: "WEBSITE",
-          chunkIndex: 12,
-          text: "Latency in retrieval pipelines is a primary concern for user-facing applications...",
-        },
-      ],
       createdAt: "2026-08-25T15:11:00Z",
     },
   ],

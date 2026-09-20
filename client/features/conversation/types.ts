@@ -47,24 +47,10 @@ export interface GetMessageInputSchema {
   conversationId: string;
 }
 
-export interface Citation {
-  id: string;
-  sourceId: string;
-  sourceTitle: string;
-  sourceType: string;
-  chunkId?: string;
-  chunkIndex?: number;
-  page?: number;
-  excerpt?: string;
-  score?: number;
-  url?: string;
-}
-
 export interface GetMessageOutputSchema {
   id: string;
   createdAt: Date;
   conversationId: string;
   role: "USER" | "ASSISTANT";
   content: string;
-  citations: Citation[];
 }

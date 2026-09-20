@@ -76,18 +76,17 @@ model Verification {
 }
 
 model Workspace {
-  id            String             @id @default(cuid())
+  id            String         @id @default(cuid())
   userId        String
   title         String
   description   String?
   icon          String?
-  defaultModel  String             @default("gpt-4o-mini")
-  createdAt     DateTime           @default(now())
-  updatedAt     DateTime           @updatedAt
-  user          User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  defaultModel  String         @default("gpt-4o-mini")
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   sources       Source[]
   conversations Conversation[]
-  artifacts     LearningArtifact[]
 
   @@index([userId])
   @@map("workspace")
@@ -171,7 +170,6 @@ model Message {
   conversationId String
   role           MessageRole
   content        String
-  citations      Json?
   createdAt      DateTime     @default(now())
   conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
 
@@ -180,48 +178,13 @@ model Message {
   @@map("message")
 }
 
-enum ArtifactType {
-  SUMMARY
-  TAKEAWAYS
-  FLASHCARDS
-  QUIZ
-  MINDMAP
-  REPORT
-}
-
-enum ArtifactStatus {
-  PENDING
-  PROCESSING
-  READY
-  FAILED
-}
-
-model LearningArtifact {
-  id          String         @id @default(cuid())
-  workspaceId String
-  type        ArtifactType
-  title       String
-  content     Json?
-  sourceIds   String[]
-  status      ArtifactStatus @default(PENDING)
-  metadata    Json?
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
-  workspace   Workspace      @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-
-  @@index([workspaceId])
-  @@index([workspaceId, type])
-  @@index([workspaceId, status])
-  @@map("learning_artifact")
-}
-
 model Plan {
   id                     String   @id @default(cuid())
-  name                   String @unique
+  name                   String   @unique
   price                  Int
-  maxWorkspaces          Int @default(0)
-  maxSourcesPerWorkspace Int @default(0)
-  maxAiQueries           Int @default(0)
+  maxWorkspaces          Int      @default(0)
+  maxSourcesPerWorkspace Int      @default(0)
+  maxAiQueries           Int      @default(0)
   webSearchEnabled       Boolean  @default(false)
   createdAt              DateTime @default(now())
   updatedAt              DateTime @updatedAt

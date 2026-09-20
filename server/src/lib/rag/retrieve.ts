@@ -39,6 +39,11 @@ export async function retrieveWorkspaceContext(
     hydeDocument(userQuery),
   ]);
 
+  console.log("Stepback: ", stepBack)
+  console.log("rewritten: ", rewritten)
+  console.log("sub queries: ", subQueries)
+  console.log("Hyde: ", hyde)
+
   const labelled = [
     { label: "rewritten", text: rewritten },
     { label: "stepback", text: stepBack },
@@ -97,31 +102,6 @@ export function buildChatSystemPrompt(input: {
   const sections: string[] = [
     `You are ANVESH, a research assistant that helps users learn from their workspace sources.
 
-=== CITATION RULES — MANDATORY, NOT OPTIONAL ===
-
-You MUST add citation markers [1], [2], etc. inside EVERY sentence that contains a factual claim.
-Place the marker directly before the period that ends the sentence.
-
-CORRECT — do this:
-"Prakash specializes in full-stack web development using React and Next.js [1]."
-"He has worked with SQL and NoSQL databases [1][2]."
-"- **Frontend:** React, Next.js [1]"
-
-WRONG — never do this:
-"Prakash specializes in full-stack web development using React and Next.js."
-"He has worked with SQL and NoSQL databases."
-
-Rules:
-- The number inside [1] must match the SOURCE number in RETRIEVED WORKSPACE CONTEXT below.
-- Web search results use [W1], [W2], etc.
-- Never write a factual sentence without at least one citation marker.
-- Never fabricate a citation number that does not exist in the context.
-- Never group citations as [1, 2] — write them as [1][2].
-- If a sentence draws on multiple sources, list all markers: [1][2][3].
-
-Before you send your response, re-read every sentence.
-If any sentence states a fact and has no [N] marker, add one before sending.
-
 === WORKSPACE GROUNDING ===
 
 - Use ONLY information from the RETRIEVED WORKSPACE CONTEXT below to answer factual questions.
@@ -132,13 +112,11 @@ If any sentence states a fact and has no [N] marker, add one before sending.
 === MEMORY & CONVERSATION SUMMARY ===
 
 - User memories and conversation summaries are for conversational continuity only.
-- They are NOT evidence for factual claims — never cite them as [1] etc.
 
 === ANSWER STYLE ===
 
 - Answer the user's actual question clearly and naturally.
-- Use bullet points and **bold** labels where they aid readability.
-- Every bullet point and bold-label line that states a fact must also carry a citation marker.`,
+- Use bullet points and **bold** labels where they aid readability.`,
   ];
 
   if (input.webSearchEnabled) {
@@ -150,7 +128,6 @@ Use web search when:
 - The user explicitly asks for current/recent/external information.
 - The workspace context is insufficient to answer.
 
-When web results are used, cite every claim with [W1], [W2], etc.
 Do not silently use web search to fill missing workspace information.`);
   }
 
@@ -180,8 +157,7 @@ No relevant workspace content was retrieved.
 
 You have access to the web_search tool.
 If the user's question requires external information, you MUST call web_search before answering.
-Do NOT answer from general knowledge without using web_search first.
-Cite all web results using [W1], [W2], etc.`);
+Do NOT answer from general knowledge without using web_search first.`);
     } else {
       sections.push(`=== RETRIEVED WORKSPACE CONTEXT ===
 
@@ -199,7 +175,7 @@ Do not add any other sentence, explanation, background, or examples.`);
   const context = input.chunks
     .map((chunk, index) => {
       const label =
-        `SOURCE [${index + 1}]: ${chunk.sourceTitle} (${chunk.sourceType})` +
+        `SOURCE ${index + 1}: ${chunk.sourceTitle} (${chunk.sourceType})` +
         `${chunk.page ? `, page ${chunk.page}` : ""}`;
 
       return `--- ${label} ---\n${chunk.text}\n---`;
@@ -209,13 +185,8 @@ Do not add any other sentence, explanation, background, or examples.`);
   sections.push(`=== RETRIEVED WORKSPACE CONTEXT ===
 
 Use the sources below as the only authoritative evidence.
-Match your [1], [2], etc. markers to the SOURCE numbers.
 
-${context}
-
-=== FINAL REMINDER ===
-Every factual sentence in your response MUST end with [1], [2], or similar before the period.
-A response with any uncited factual sentence is incorrect.`);
+${context}`);
 
   return sections.join("\n\n");
 }

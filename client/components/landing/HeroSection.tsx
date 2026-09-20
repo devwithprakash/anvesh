@@ -202,7 +202,6 @@ function HeroVisual() {
           </span>
         </div>
 
-        {/* Generated answer with citation */}
         <p className="text-[12.5px] text-gray-700 leading-relaxed mb-3 font-medium">
           &ldquo;Formal methods are mathematically based techniques used for the
           specification, design, and verification of software
