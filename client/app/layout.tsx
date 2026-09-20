@@ -9,6 +9,7 @@ import "./globals.css";
 import { cn } from "@/lib/utils";
 import { QueryProvider } from "@/components/providers/query-provider";
 import Script from "next/script";
+import { Analytics } from "@vercel/analytics/next";
 
 const sourceSans3Heading = Source_Sans_3({
   subsets: ["latin"],
@@ -56,6 +57,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             strategy="lazyOnload"
           />
           {children}
+          <Analytics />
         </body>
       </QueryProvider>
     </html>
