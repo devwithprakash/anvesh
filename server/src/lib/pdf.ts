@@ -10,13 +10,6 @@ export type PdfExtractResult = {
 async function downloadPdf(url: string) {
   const response = await fetch(url);
 
-  console.log("PDF download:", {
-    url,
-    status: response.status,
-    statusText: response.statusText,
-    cloudinaryError: response.headers.get("x-cld-error"),
-  });
-
   if (!response.ok) {
     throw new Error(`Failed to download PDF (${response.status})`);
   }
@@ -61,7 +54,6 @@ export async function extractPdfFromCloudinary(input: {
   resourceType?: "raw" | "image";
 }): Promise<PdfExtractResult> {
   try {
-    console.log("file url: ", input);
     const buffer = await downloadPdf(input.fileUrl);
     return await extractPdfFromBuffer(buffer);
   } catch (error) {
@@ -74,6 +66,7 @@ export async function extractPdfFromCloudinary(input: {
 
     const signedUrl = getSignedCloudinaryDownloadUrl(
       input.publicId,
+      "pdf",
       input.resourceType ?? "raw",
     );
 

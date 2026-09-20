@@ -1,5 +1,4 @@
 import { v2 as cloudinary } from "cloudinary";
-import { ValidationError } from "../types/app-error.js";
 import { Readable } from "stream";
 
 const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
@@ -20,27 +19,19 @@ export type CloudinaryUploadResult = {
   resourceType: "raw" | "image";
 };
 
-type CloudinaryUploadResponse = {
-  secure_url: string;
-  public_id: string;
-  bytes: number;
-  resource_type?: string;
-  error?: { message: string };
-};
-
 export function getSignedCloudinaryDownloadUrl(
   publicId: string,
+  format: string,
   resourceType: "raw" | "image" = "raw",
 ) {
   if (!cloudName || !apiKey || !apiSecret) {
     return null;
   }
 
-  return cloudinary.url(publicId, {
+  return cloudinary.utils.private_download_url(publicId, format, {
     resource_type: resourceType,
-    type: "upload",
-    sign_url: true,
-    secure: true,
+    type: "private",
+    expires_at: Math.floor(Date.now() / 1000) + 60 * 5,
   });
 }
 
@@ -54,20 +45,14 @@ export async function uploadFileToCloudinary(
         resource_type: "raw",
         folder: "notebook/files",
         public_id: fileName,
-        access_mode: "public",
+        type: "private",
       },
       (error, result) => {
         if (error) {
           reject(error);
           return;
         }
-        console.log("Cloudinary upload:", {
-          publicId: result?.public_id,
-          resourceType: result?.resource_type,
-          type: result?.type,
-          accessMode: result?.access_mode,
-          secureUrl: result?.secure_url,
-        });
+
         resolve(result);
       },
     );
