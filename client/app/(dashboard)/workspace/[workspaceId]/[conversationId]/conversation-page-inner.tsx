@@ -43,14 +43,14 @@ export function ConversationPageInner({
         <div className="hidden md:flex md:w-[260px] md:shrink-0 h-full">
           <ConversationList
             workspaceId={workspaceId}
-            activeConversationId={conversationId}
+            activeConversationId={conversationId === "new" ? undefined : conversationId}
           />
         </div>
 
         {/* ── Center: chat (takes remaining space) ── */}
         <ChatInterface
           workspaceId={workspaceId}
-          conversationId={conversationId}
+          conversationId={conversationId === "new" ? undefined : conversationId}
           onOpenChats={() => setChatsOpen(true)}
           onOpenSources={() => setSourcesOpen(true)}
         />
@@ -73,7 +73,7 @@ export function ConversationPageInner({
           <div className="relative z-10 flex w-[300px] max-w-[85vw] h-full">
             <ConversationList
               workspaceId={workspaceId}
-              activeConversationId={conversationId}
+              activeConversationId={conversationId === "new" ? undefined : conversationId}
               onClose={() => setChatsOpen(false)}
             />
           </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import {useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAppState } from "@/components/providers/app-provider";
 import { AppNavbar } from "@/components/workspace/app-navbar";
@@ -46,9 +46,8 @@ export function WorkspacePageInner({ workspaceId }: { workspaceId: string }) {
 
   if (!workspace) return null;
 
-  const handleNewChat = async () => {
-    const conv = await createConversation.mutateAsync({ workspaceId });
-    router.push(`/workspace/${workspaceId}/${conv.id}`);
+  const handleNewChat = () => {
+    router.push(`/workspace/${workspaceId}/new`);
   };
 
   return (

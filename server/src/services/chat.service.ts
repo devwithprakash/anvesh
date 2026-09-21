@@ -117,6 +117,8 @@ async function resolveConversation(
   firstMessage: string,
 ) {
   if (conversationId) {
+
+    console.log("conversation id: ", conversationId)
     const existing = await findConversationByIdAndWorkspaceId(
       conversationId,
       workspaceId,
@@ -166,6 +168,7 @@ export async function streamWorkspaceChat(
     webSearch?: boolean;
   },
 ) {
+
   const subscription = await getSubscriptionByUserId(userId);
 
   const plan = subscription

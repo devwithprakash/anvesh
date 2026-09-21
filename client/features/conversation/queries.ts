@@ -10,10 +10,10 @@ export function useConversations(workspaceId: string) {
   });
 }
 
-export function useMessages({ workspaceId, conversationId }: GetMessageInputSchema) {
+export function useMessages({ workspaceId, conversationId}: GetMessageInputSchema) {
   return useQuery({
     queryKey: ["messages", workspaceId, conversationId],
     queryFn: () => getMessages({ workspaceId, conversationId }),
-    enabled: !!workspaceId && !!conversationId,
+    enabled: !!workspaceId && !!conversationId && conversationId !== "new"
   });
 }

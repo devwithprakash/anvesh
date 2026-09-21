@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { formatDistanceToNow } from "date-fns";
 import {
@@ -21,8 +21,6 @@ import { useWorkspaces } from "@/features/workspace/queries";
 import { useDeleteWorkspace } from "@/features/workspace/mutations";
 import { useSources } from "@/features/source/queries";
 import { useConversations } from "@/features/conversation/queries";
-
-// ─── Floating decorative symbols ─────────────────────────────────────────────
 
 const FLOATERS = [
   {
@@ -126,8 +124,6 @@ function FloatingSymbols() {
     </>
   );
 }
-
-// ─── Workspace Card ───────────────────────────────────────────────────────────
 
 function WorkspaceCard({
   workspace,
@@ -257,8 +253,6 @@ function WorkspaceCard({
   );
 }
 
-// ─── Dashboard Page ───────────────────────────────────────────────────────────
-
 export default function DashboardPage() {
   const [createOpen, setCreateOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -266,7 +260,7 @@ export default function DashboardPage() {
     null,
   );
 
-  const { data: workspacesList, error } = useWorkspaces();
+  const { data: workspacesList} = useWorkspaces();
   const deleteWorkspace = useDeleteWorkspace();
 
   const handleDeleteWorkspace = async (workspaceId: string) => {
@@ -305,7 +299,6 @@ export default function DashboardPage() {
 
   return (
     <div className="flex flex-col flex-1 min-h-svh bg-[#FFFBF0]">
-      {/* Dot grid texture */}
       <div
         className="fixed inset-0 pointer-events-none opacity-[0.04]"
         style={{
@@ -319,7 +312,6 @@ export default function DashboardPage() {
       <AppNavbar />
 
       <main className="relative z-10 flex-1 mx-auto w-full max-w-5xl px-6 py-10">
-        {/* ── Hero header ── */}
         <div className="mb-8 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
           <div>
             <div className="inline-flex items-center gap-2 rounded-full border-[2px] border-black bg-[#EDE9FE] px-3 py-1 mb-3 shadow-[2px_2px_0px_#000]">
@@ -336,7 +328,6 @@ export default function DashboardPage() {
             </p>
           </div>
 
-          {/* Stats pills */}
           <div className="flex items-center gap-2 shrink-0">
             <div className="flex items-center gap-1.5 rounded-xl border-[2px] border-black bg-white px-3 py-2 shadow-[2px_2px_0px_#000]">
               <BookOpen size={13} className="text-[#6C47FF]" />
@@ -350,10 +341,8 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* ── Plan & Usage Banner ── */}
         <PlanBanner />
 
-        {/* ── Toolbar ── */}
         <div className="mb-6 flex items-center gap-3">
           <div className="relative flex-1 max-w-sm">
             <Search
@@ -377,16 +366,11 @@ export default function DashboardPage() {
           </button>
         </div>
 
-        {/* ── Grid / Empty state ── */}
         {filtered.length === 0 && !search ? (
-          /* Beautiful empty state */
           <div className="relative mt-4">
-            {/* Big hero empty card */}
             <div className="rounded-2xl border-[3px] border-black bg-white shadow-[6px_6px_0px_#000] overflow-hidden">
-              {/* Coloured top stripe */}
               <div className="h-2 bg-[#6C47FF]" />
               <div className="flex flex-col items-center justify-center gap-6 px-8 py-16 text-center">
-                {/* Icon cluster */}
                 <div className="relative">
                   <div className="flex size-20 items-center justify-center rounded-2xl border-[3px] border-black bg-[#EDE9FE] shadow-[5px_5px_0px_#000]">
                     <BookOpen size={36} className="text-[#6C47FF]" />
@@ -406,7 +390,6 @@ export default function DashboardPage() {
                   </p>
                 </div>
 
-                {/* Feature pills */}
                 <div className="flex flex-wrap justify-center gap-2">
                   {[
                     { emoji: "📄", label: "Upload PDFs" },
@@ -448,9 +431,7 @@ export default function DashboardPage() {
             </div>
           </div>
         ) : (
-          /* Workspace grid */
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {/* Create new card */}
             <button
               onClick={() => setCreateOpen(true)}
               className="flex flex-col items-center justify-center gap-3 rounded-2xl border-[2.5px] border-dashed border-black/40 bg-white/50 px-6 py-10 hover:border-black hover:bg-white hover:shadow-[4px_4px_0px_#000] transition-all min-h-[180px] group"
@@ -478,7 +459,6 @@ export default function DashboardPage() {
         )}
       </main>
 
-      {/* ── Footer ── */}
       <footer className="relative z-10 border-t-[2px] border-black/10 bg-[#FFFBF0]">
         <div className="max-w-5xl mx-auto px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex items-center gap-2">

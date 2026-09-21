@@ -44,7 +44,7 @@ export interface StreamChatSchema {
 
 export interface GetMessageInputSchema {
   workspaceId: string;
-  conversationId: string;
+  conversationId?: string;
 }
 
 export interface GetMessageOutputSchema {

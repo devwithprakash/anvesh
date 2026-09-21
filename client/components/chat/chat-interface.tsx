@@ -4,6 +4,7 @@ import * as React from "react";
 import { UIMessage, DefaultChatTransport } from "ai";
 import { useChat } from "@ai-sdk/react";
 import { useState, useRef, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import {
   Send,
   Sparkles,
@@ -17,8 +18,6 @@ import { useAppState } from "@/components/providers/app-provider";
 import { useMessages } from "@/features/conversation/queries";
 import { useSources } from "@/features/source/queries";
 import { useSubscriptionStatus } from "@/features/subscription/queries";
-
-
 
 function FormattedText({ text }: { text: string }) {
   const lines = text.split("\n");
@@ -45,9 +44,7 @@ function FormattedText({ text }: { text: string }) {
               <span className="text-gray-400 shrink-0">
                 {line.match(/^\d+/)?.[0]}.
               </span>
-              <span>
-                {formatInline(line.replace(/^\d+\.\s/, ""))}
-              </span>
+              <span>{formatInline(line.replace(/^\d+\.\s/, ""))}</span>
             </div>
           );
         return (
@@ -218,6 +215,10 @@ function ChatInner({
   const [input, setInput] = useState("");
   const [webSearch, setWebSearch] = useState(false);
 
+  const router = useRouter();
+  // Prevent replacing the URL more than once per "new" chat session
+  const hasReplacedUrl = useRef(false);
+
   const { conversations } = useAppState();
   const { data: sources } = useSources(workspaceId);
   const { data: subStatus } = useSubscriptionStatus();
@@ -228,7 +229,7 @@ function ChatInner({
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const { messages, sendMessage, status, stop, error } = useChat({
-    id: conversationId,
+    id: conversationId ?? "new",
     messages: initialMessages,
     transport: new DefaultChatTransport({
       api: `${API_BASE_URL}/workspaces/${workspaceId}/chat`,
@@ -236,6 +237,20 @@ function ChatInner({
       body: {
         conversationId,
         webSearch,
+      },
+      // Custom fetch wrapper — intercept the Response to read the
+      // X-Conversation-Id header set by the backend, then replace
+      // the browser URL when we're on the /new route.
+      fetch: async (input, init) => {
+        const response = await fetch(input, init);
+        if (!conversationId && !hasReplacedUrl.current) {
+          const newConversationId = response.headers.get("X-Conversation-Id");
+          if (newConversationId) {
+            hasReplacedUrl.current = true;
+            router.replace(`/workspace/${workspaceId}/${newConversationId}`);
+          }
+        }
+        return response;
       },
     }),
   });
@@ -352,18 +367,10 @@ function ChatInner({
                     .join("")}
                 />
               ) : (
-                <AIMessage
-                  key={msg.id}
-                  message={msg}
-                />
+                <AIMessage key={msg.id} message={msg} />
               ),
             )}
-            {isStreaming && (
-              <StreamingBubble
-                text={streamingText}
-              />
-
-            )}
+            {isStreaming && <StreamingBubble text={streamingText} />}
             {error && (
               <div className="text-xs font-semibold text-red-500 text-center py-2">
                 Error:{" "}
@@ -447,10 +454,8 @@ function ChatInner({
 
 interface ChatInterfaceProps {
   workspaceId: string;
-  conversationId: string;
-  /** Called on mobile to open the Chats drawer */
+  conversationId?: string;
   onOpenChats?: () => void;
-  /** Called on mobile to open the Sources drawer */
   onOpenSources?: () => void;
 }
 
@@ -463,12 +468,16 @@ export function ChatInterface({
   onOpenChats,
   onOpenSources,
 }: ChatInterfaceProps) {
-  const { data: conversationMessages, isPending } = useMessages({
+  const { data: conversationMessages, isPending, fetchStatus } = useMessages({
     workspaceId,
     conversationId,
   });
 
-  if (isPending) {
+  const initialMessages = toUIMessages(conversationMessages ?? []);
+
+  // isPending is true even for disabled queries in TanStack Query v5.
+  // Only show the skeleton when the query is actually running (fetchStatus === "fetching").
+  if (isPending && fetchStatus === "fetching") {
     return (
       <div className="flex flex-1 flex-col min-h-0 min-w-0 bg-[#FFFBF0]">
         {/* Top bar skeleton */}
@@ -511,8 +520,6 @@ export function ChatInterface({
       </div>
     );
   }
-
-  const initialMessages = toUIMessages(conversationMessages ?? []);
 
   return (
     <ChatInner
