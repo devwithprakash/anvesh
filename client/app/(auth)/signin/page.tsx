@@ -265,7 +265,7 @@ export default function SignInPage() {
         {...fadeIn(0.28)}
         className="mt-5 text-center text-xs font-semibold text-black/40"
       >
-        By continuing, you agree to Notebook&apos;s{" "}
+        By continuing, you agree to Anvesh&apos;s{" "}
         <a href="#" className="underline hover:text-black/70">
           Terms
         </a>{" "}

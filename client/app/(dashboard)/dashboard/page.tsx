@@ -465,7 +465,7 @@ export default function DashboardPage() {
             <span className="inline-flex items-center justify-center w-6 h-6 rounded-md border-[2px] border-black bg-[#6C47FF] text-white font-black text-[10px] shadow-[2px_2px_0px_#000]">
               N
             </span>
-            <span className="font-black text-sm text-black">Notebook</span>
+            <span className="font-black text-sm text-black">Anvesh</span>
           </div>
           <div className="flex items-center gap-4 text-xs font-semibold text-gray-500">
             <a href="/pricing" className="hover:text-black transition-colors">
@@ -473,7 +473,7 @@ export default function DashboardPage() {
             </a>
             <span>·</span>
             <a
-              href="mailto:support@notebook.ai"
+              href="mailto:support@anvesh.ai"
               className="hover:text-black transition-colors"
             >
               Support
@@ -485,7 +485,7 @@ export default function DashboardPage() {
             </span>
           </div>
           <p className="text-xs font-semibold text-gray-400">
-            © {new Date().getFullYear()} Notebook AI
+            © {new Date().getFullYear()} Anvesh AI
           </p>
         </div>
       </footer>

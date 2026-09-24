@@ -78,7 +78,7 @@ function openRazorpayModal(checkout: CheckoutResponse) {
   const options = {
     key: checkout.keyId,
     subscription_id: checkout.subscriptionId,
-    name: "Notebook LM",
+    name: "Anvesh",
     description: `${checkout.planName} Plan Subscription`,
     handler: () => {
       // Payment successful — webhook will handle the rest

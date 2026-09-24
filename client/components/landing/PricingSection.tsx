@@ -10,7 +10,7 @@ const plans = [
     planKey: "FREE",
     price: "₹0",
     period: "forever",
-    desc: "Perfect for getting started and exploring your first notebooks.",
+    desc: "Perfect for getting started and exploring your first workspaces.",
     icon: <Star size={22} />,
     iconBg: "bg-[#FFE14D]",
     cardBg: "bg-white",

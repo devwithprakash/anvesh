@@ -34,7 +34,7 @@ const plans = [
     planKey: "FREE",
     price: "₹0",
     period: "forever",
-    desc: "Perfect for getting started and exploring your first notebooks.",
+    desc: "Perfect for getting started and exploring your first workspaces.",
     icon: <Star size={22} />,
     iconBg: "bg-[#FFE14D]",
     cardBg: "bg-white",
@@ -156,7 +156,7 @@ function openRazorpayModal(checkout: CheckoutResponse) {
   const options = {
     key: checkout.keyId,
     subscription_id: checkout.subscriptionId,
-    name: "Notebook LM",
+    name: "Anvesh",
     description: `${checkout.planName} Plan`,
     handler: () => {
       window.location.href = "/dashboard";
@@ -557,7 +557,7 @@ export default function PricingPage() {
                 Still have questions? We are happy to help.
               </p>
               <a
-                href="mailto:support@notebook.ai"
+                href="mailto:support@anvesh.ai"
                 className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border-[2.5px] border-black bg-black text-white font-black text-sm shadow-[5px_5px_0px_#6C47FF] hover:shadow-none hover:translate-x-[5px] hover:translate-y-[5px] transition-all"
               >
                 Contact support

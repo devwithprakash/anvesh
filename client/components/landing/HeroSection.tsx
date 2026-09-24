@@ -298,7 +298,7 @@ export default function HeroSection() {
               href="/dashboard"
               className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border-[2.5px] border-black bg-[#6C47FF] text-white font-black text-sm shadow-[5px_5px_0px_#000] hover:shadow-none hover:translate-x-[5px] hover:translate-y-[5px] transition-all"
             >
-              Start your notebook
+              Get started with Anvesh
               <ArrowRight size={16} />
             </a>
             <a

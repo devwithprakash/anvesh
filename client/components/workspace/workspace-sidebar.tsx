@@ -62,7 +62,7 @@ export function WorkspaceSidebar({ activeWorkspaceId }: WorkspaceSidebarProps) {
               N
             </div>
             <span className="font-heading font-semibold text-sm truncate group-data-[collapsible=icon]:hidden">
-              NotebookLM
+              Anvesh
             </span>
             <div className="ml-auto group-data-[collapsible=icon]:hidden">
               <SidebarTrigger className="size-6" />

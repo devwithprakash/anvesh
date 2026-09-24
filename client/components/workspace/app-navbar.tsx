@@ -49,7 +49,7 @@ export function AppNavbar({ activeWorkspaceId }: AppNavbarProps) {
               N
             </span>
             <span className="font-black text-base text-black tracking-tight hidden sm:block">
-              Notebook
+              Anvesh
             </span>
           </button>
 

@@ -101,7 +101,7 @@ export default function Footer() {
               </span>
             </h2>
             <p className="text-gray-400 font-semibold text-sm max-w-sm">
-              Join thousands of researchers, students, and teams already using Notebook.
+              Join thousands of researchers, students, and teams already using Anvesh.
             </p>
           </div>
 
@@ -142,7 +142,7 @@ export default function Footer() {
               <span className="inline-flex items-center justify-center w-9 h-9 rounded-lg border-[2px] border-white bg-[#6C47FF] text-white font-black text-sm shadow-[3px_3px_0px_rgba(255,255,255,0.2)]">
                 N
               </span>
-              <span className="font-black text-xl text-white tracking-tight">Notebook</span>
+              <span className="font-black text-xl text-white tracking-tight">Anvesh</span>
             </a>
 
             <p className="text-gray-400 text-sm font-semibold leading-relaxed mb-6 max-w-[220px]">
@@ -196,7 +196,7 @@ export default function Footer() {
       {/* ── Bottom bar ── */}
       <div className="border-t-[2px] border-[#333] px-6 py-5">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-xs font-bold text-gray-500">
-          <p>© {new Date().getFullYear()} Notebook AI, Inc. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} Anvesh AI, Inc. All rights reserved.</p>
           <div className="flex items-center gap-4">
             <span className="flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-[#00D4AA] animate-pulse" />

@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
@@ -96,7 +96,7 @@ export default function VerifyEmailPage() {
             className="rounded-xl border-[2px] border-black bg-[#FFFBF0] p-4 space-y-2.5"
           >
             {[
-              "Open the email from Notebook",
+              "Open the email from Anvesh",
               'Click the "Verify email" button',
               "You'll be signed in automatically",
             ].map((step, i) => (

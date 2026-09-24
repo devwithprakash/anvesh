@@ -10,20 +10,20 @@ const faqs = [
     a: "You can upload PDFs, Word documents (.docx), plain text files (.txt), and Markdown files. You can also paste in web page URLs and we will extract the content automatically. Support for more formats like PowerPoint and spreadsheets is coming soon.",
   },
   {
-    q: "How does Notebook ground answers in my sources?",
-    a: "When you ask a question, Notebook retrieves the most relevant passages from your uploaded documents using semantic search, then asks the AI to answer strictly based on those retrieved chunks. Every answer includes numbered citations so you can verify exactly which part of which document the answer came from.",
+    q: "How does Anvesh ground answers in my sources?",
+    a: "When you ask a question, Anvesh retrieves the most relevant passages from your uploaded documents using semantic search, then asks the AI to answer strictly based on those retrieved chunks. Every answer includes numbered citations so you can verify exactly which part of which document the answer came from.",
   },
   {
     q: "Is my data private and secure?",
     a: "Absolutely. Your documents are stored in an encrypted, isolated environment. We never use your data to train AI models, and we never share it with third parties. You can delete your data at any time from your account settings.",
   },
   {
-    q: "Can I use Notebook with my team?",
+    q: "Can I use Anvesh with my team?",
     a: "Yes! The Team plan lets you create shared workspaces where multiple members can upload sources, ask questions, and collaborate on notes. Admins can manage permissions, view usage, and enforce security policies.",
   },
   {
     q: "What AI model powers the answers?",
-    a: "Notebook uses a combination of state-of-the-art large language models optimised for retrieval-augmented generation (RAG). The exact model may vary depending on your plan and the type of query. We continuously evaluate and update our model stack to give you the best accuracy.",
+    a: "Anvesh uses a combination of state-of-the-art large language models optimised for retrieval-augmented generation (RAG). The exact model may vary depending on your plan and the type of query. We continuously evaluate and update our model stack to give you the best accuracy.",
   },
   {
     q: "Can I cancel my subscription anytime?",
@@ -168,7 +168,7 @@ export default function FAQSection() {
             Still have questions? We are happy to help.
           </p>
           <a
-            href="mailto:support@notebook.ai"
+            href="mailto:support@anvesh.ai"
             className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border-[2.5px] border-black bg-black text-white font-black text-sm shadow-[5px_5px_0px_#6C47FF] hover:shadow-none hover:translate-x-[5px] hover:translate-y-[5px] transition-all"
           >
             Contact support

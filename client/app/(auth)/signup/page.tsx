@@ -305,7 +305,7 @@ export default function SignUpPage() {
         {...fadeIn(0.32)}
         className="mt-5 text-center text-xs font-semibold text-black/40"
       >
-        By creating an account, you agree to Notebook&apos;s{" "}
+        By creating an account, you agree to Anvesh&apos;s{" "}
         <a href="#" className="underline hover:text-black/70">
           Terms
         </a>{" "}
