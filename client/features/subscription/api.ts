@@ -6,7 +6,6 @@ export async function getSubscriptionStatus(): Promise<SubscriptionStatus> {
 }
 
 export async function createCheckout(planName: string): Promise<CheckoutResponse> {
-  console.log("Inside the API")
   return api<CheckoutResponse>("/subscription/checkout", { method: "POST", data: { planName } });
 }
 

@@ -27,7 +27,6 @@ declare global {
   }
 }
 
-// ─── Plans — mirrors PricingSection.tsx exactly ───────────────────────────────
 
 const plans = [
   {
@@ -97,7 +96,6 @@ const plans = [
   },
 ];
 
-// ─── FAQ — mirrors FAQSection.tsx exactly ────────────────────────────────────
 
 const faqs = [
   {
@@ -149,7 +147,6 @@ const cardVariants = {
   }),
 };
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function openRazorpayModal(checkout: CheckoutResponse) {
   if (!window.Razorpay) {

@@ -65,7 +65,6 @@ export default function SignUpPage() {
       }
 
       router.push(`/verify-email?email=${encodeURIComponent(form.email)}`);
-      console.log("Signup response: ", response);
     } catch (error: any) {
       console.error(error);
       setError(

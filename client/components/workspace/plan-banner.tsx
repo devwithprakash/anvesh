@@ -75,7 +75,6 @@ function openRazorpayModal(checkout: CheckoutResponse) {
     alert("Payment SDK not loaded. Please refresh and try again.");
     return;
   }
-  console.log("Inside the open razorpay");
   const options = {
     key: checkout.keyId,
     subscription_id: checkout.subscriptionId,

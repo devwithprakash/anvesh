@@ -39,11 +39,6 @@ export async function retrieveWorkspaceContext(
     hydeDocument(userQuery),
   ]);
 
-  console.log("Stepback: ", stepBack)
-  console.log("rewritten: ", rewritten)
-  console.log("sub queries: ", subQueries)
-  console.log("Hyde: ", hyde)
-
   const labelled = [
     { label: "rewritten", text: rewritten },
     { label: "stepback", text: stepBack },

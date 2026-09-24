@@ -115,12 +115,11 @@ export function SourcesPanel({ workspaceId, onClose }: SourcesPanelProps) {
 
   const handleDeleteSource = async (workspaceId: string, sourceId: string) => {
     try {
-      const response = await deleteSource.mutateAsync({
+      await deleteSource.mutateAsync({
         workspaceId,
         sourceId,
       });
 
-      console.log("Delete source response: ", response);
     } catch (error) {
       console.error(error);
     }
@@ -429,12 +428,11 @@ function AddSourceDialog({
       const formData = new FormData();
       formData.append("file", file);
 
-      const response = await createFileSource.mutateAsync({
+      await createFileSource.mutateAsync({
         workspaceId,
         formData,
       });
       setAddOpen(false);
-      console.log("Response of file source: ", response);
     } catch (error) {
       console.error(error);
     }
@@ -482,7 +480,7 @@ function AddSourceDialog({
 
       setYoutubeError(null);
 
-      const response = await createYoutubeSource.mutateAsync({
+      await createYoutubeSource.mutateAsync({
         workspaceId,
         data: {
           url: normalizeUrl(websiteUrl),
@@ -492,7 +490,6 @@ function AddSourceDialog({
       setYoutubeUrl("");
       setYoutubeTitle("");
       setAddOpen(false);
-      console.log("Response of youtube source: ", response);
     } catch (error) {
       console.error(error);
       setWebsiteError(

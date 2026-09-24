@@ -118,7 +118,6 @@ async function resolveConversation(
 ) {
   if (conversationId) {
 
-    console.log("conversation id: ", conversationId)
     const existing = await findConversationByIdAndWorkspaceId(
       conversationId,
       workspaceId,

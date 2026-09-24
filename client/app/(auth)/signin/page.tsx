@@ -43,7 +43,6 @@ export default function SignInPage() {
         setError("Incorrect email or password. Please try again.");
         return;
       }
-      console.log("Signin response: ", response);
     } catch (error) {
       console.error(error);
       setError("Incorrect email or password. Please try again.");

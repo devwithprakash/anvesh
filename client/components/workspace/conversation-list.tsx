@@ -5,16 +5,12 @@ import { useRouter } from "next/navigation";
 import { formatDistanceToNow } from "date-fns";
 import { Plus, MessageSquare, Trash2, MoreHorizontal, X } from "lucide-react";
 import { cn } from "@/lib/utils";
-import {
-  useCreateConversation,
-  useDeleteConversation,
-} from "@/features/conversation/mutations";
+import { useDeleteConversation } from "@/features/conversation/mutations";
 import { useConversations } from "@/features/conversation/queries";
 
 interface ConversationListProps {
   workspaceId: string;
   activeConversationId?: string;
-  /** When provided, a close (×) button is shown — used by mobile slide-over */
   onClose?: () => void;
 }
 
@@ -26,18 +22,15 @@ export function ConversationList({
   const router = useRouter();
   const [openMenu, setOpenMenu] = useState<string | null>(null);
 
-  const createConversation = useCreateConversation();
   const deleteConversation = useDeleteConversation();
   const { data: conversationList, isLoading } = useConversations(workspaceId);
 
   const handleNew = async () => {
-    const conv = await createConversation.mutateAsync({ workspaceId });
-    router.push(`/workspace/${workspaceId}/${conv.id}`);
-    onClose?.();
+    router.push(`/workspace/${workspaceId}/new`);
   };
 
   const handleDelete = async (convId: string) => {
-    const response = await deleteConversation.mutateAsync({
+    await deleteConversation.mutateAsync({
       conversationId: convId,
       workspaceId,
     });
@@ -75,7 +68,6 @@ export function ConversationList({
         </div>
       </div>
 
-      {/* New chat button */}
       <div className="px-3 pt-3 pb-2">
         <button
           onClick={handleNew}

@@ -77,7 +77,7 @@ export default function Navbar() {
                 rx="32"
                 fill="#6C5CE7"
                 stroke="#0D0D0D"
-                stroke-width="6"
+                strokeWidth="6"
               />
               <circle
                 cx="80"
@@ -85,13 +85,13 @@ export default function Navbar() {
                 r="32"
                 fill="none"
                 stroke="#FBF7EC"
-                stroke-width="9"
+                strokeWidth="9"
               />
               <path
                 d="M67,98 L80,64 L93,98"
                 fill="none"
                 stroke="#FBF7EC"
-                stroke-width="8"
+                strokeWidth="8"
                 stroke-linecap="round"
                 stroke-linejoin="round"
               />
@@ -102,7 +102,7 @@ export default function Navbar() {
                   x2="122"
                   y2="128"
                   stroke="#FBF7EC"
-                  stroke-width="10"
+                  strokeWidth="10"
                   stroke-linecap="round"
                 />
                 <line
@@ -111,7 +111,7 @@ export default function Navbar() {
                   x2="136"
                   y2="142"
                   stroke="#0D0D0D"
-                  stroke-width="10"
+                  strokeWidth="10"
                   stroke-linecap="round"
                 />
               </g>
