@@ -22,10 +22,10 @@ const features = [
   },
   {
     icon: <Search size={24} />,
-    tag: "CITATIONS",
+    tag: "SUMMARIZE",
     tagColor: "bg-[#C4F0D8]",
-    title: "Grounded answers",
-    desc: "Every response is tied to your documents with precise citations you can trust.",
+    title: "Instant summaries",
+    desc: "Get concise summaries of any document or workspace at the click of a button.",
     bg: "bg-[#C4F0D8]",
     rotate: "rotate-1",
   },

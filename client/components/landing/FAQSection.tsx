@@ -11,7 +11,7 @@ const faqs = [
   },
   {
     q: "How does Anvesh ground answers in my sources?",
-    a: "When you ask a question, Anvesh retrieves the most relevant passages from your uploaded documents using semantic search, then asks the AI to answer strictly based on those retrieved chunks. Every answer includes numbered citations so you can verify exactly which part of which document the answer came from.",
+    a: "When you ask a question, Anvesh retrieves the most relevant passages from your uploaded documents using semantic search, then asks the AI to answer strictly based on those retrieved chunks, ensuring accuracy and relevance.",
   },
   {
     q: "Is my data private and secure?",
