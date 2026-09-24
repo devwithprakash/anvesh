@@ -46,14 +46,13 @@ export function AppNavbar({ activeWorkspaceId }: AppNavbarProps) {
             className="flex items-center gap-2.5 shrink-0"
           >
             <span className="inline-flex items-center justify-center w-8 h-8 rounded-lg border-[2px] border-black bg-[#6C47FF] text-white font-black text-sm shadow-[2px_2px_0px_#000]">
-              N
+              A
             </span>
             <span className="font-black text-base text-black tracking-tight hidden sm:block">
               Anvesh
             </span>
           </button>
 
-          {/* Workspace switcher — center */}
           {activeWs ? (
             <div className="relative flex-1 flex justify-center">
               <button
