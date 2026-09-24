@@ -1,4 +1,4 @@
-import type { SubscriptionStatus } from "../generated/prisma/client.js";
+import type { Prisma, SubscriptionStatus } from "../generated/prisma/client.js";
 import prisma from "../lib/db.js";
 
 // ── Subscription ─────────────────────────────────────────────────────────────
@@ -10,9 +10,7 @@ export function findActiveSubscriptionByUserId(userId: string) {
   });
 }
 
-export function findSubscriptionByRazorpayId(
-  razorpaySubscriptionId: string,
-) {
+export function findSubscriptionByRazorpayId(razorpaySubscriptionId: string) {
   return prisma.subscription.findFirst({
     where: { razorpaySubscriptionId },
     include: { plan: true },
@@ -146,5 +144,51 @@ export function getPlanByName(name: string) {
 export function getUsageByUserId(userId: string) {
   return prisma.usageRecords.findFirst({
     where: { userId },
+  });
+}
+
+export function getWebhookEventById(eventId: string) {
+  return prisma.webhookEvent.findUnique({
+    where: { eventId },
+  });
+}
+
+export function createWebhookEvent(
+  eventId: string,
+  event: string,
+  payload: Prisma.InputJsonValue,
+  signature: string,
+) {
+  return prisma.webhookEvent.create({
+    data: {
+      eventId,
+      eventType: event,
+      payload,
+      signature,
+      status: "RECEIVED",
+    },
+  });
+}
+
+export function markWebhookEventProcessed(eventId: string) {
+  return prisma.webhookEvent.update({
+    where: {
+      eventId,
+    },
+    data: {
+      status: "PROCESSED",
+      processdAt: new Date(),
+    },
+  });
+}
+export function markWebhookEventFailed(eventId: string, errorMessage: string) {
+  return prisma.webhookEvent.update({
+    where: {
+      eventId,
+    },
+    data: {
+      status: "FAILED",
+      errorMessage: errorMessage,
+    },
   });
 }

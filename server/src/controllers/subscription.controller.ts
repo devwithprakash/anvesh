@@ -47,6 +47,15 @@ export async function handleWebhook(
   req: Request,
   res: Response,
 ): Promise<void> {
+  const eventId = req.headers["x-razorpay-event-id"];
+
+  if (!eventId || Array.isArray(eventId)) {
+    res.status(400).json({
+      error: "Invalid or missing event ID",
+    });
+    return;
+  }
+  
   const signature = req.headers["x-razorpay-signature"] as string;
 
   if (!signature) {
@@ -68,7 +77,7 @@ export async function handleWebhook(
 
   const rawBody = req.body.toString("utf-8");
 
-  const result = await handleWebhookEvent(rawBody, signature);
+  const result = await handleWebhookEvent(rawBody, signature, eventId);
 
   res.status(200).json(result);
 }

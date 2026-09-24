@@ -229,3 +229,21 @@ model UsageRecords {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
+
+enum WebhookEventStatus {
+  RECEIVED
+  PROCESSED
+  FAILED
+}
+
+model WebhookEvent {
+  id           String             @id @default(cuid())
+  eventId   String             @unique
+  eventType   String
+  payload      Json
+  signature    String?
+  status       WebhookEventStatus @default(RECEIVED)
+  processdAt   DateTime?
+  errorMessage String?
+  createdAt    DateTime           @default(now())
+}
