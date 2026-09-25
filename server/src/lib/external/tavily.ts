@@ -31,6 +31,8 @@ export async function searchWeb(query: string): Promise<TavilySearchResponse> {
     includeAnswer: true,
   });
 
+  console.log("Tavily result: ", response)
+
 
   return {
     query,

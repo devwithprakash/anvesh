@@ -117,7 +117,6 @@ async function resolveConversation(
   firstMessage: string,
 ) {
   if (conversationId) {
-
     const existing = await findConversationByIdAndWorkspaceId(
       conversationId,
       workspaceId,
@@ -167,7 +166,6 @@ export async function streamWorkspaceChat(
     webSearch?: boolean;
   },
 ) {
-
   const subscription = await getSubscriptionByUserId(userId);
 
   const plan = subscription
@@ -209,16 +207,16 @@ export async function streamWorkspaceChat(
     content: userText,
   });
 
-  const [retrievedChunks, userMemories] = await Promise.all([
+  const [retrievedChunks] = await Promise.all([
     retrieveWorkspaceContext(workspaceId, userText),
-    searchUserMemories(userId, userText),
   ]);
+
+  console.log("Retrived chukks: ", retrievedChunks)
 
   const systemPrompt = buildChatSystemPrompt({
     chunks: retrievedChunks.chunks,
     conversationSummary: conversation.summary,
-    userMemories: userMemories.map((memory) => memory.memory),
-    webSearchEnabled,
+    webSearchEnabled
   });
 
   // Limit conversation history, give only recent RECENT_MESSAGE_WINDOW=12 messages for context
@@ -232,6 +230,7 @@ export async function streamWorkspaceChat(
   const stream = createUIMessageStream({
     originalMessages: input.messages,
     execute: async ({ writer }) => {
+
       const tools = webSearchEnabled
         ? {
             web_search: tool({
