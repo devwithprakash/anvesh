@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useAppState } from "@/components/providers/app-provider";
 import { AppNavbar } from "@/components/workspace/app-navbar";
 import { ConversationList } from "@/components/workspace/conversation-list";
 import { SourcesPanel } from "@/components/workspace/sources-panel";
@@ -10,18 +9,15 @@ import { Plus, MessageSquare, FileText, ArrowRight } from "lucide-react";
 import { useGetWorkspace } from "@/features/workspace/queries";
 import { useConversations } from "@/features/conversation/queries";
 import { useSources } from "@/features/source/queries";
-import { useCreateConversation } from "@/features/conversation/mutations";
 
 export function WorkspacePageInner({ workspaceId }: { workspaceId: string }) {
   const [chatsOpen, setChatsOpen] = useState(false);
   const [sourcesOpen, setSourcesOpen] = useState(false);
 
   const router = useRouter();
-  const { workspaces } = useAppState();
 
-  const { data: workspace, isLoading } = useGetWorkspace(workspaceId);
+  const { data: workspace } = useGetWorkspace(workspaceId);
   const { data: conversations, isPending } = useConversations(workspaceId);
-  const createConversation = useCreateConversation();
   const { data: sources } = useSources(workspaceId);
 
   // Close drawers on Escape
@@ -35,10 +31,6 @@ export function WorkspacePageInner({ workspaceId }: { workspaceId: string }) {
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
   }, []);
-
-  if (!workspaces || workspaces.length === 0) {
-    return null;
-  }
 
   if (isPending || !conversations) {
     return <div>Loading...</div>;

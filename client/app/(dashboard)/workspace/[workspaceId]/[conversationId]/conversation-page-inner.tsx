@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useAppState } from "@/components/providers/app-provider";
 import { AppNavbar } from "@/components/workspace/app-navbar";
 import { ConversationList } from "@/components/workspace/conversation-list";
 import { SourcesPanel } from "@/components/workspace/sources-panel";
@@ -14,12 +13,8 @@ export function ConversationPageInner({
   workspaceId: string;
   conversationId: string;
 }) {
-  const { workspaces } = useAppState();
-  const workspace = workspaces.find((ws) => ws.id === workspaceId);
-
   const [chatsOpen, setChatsOpen] = useState(false);
   const [sourcesOpen, setSourcesOpen] = useState(false);
-
 
   // Close drawers on Escape
   useEffect(() => {
@@ -43,7 +38,9 @@ export function ConversationPageInner({
         <div className="hidden md:flex md:w-[260px] md:shrink-0 h-full">
           <ConversationList
             workspaceId={workspaceId}
-            activeConversationId={conversationId === "new" ? undefined : conversationId}
+            activeConversationId={
+              conversationId === "new" ? undefined : conversationId
+            }
           />
         </div>
 
@@ -73,7 +70,9 @@ export function ConversationPageInner({
           <div className="relative z-10 flex w-[300px] max-w-[85vw] h-full">
             <ConversationList
               workspaceId={workspaceId}
-              activeConversationId={conversationId === "new" ? undefined : conversationId}
+              activeConversationId={
+                conversationId === "new" ? undefined : conversationId
+              }
               onClose={() => setChatsOpen(false)}
             />
           </div>
