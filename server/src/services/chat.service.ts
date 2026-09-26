@@ -48,7 +48,6 @@ import {
   getTextFromUIMessage,
 } from "../utils/chat-message.js";
 import { getWorkspaceByIdForUser } from "./workspace.service.js";
-import { addMemoriesFromMessages, searchUserMemories } from "../lib/mem0.js";
 import {
   getFreePlan,
   getPlanById,
@@ -135,26 +134,6 @@ async function resolveConversation(
   );
 }
 
-/**
- * Main RAG chat endpoint: streams an AI reply with workspace context and optional web search.
- *
- * **Pipeline:**
- * 1. Validate user message and resolve/create conversation
- * 2. Save user message to Postgres
- * 3. Parallel: Pinecone RAG retrieval + Mem0 memory search
- * 4. Build system prompt and stream model response via AI SDK
- * 5. On finish: save assistant message, title, summary job, Mem0 learning
- *
- * @param res - Express response (streamed via `pipeUIMessageStreamToResponse`)
- * @param workspaceId - Workspace whose sources to search
- * @param userId - Authenticated user's id
- * @param input - Client chat payload from `useChat`
- * @returns Writes UI message stream to `res`; sets `X-Conversation-Id` header
- * @throws {ValidationError} When no user message text is present
- * @throws {NotFoundError} When conversation or workspace is not found
- *
- *
- */
 export async function streamWorkspaceChat(
   res: Response,
   workspaceId: string,
@@ -211,12 +190,12 @@ export async function streamWorkspaceChat(
     retrieveWorkspaceContext(workspaceId, userText),
   ]);
 
-  console.log("Retrived chukks: ", retrievedChunks)
+  console.log("Retrived chukks: ", retrievedChunks);
 
   const systemPrompt = buildChatSystemPrompt({
     chunks: retrievedChunks.chunks,
     conversationSummary: conversation.summary,
-    webSearchEnabled
+    webSearchEnabled,
   });
 
   // Limit conversation history, give only recent RECENT_MESSAGE_WINDOW=12 messages for context
@@ -230,7 +209,6 @@ export async function streamWorkspaceChat(
   const stream = createUIMessageStream({
     originalMessages: input.messages,
     execute: async ({ writer }) => {
-
       const tools = webSearchEnabled
         ? {
             web_search: tool({
@@ -290,20 +268,6 @@ export async function streamWorkspaceChat(
           userId,
         });
       }
-
-      void addMemoriesFromMessages(
-        userId,
-        [
-          { role: "user", content: userText },
-          { role: "assistant", content: assistantText },
-        ],
-        {
-          source: "learned",
-          conversationId: conversation.id,
-        },
-      ).catch((error) => {
-        console.error("Mem0 add failed:", error);
-      });
     },
   });
 

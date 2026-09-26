@@ -7,7 +7,6 @@ import {
 } from "../repositories/conversation.repository.js";
 import { findMessagesByConversationId } from "../repositories/message.repository.js";
 import { NotFoundError } from "../types/app-error.js";
-import { addMemoriesFromMessages } from "../lib/mem0.js";
 
 
 export async function summarizeConversationById(
@@ -55,15 +54,6 @@ export async function summarizeConversationById(
     summaryMessageCount: messages.length,
   });
 
-  const recentMessages = messages.slice(-16).map((message) => ({
-    role: message.role.toLowerCase() as "user" | "assistant",
-    content: message.content,
-  }));
-
-  await addMemoriesFromMessages(userId, recentMessages, {
-    source: "learned",
-    conversationId,
-  });
 
   return updated;
 }
