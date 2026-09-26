@@ -260,7 +260,7 @@ export default function DashboardPage() {
     null,
   );
 
-  const { data: workspacesList} = useWorkspaces();
+  const { data: workspacesList } = useWorkspaces();
   const deleteWorkspace = useDeleteWorkspace();
 
   const handleDeleteWorkspace = async (workspaceId: string) => {
@@ -463,7 +463,7 @@ export default function DashboardPage() {
         <div className="max-w-5xl mx-auto px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <span className="inline-flex items-center justify-center w-6 h-6 rounded-md border-[2px] border-black bg-[#6C47FF] text-white font-black text-[10px] shadow-[2px_2px_0px_#000]">
-              N
+              A
             </span>
             <span className="font-black text-sm text-black">Anvesh</span>
           </div>

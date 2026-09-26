@@ -20,7 +20,7 @@ const itemVariants = {
 };
 
 export default function Navbar() {
-  const { data: session } = authClient.useSession();
+  const { data: session, isPending: authLoading } = authClient.useSession();
   const user = session?.user;
 
   const handleLogOut = async () => {
@@ -36,7 +36,7 @@ export default function Navbar() {
     { label: "How it works", href: "/#how-it-works" },
     { label: "Pricing", href: "/pricing" },
     { label: "Faq", href: "/#faq" },
-    ...(user ? [{ label: "Dashboard", href: "/dashboard" }] : []),
+    { label: "Dashboard", href: "/dashboard", authOnly: true },
   ];
 
   return (
@@ -92,8 +92,8 @@ export default function Navbar() {
                 fill="none"
                 stroke="#FBF7EC"
                 strokeWidth="8"
-                stroke-linecap="round"
-                stroke-linejoin="round"
+                strokeLinecap="round"
+                strokeLinejoin="round"
               />
               <g className="anvesh-handle">
                 <line
@@ -103,7 +103,7 @@ export default function Navbar() {
                   y2="128"
                   stroke="#FBF7EC"
                   strokeWidth="10"
-                  stroke-linecap="round"
+                  strokeLinecap="round"
                 />
                 <line
                   x1="122"
@@ -112,7 +112,7 @@ export default function Navbar() {
                   y2="142"
                   stroke="#0D0D0D"
                   strokeWidth="10"
-                  stroke-linecap="round"
+                  strokeLinecap="round"
                 />
               </g>
             </g>
@@ -123,21 +123,26 @@ export default function Navbar() {
         </motion.a>
 
         {/* Nav Links */}
-        <motion.ul
-          variants={containerVariants}
-          className="hidden md:flex items-center gap-1"
-        >
-          {navLinks.map((link) => (
-            <motion.li key={link.label} variants={itemVariants}>
-              <a
-                href={link.href}
-                className="px-3 py-1.5 text-sm font-bold text-black rounded-lg hover:bg-black hover:text-[#FFFBF0] transition-colors"
-              >
-                {link.label}
-              </a>
-            </motion.li>
-          ))}
-        </motion.ul>
+
+        {!authLoading && (
+          <motion.ul
+            variants={containerVariants}
+            className="hidden lg:flex items-center gap-1"
+          >
+            {navLinks.map((link) => {
+              return (
+                <motion.li key={link.label} variants={itemVariants}>
+                  <a
+                    href={link.href}
+                    className="px-3 py-1.5 text-sm font-bold text-black rounded-lg hover:bg-black hover:text-[#FFFBF0] transition-colors"
+                  >
+                    {link.label}
+                  </a>
+                </motion.li>
+              );
+            })}
+          </motion.ul>
+        )}
 
         {/* CTA Buttons */}
         <motion.div
