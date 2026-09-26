@@ -9,6 +9,7 @@ import {
   markSourceProcessing,
 } from "../services/source-processing.service.js";
 import { inngest } from "./client.js";
+import logger from "../utils/logger.js";
 
 export const processSource = inngest.createFunction(
   {
@@ -18,6 +19,10 @@ export const processSource = inngest.createFunction(
   },
   async ({ event, step }) => {
     const { sourceId } = event.data;
+
+    logger.info("Source processing started", {
+      sourceId,
+    });
 
     await step.run("mark-processing", () => markSourceProcessing(sourceId));
 
@@ -45,8 +50,19 @@ export const processSource = inngest.createFunction(
         return { chunkCount: chunks.length };
       });
 
+      logger.info("Source processing completed", {
+        sourceId,
+        chunkCount: result.chunkCount,
+      });
+
       return { sourceId, status: "READY", ...result };
     } catch (error) {
+      logger.error("Source processing failed", {
+        sourceId,
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+      });
+
       await step.run("mark-failed", async () => {
         const source = await findSourceById(sourceId);
         if (source) {
@@ -66,10 +82,10 @@ export const summarizeConversation = inngest.createFunction(
     triggers: [{ event: "conversation/summarize" }],
   },
   async ({ event, step }) => {
-    const { conversationId, userId } = event.data;
+    const { conversationId } = event.data;
 
     await step.run("summarize", () => {
-      summarizeConversationById(conversationId, userId);
+      summarizeConversationById(conversationId);
     });
 
     return { conversationId, status: "SUMMARIZE" };

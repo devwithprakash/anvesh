@@ -39,10 +39,6 @@ export async function retrieveWorkspaceContext(
     hydeDocument(userQuery),
   ]);
 
-  console.log("Stepback: ", stepBack);
-  console.log("Rewritten: ", rewritten);
-  console.log("Subqueries: ", subQueries);
-  console.log("Hyde: ", hyde);
 
   const labelled = [
     { label: "rewritten", text: rewritten },
@@ -54,8 +50,6 @@ export async function retrieveWorkspaceContext(
       text: q,
     })),
   ].filter((q) => typeof q.text === "string" && q.text.trim().length > 0);
-
-  console.log("Labelled: ", labelled);
 
   const vectors = await embedTexts(labelled.map((q) => q.text));
 
@@ -88,7 +82,6 @@ export function buildChatSystemPrompt(input: {
   conversationSummary?: string | null;
   webSearchEnabled?: boolean;
 }) {
-  console.log("Web search status: ", input.webSearchEnabled);
 
   const sections: string[] = [
     `

@@ -54,6 +54,7 @@ import {
   getSubscriptionByUserId,
   updateAiQueryUsageRecord,
 } from "../repositories/workspace.repository.js";
+import { logger } from "better-auth";
 
 export async function listConversationsForWorkspace(
   workspaceId: string,
@@ -145,138 +146,178 @@ export async function streamWorkspaceChat(
     webSearch?: boolean;
   },
 ) {
-  const subscription = await getSubscriptionByUserId(userId);
+  try {
+    const subscription = await getSubscriptionByUserId(userId);
 
-  const plan = subscription
-    ? await getPlanById(subscription.planId)
-    : await getFreePlan();
+    const plan = subscription
+      ? await getPlanById(subscription.planId)
+      : await getFreePlan();
 
-  if (!plan) {
-    throw new Error("Plan not found");
-  }
+    if (!plan) throw new Error("Plan not found");
 
-  await updateAiQueryUsageRecord(userId, plan.maxAiQueries);
+    await updateAiQueryUsageRecord(userId, plan.maxAiQueries);
 
-  const workspace = await getWorkspaceByIdForUser(workspaceId, userId);
+    const workspace = await getWorkspaceByIdForUser(workspaceId, userId);
 
-  const requestedModel = input.model ?? workspace.defaultModel;
-  const chatModel =
-    CHAT_MODELS.find((model) => model === requestedModel) ?? CHAT_MODEL;
+    const requestedModel = input.model ?? workspace.defaultModel;
+    const chatModel =
+      CHAT_MODELS.find((model) => model === requestedModel) ?? CHAT_MODEL;
 
-  const webSearchEnabled =
-    input.webSearch === true &&
-    plan.webSearchEnabled === true &&
-    !!process.env.TAVILY_API_KEY?.trim();
+    const webSearchEnabled =
+      input.webSearch === true &&
+      plan.webSearchEnabled === true &&
+      !!process.env.TAVILY_API_KEY?.trim();
 
-  const userText = getLastUserMessageText(input.messages);
+    const userText = getLastUserMessageText(input.messages);
 
-  if (!userText) {
-    throw new ValidationError("A user message is required");
-  }
-  // get the conversation, if not exist then first create and then get
-  const conversation = await resolveConversation(
-    workspaceId,
-    input.conversationId,
-    userText,
-  );
+    if (!userText) throw new ValidationError("A user message is required");
 
-  await createMessageRecord({
-    conversationId: conversation.id,
-    role: "USER",
-    content: userText,
-  });
+    // get the conversation, if not exist then first create and then get
+    const conversation = await resolveConversation(
+      workspaceId,
+      input.conversationId,
+      userText,
+    );
 
-  const [retrievedChunks] = await Promise.all([
-    retrieveWorkspaceContext(workspaceId, userText),
-  ]);
+    logger.info("AI query started", {
+      workspaceId,
+      conversationId: conversation.id,
+      model: chatModel,
+      webSearchEnabled,
+    });
 
-  console.log("Retrived chukks: ", retrievedChunks);
+    await createMessageRecord({
+      conversationId: conversation.id,
+      role: "USER",
+      content: userText,
+    });
 
-  const systemPrompt = buildChatSystemPrompt({
-    chunks: retrievedChunks.chunks,
-    conversationSummary: conversation.summary,
-    webSearchEnabled,
-  });
+    const [retrievedChunks] = await Promise.all([
+      retrieveWorkspaceContext(workspaceId, userText),
+    ]);
 
-  // Limit conversation history, give only recent RECENT_MESSAGE_WINDOW=12 messages for context
-  const contextMessages =
-    conversation.summary && input.messages.length > RECENT_MESSAGE_WINDOW
-      ? input.messages.slice(-RECENT_MESSAGE_WINDOW)
-      : input.messages;
+    logger.debug("Workspace context retrieved", {
+      workspaceId,
+      conversationId: conversation.id,
+      chunkCount: retrievedChunks.chunks.length,
+    });
 
-  let webSearchResults: TavilySearchResponse | null = null;
+    const systemPrompt = buildChatSystemPrompt({
+      chunks: retrievedChunks.chunks,
+      conversationSummary: conversation.summary,
+      webSearchEnabled,
+    });
 
-  const stream = createUIMessageStream({
-    originalMessages: input.messages,
-    execute: async ({ writer }) => {
-      const tools = webSearchEnabled
-        ? {
-            web_search: tool({
-              description:
-                "Search the web for up-to-date information outside the workspace sources.",
-              inputSchema: z.object({
-                query: z
-                  .string()
-                  .describe("The search query for current web information"),
+    // Limit conversation history, give only recent RECENT_MESSAGE_WINDOW=12 messages for context
+    const contextMessages =
+      conversation.summary && input.messages.length > RECENT_MESSAGE_WINDOW
+        ? input.messages.slice(-RECENT_MESSAGE_WINDOW)
+        : input.messages;
+
+    let webSearchResults: TavilySearchResponse | null = null;
+
+    const stream = createUIMessageStream({
+      originalMessages: input.messages,
+      execute: async ({ writer }) => {
+        const tools = webSearchEnabled
+          ? {
+              web_search: tool({
+                description:
+                  "Search the web for up-to-date information outside the workspace sources.",
+                inputSchema: z.object({
+                  query: z
+                    .string()
+                    .describe("The search query for current web information"),
+                }),
+                execute: async ({ query }) => {
+                  logger.info("Web search started", {
+                    workspaceId,
+                    conversationId: conversation.id,
+                  });
+
+                  webSearchResults = await searchWeb(query);
+
+                  logger.debug("Web search completed", {
+                    workspaceId,
+                    conversationId: conversation.id,
+                    resultCount: webSearchResults?.results?.length ?? 0,
+                  });
+
+                  return formatTavilyResultsForPrompt(webSearchResults);
+                },
               }),
-              execute: async ({ query }) => {
-                webSearchResults = await searchWeb(query);
-                return formatTavilyResultsForPrompt(webSearchResults);
-              },
-            }),
-          }
-        : undefined;
+            }
+          : undefined;
 
-      const result = streamText({
-        model: openai(chatModel),
-        system: systemPrompt,
-        messages: await convertToModelMessages(contextMessages),
-        ...(tools !== undefined && { tools }),
-        stopWhen: webSearchEnabled ? isStepCount(3) : undefined,
-      });
-
-      // Pipe to frontend AND drain the stream fully before continuing
-      writer.merge(toUIMessageStream({ stream: result.stream }));
-      await result.consumeStream(); // ✅ waits until LLM is fully done
-    },
-
-    onFinish: async ({ responseMessage, isAborted }) => {
-      if (isAborted) return;
-
-      const assistantText = getTextFromUIMessage(responseMessage).trim();
-      if (!assistantText) return;
-
-      await createMessageRecord({
-        conversationId: conversation.id,
-        role: "ASSISTANT",
-        content: assistantText,
-      });
-
-      await touchConversation(conversation.id);
-
-      if (!conversation.title) {
-        await updateConversationRecord(conversation.id, {
-          title: buildConversationTitle(userText),
+        const result = streamText({
+          model: openai(chatModel),
+          system: systemPrompt,
+          messages: await convertToModelMessages(contextMessages),
+          ...(tools !== undefined && { tools }),
+          stopWhen: webSearchEnabled ? isStepCount(3) : undefined,
         });
-      }
 
-      const messageCount = await countMessagesByConversationId(conversation.id);
+        // Pipe to frontend AND drain the stream fully before continuing
+        writer.merge(toUIMessageStream({ stream: result.stream }));
+        await result.consumeStream(); // ✅ waits until LLM is fully done
+      },
 
-      if (messageCount % CONVERSATION_SUMMARY_INTERVAL === 0) {
-        await enqueueConversationSummarize({
+      onFinish: async ({ responseMessage, isAborted }) => {
+        if (isAborted) return;
+
+        const assistantText = getTextFromUIMessage(responseMessage).trim();
+        if (!assistantText) return;
+
+        await createMessageRecord({
           conversationId: conversation.id,
-          userId,
+          role: "ASSISTANT",
+          content: assistantText,
         });
-      }
-    },
-  });
 
-  // send streamed HTTP response to frontend
-  await pipeUIMessageStreamToResponse({
-    response: res,
-    stream,
-    headers: {
-      "X-Conversation-Id": conversation.id,
-    },
-  });
+        await touchConversation(conversation.id);
+
+        if (!conversation.title) {
+          await updateConversationRecord(conversation.id, {
+            title: buildConversationTitle(userText),
+          });
+        }
+
+        const messageCount = await countMessagesByConversationId(
+          conversation.id,
+        );
+
+        if (messageCount % CONVERSATION_SUMMARY_INTERVAL === 0) {
+          await enqueueConversationSummarize({
+            conversationId: conversation.id,
+            userId,
+          });
+        }
+
+        logger.info("AI query completed", {
+          workspaceId,
+          conversationId: conversation.id,
+          model: chatModel,
+          webSearchUsed: webSearchResults !== null,
+        });
+      },
+    });
+
+    // send streamed HTTP response to frontend
+    await pipeUIMessageStreamToResponse({
+      response: res,
+      stream,
+      headers: {
+        "X-Conversation-Id": conversation.id,
+      },
+    });
+  } catch (error) {
+    logger.error("AI query failed", {
+      workspaceId,
+      conversationId: input.conversationId,
+      error: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+    });
+
+    throw error;
+  }
 }

@@ -11,7 +11,6 @@ import { NotFoundError } from "../types/app-error.js";
 
 export async function summarizeConversationById(
   conversationId: string,
-  userId: string,
 ) {
   const conversation = await findConversationById(conversationId);
 

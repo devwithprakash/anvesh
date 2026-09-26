@@ -9,6 +9,7 @@ import { functions } from "./inngest/index.js";
 import { serve } from "inngest/express";
 import { handleWebhook } from "./controllers/subscription.controller.js";
 import { asyncHandler } from "./utils/async-handler.js";
+import { httpLogger } from "./middleware/http-logger.js";
 
 const app: Express = express();
 
@@ -21,7 +22,8 @@ app.use(
   }),
 );
 
-// express wildcard route pattern
+app.use(httpLogger);
+
 app.all("/api/auth/{*splat}", toNodeHandler(auth));
 
 app.post(
