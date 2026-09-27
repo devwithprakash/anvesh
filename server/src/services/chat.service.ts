@@ -157,11 +157,7 @@ export async function streamWorkspaceChat(
 
     await updateAiQueryUsageRecord(userId, plan.maxAiQueries);
 
-    const workspace = await getWorkspaceByIdForUser(workspaceId, userId);
-
-    const requestedModel = input.model ?? workspace.defaultModel;
-    const chatModel =
-      CHAT_MODELS.find((model) => model === requestedModel) ?? CHAT_MODEL;
+    const chatModel = CHAT_MODEL;
 
     const webSearchEnabled =
       input.webSearch === true &&

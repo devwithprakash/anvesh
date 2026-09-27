@@ -11,7 +11,6 @@ export const workspaceSelect = {
   title: true,
   description: true,
   icon: true,
-  defaultModel: true,
   createdAt: true,
   updatedAt: true,
 } as const;
@@ -21,7 +20,6 @@ export type WorkspaceRecord = {
   title: string;
   description: string | null;
   icon: string | null;
-  defaultModel: string;
   createdAt: Date;
   updatedAt: Date;
 };
@@ -88,7 +86,6 @@ export function createWorkspaceRecord(
       title: data.title,
       description: data.description ?? null,
       icon: data.icon ?? null,
-      defaultModel: data.defaultModel ?? "gpt-4o-mini",
     },
     select: workspaceSelect,
   });
@@ -107,10 +104,7 @@ export function updateWorkspaceRecord(
       }),
       ...(data.icon !== undefined && {
         icon: data.icon,
-      }),
-      ...(data.defaultModel !== undefined && {
-        defaultModel: data.defaultModel,
-      }),
+      })
     },
     select: workspaceSelect,
   });
@@ -249,7 +243,6 @@ export async function createWorkspaceWithQuota(
         title: input.title,
         description: input.description ?? null,
         icon: input.icon ?? null,
-        defaultModel: input.defaultModel ?? "gpt-4o-mini",
       },
     });
   });
