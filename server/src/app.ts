@@ -1,6 +1,7 @@
 import express, { type Express } from "express";
 import cors from "cors";
 import helmet from "helmet"
+import hpp from "hpp"
 import { serve } from "inngest/express";
 
 import { toNodeHandler } from "better-auth/node";
@@ -16,6 +17,7 @@ import { httpLogger } from "./middleware/http-logger.js";
 const app: Express = express();
 
 app.use(helmet())
+app.use(hpp())
 
 const clientUrl = process.env.FRONTEND_URL;
 app.use(
