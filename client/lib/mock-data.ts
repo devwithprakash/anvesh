@@ -8,7 +8,6 @@ export interface Workspace {
   title: string;
   description?: string;
   icon?: string;
-  defaultModel: string;
   createdAt: string;
   sourceCount?: number;
   conversationCount?: number;
@@ -48,7 +47,6 @@ export const MOCK_WORKSPACES: Workspace[] = [
     title: "AI Research Papers",
     description: "Collection of papers on LLMs, transformers, and RAG systems",
     icon: "🧠",
-    defaultModel: "gpt-4o-mini",
     createdAt: "2026-08-20T10:00:00Z",
     sourceCount: 8,
     conversationCount: 12,
@@ -58,7 +56,6 @@ export const MOCK_WORKSPACES: Workspace[] = [
     title: "Product Roadmap",
     description: "Q4 product strategy and planning documents",
     icon: "🗺️",
-    defaultModel: "gpt-4o",
     createdAt: "2026-08-22T14:30:00Z",
     sourceCount: 3,
     conversationCount: 5,
@@ -68,7 +65,6 @@ export const MOCK_WORKSPACES: Workspace[] = [
     title: "History of Rome",
     description: "Books and articles about ancient Roman history",
     icon: "🏛️",
-    defaultModel: "gpt-4o-mini",
     createdAt: "2026-08-24T09:15:00Z",
     sourceCount: 6,
     conversationCount: 3,
@@ -78,7 +74,6 @@ export const MOCK_WORKSPACES: Workspace[] = [
     title: "Legal Documents",
     description: "Contracts and legal review materials",
     icon: "⚖️",
-    defaultModel: "gpt-4o",
     createdAt: "2026-08-25T11:00:00Z",
     sourceCount: 2,
     conversationCount: 1,

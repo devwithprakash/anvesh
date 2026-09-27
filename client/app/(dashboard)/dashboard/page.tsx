@@ -244,9 +244,6 @@ function WorkspaceCard({
             <MessageSquare size={12} />
             {conversations?.length ?? 0} chats
           </span>
-          <span className="ml-auto rounded-full border-[1.5px] border-black bg-[#EDE9FE] px-2 py-0.5 text-[10px] font-black text-[#6C47FF]">
-            {workspace.defaultModel}
-          </span>
         </div>
       </div>
     </div>

@@ -3,8 +3,6 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { X } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { AVAILABLE_MODELS } from "@/lib/mock-data";
 import {
   useCreateWorkspace,
   useUpdateWorkspace,
@@ -28,17 +26,14 @@ export function WorkspaceDialog({
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [defaultModel, setDefaultModel] = useState("gpt-4o-mini");
 
   useEffect(() => {
     if (workspace) {
       setTitle(workspace.title);
       setDescription(workspace.description ?? "");
-      setDefaultModel(workspace.defaultModel);
     } else {
       setTitle("");
       setDescription("");
-      setDefaultModel("gpt-4o-mini");
     }
   }, [workspace, open]);
 
@@ -55,13 +50,11 @@ export function WorkspaceDialog({
         workspaceId: workspace.id,
         title: title.trim(),
         description: description.trim(),
-        defaultModel,
       });
     } else {
       const ws = await createWorkspace.mutateAsync({
         title: title.trim(),
         description: description.trim(),
-        defaultModel,
       });
       router.push(`/workspace/${ws.id}`);
     }
@@ -117,38 +110,6 @@ export function WorkspaceDialog({
               rows={3}
               className="w-full rounded-xl border-[2px] border-black bg-white px-3 py-2 text-sm font-semibold text-black placeholder:text-gray-400 shadow-[2px_2px_0px_#000] outline-none focus:shadow-none focus:translate-x-[2px] focus:translate-y-[2px] transition-all resize-none"
             />
-          </div>
-
-          <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-black text-black uppercase tracking-wide">
-              Default model
-            </label>
-            <div className="grid grid-cols-2 gap-2.5">
-              {AVAILABLE_MODELS.map((m) => (
-                <button
-                  key={m.value}
-                  onClick={() => setDefaultModel(m.value)}
-                  className={cn(
-                    "flex flex-col items-start rounded-xl border-[2px] border-black px-3 py-3 text-left transition-all shadow-[2px_2px_0px_#000]",
-                    defaultModel === m.value
-                      ? "bg-[#6C47FF] text-white shadow-none translate-x-[2px] translate-y-[2px]"
-                      : "bg-white text-black hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]",
-                  )}
-                >
-                  <span className="text-sm font-black">{m.label}</span>
-                  <span
-                    className={cn(
-                      "text-xs font-semibold",
-                      defaultModel === m.value
-                        ? "text-white/70"
-                        : "text-gray-500",
-                    )}
-                  >
-                    {m.description}
-                  </span>
-                </button>
-              ))}
-            </div>
           </div>
         </div>
 

@@ -206,10 +206,6 @@ export function AppNavbar({ activeWorkspaceId }: AppNavbarProps) {
                   />
                   <div className="absolute right-0 top-full mt-2 z-20 w-48 rounded-xl border-[2.5px] border-black bg-white shadow-[4px_4px_0px_#000] overflow-hidden">
                     <div className="p-1.5 flex flex-col gap-0.5">
-                      <button className="flex items-center gap-2.5 w-full rounded-lg px-3 py-2 text-sm font-bold text-black hover:bg-gray-100 transition-colors">
-                        <Settings size={14} />
-                        Settings
-                      </button>
                       <button
                         onClick={handleLogOut}
                         className="flex items-center gap-2.5 w-full rounded-lg px-3 py-2 text-sm font-bold text-[#FF6B6B] hover:bg-[#FFF0F0] transition-colors"
