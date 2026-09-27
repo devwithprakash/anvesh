@@ -36,8 +36,11 @@ export default function Navbar() {
     { label: "How it works", href: "/#how-it-works" },
     { label: "Pricing", href: "/pricing" },
     { label: "Faq", href: "/#faq" },
-    { label: "Dashboard", href: "/dashboard", authOnly: true },
   ];
+
+  const links = user
+    ? [...navLinks, { label: "Dashboard", href: "/dashboard" }]
+    : navLinks;
 
   return (
     <motion.nav
@@ -127,20 +130,20 @@ export default function Navbar() {
         {!authLoading && (
           <motion.ul
             variants={containerVariants}
+            initial="hidden"
+            animate="visible"
             className="hidden lg:flex items-center gap-1"
           >
-            {navLinks.map((link) => {
-              return (
-                <motion.li key={link.label} variants={itemVariants}>
-                  <a
-                    href={link.href}
-                    className="px-3 py-1.5 text-sm font-bold text-black rounded-lg hover:bg-black hover:text-[#FFFBF0] transition-colors"
-                  >
-                    {link.label}
-                  </a>
-                </motion.li>
-              );
-            })}
+            {links.map((link) => (
+              <motion.li key={link.label} variants={itemVariants}>
+                <a
+                  href={link.href}
+                  className="px-3 py-1.5 text-sm font-bold text-black rounded-lg hover:bg-black hover:text-[#FFFBF0] transition-colors"
+                >
+                  {link.label}
+                </a>
+              </motion.li>
+            ))}
           </motion.ul>
         )}
 
