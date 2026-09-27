@@ -6,7 +6,6 @@ import {
   GetConversationOutputSchema,
   GetMessageInputSchema,
   GetMessageOutputSchema,
-  StreamChatSchema,
 } from "./types";
 
 export async function createConversation({

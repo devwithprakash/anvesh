@@ -1,7 +1,6 @@
 import { api } from "@/lib/api/client";
 import {
   CreateWorkspaceInput,
-  DeleteWorkspaceInput,
   UpdateWorkspaceInput,
   Workspace,
 } from "./types";

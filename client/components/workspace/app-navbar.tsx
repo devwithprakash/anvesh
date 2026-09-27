@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronDown, LogOut, Settings, Plus } from "lucide-react";
+import { ChevronDown, LogOut, Plus } from "lucide-react";
 import { useAppState } from "@/components/providers/app-provider";
 import { WorkspaceDialog } from "@/components/workspace/workspace-dialog";
 import { PlanBadge } from "@/components/workspace/plan-banner";
@@ -30,7 +30,7 @@ export function AppNavbar({ activeWorkspaceId }: AppNavbarProps) {
   const [userOpen, setUserOpen] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
 
-  const { data: session, isPending } = authClient.useSession();
+  const { data: session} = authClient.useSession();
 
   const user = session?.user;
 
