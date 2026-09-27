@@ -1,20 +1,23 @@
 import express, { type Express } from "express";
 import cors from "cors";
+import helmet from "helmet"
+import { serve } from "inngest/express";
+
 import { toNodeHandler } from "better-auth/node";
 import { auth } from "./lib/auth.js";
 import { registerRoutes } from "./routes/index.js";
 import { errorHandler } from "./middleware/error-handler-middleware.js";
 import { inngest } from "./inngest/client.js";
 import { functions } from "./inngest/index.js";
-import { serve } from "inngest/express";
 import { handleWebhook } from "./controllers/subscription.controller.js";
 import { asyncHandler } from "./utils/async-handler.js";
 import { httpLogger } from "./middleware/http-logger.js";
 
 const app: Express = express();
 
-const clientUrl = process.env.FRONTEND_URL;
+app.use(helmet())
 
+const clientUrl = process.env.FRONTEND_URL;
 app.use(
   cors({
     origin: clientUrl,
