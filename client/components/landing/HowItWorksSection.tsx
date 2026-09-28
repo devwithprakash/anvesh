@@ -139,24 +139,39 @@ const steps = [
   },
 ];
 
-function DashedArrow() {
+function StepConnector({ index }: { index: number }) {
+  const lineDelay = 0.2 + index * 0.15;
+  const headDelay = lineDelay + 0.45;
+
   return (
-    <div className="hidden lg:flex items-center shrink-0 w-10">
-      <svg width="40" height="20" viewBox="0 0 40 20" fill="none">
-        <line
-          x1="0" y1="10" x2="32" y2="10"
+    <div className="hidden lg:flex items-center justify-center shrink-0 w-16 px-1">
+      <svg width="100%" height="24" viewBox="0 0 60 24" fill="none" className="overflow-visible">
+        {/* Elegant dashed line matching card border thickness */}
+        <motion.line
+          x1="2" y1="12" x2="48" y2="12"
           stroke="#000"
-          strokeWidth="2"
-          strokeDasharray="4 3"
+          strokeWidth="2.5"
+          strokeDasharray="6 6"
           strokeLinecap="round"
+          initial={{ pathLength: 0, opacity: 0 }}
+          whileInView={{ pathLength: 1, opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, ease: "easeOut", delay: lineDelay } as any}
         />
-        <path
-          d="M30 5 L38 10 L30 15"
+
+        {/* Sharp chevron arrowhead that shoots out */}
+        <motion.path
+          d="M40 4 L50 12 L40 20"
+          fill="none"
           stroke="#000"
-          strokeWidth="2"
+          strokeWidth="2.5"
           strokeLinecap="round"
           strokeLinejoin="round"
-          fill="none"
+          initial={{ scale: 0.5, opacity: 0, x: -8 }}
+          whileInView={{ scale: 1, opacity: 1, x: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.4, ease: "backOut", delay: headDelay } as any}
+          style={{ transformOrigin: "45px 12px" }}
         />
       </svg>
     </div>
@@ -227,7 +242,7 @@ export default function HowItWorksSection() {
                 <p className="text-sm font-semibold text-gray-700 leading-relaxed">{step.desc}</p>
               </motion.div>
 
-              {i < steps.length - 1 && <DashedArrow />}
+              {i < steps.length - 1 && <StepConnector index={i} />}
             </div>
           ))}
         </div>
