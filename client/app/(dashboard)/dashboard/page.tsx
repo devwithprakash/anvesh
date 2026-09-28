@@ -151,8 +151,8 @@ function WorkspaceCard({
     };
   }, [menuOpen]);
 
-  const { data: sources } = useSources(workspace.id);
-  const { data: conversations } = useConversations(workspace.id);
+  const { data: sources, isPending: sourcesPending } = useSources(workspace.id);
+  const { data: conversations, isPending: convsPending } = useConversations(workspace.id);
 
   return (
     <div className="relative group h-full">
@@ -235,20 +235,30 @@ function WorkspaceCard({
         </p>
 
         {/* Stats */}
-        <div className="flex items-center gap-3 pt-3 border-t-[2px] border-black/10">
-          <span className="flex items-center gap-1.5 text-xs font-bold text-gray-700">
-            <FileText size={12} />
-            {sources?.length ?? 0} sources
-          </span>
-          <span className="flex items-center gap-1.5 text-xs font-bold text-gray-700">
-            <MessageSquare size={12} />
-            {conversations?.length ?? 0} chats
-          </span>
+        <div className="flex items-center gap-4 pt-3 border-t-[2px] border-black/10">
+          {sourcesPending ? (
+            <div className="h-4 w-16 rounded bg-black/5 animate-pulse" />
+          ) : (
+            <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-gray-500">
+              <FileText size={12} className="text-[#6C47FF]" />
+              {sources?.length ?? 0} {sources?.length === 1 ? "source" : "sources"}
+            </span>
+          )}
+
+          {convsPending ? (
+            <div className="h-4 w-12 rounded bg-black/5 animate-pulse" />
+          ) : (
+            <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-gray-500">
+              <MessageSquare size={12} className="text-[#6C47FF]" />
+              {conversations?.length ?? 0} {conversations?.length === 1 ? "chat" : "chats"}
+            </span>
+          )}
         </div>
       </div>
     </div>
   );
 }
+
 
 export default function DashboardPage() {
   const [createOpen, setCreateOpen] = useState(false);
