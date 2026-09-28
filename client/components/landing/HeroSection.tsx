@@ -232,25 +232,31 @@ export default function HeroSection() {
         }}
       />
 
-      <motion.span
-        {...fadePop(0.9)}
-        className="absolute top-14 left-[43%] text-2xl text-[#6C47FF] opacity-50 pointer-events-none select-none font-black"
+      <style>{`
+        @keyframes heroFloatY {
+          0%, 100% { transform: translateY(0px) rotate(0deg); }
+          50%       { transform: translateY(-18px) rotate(15deg); }
+        }
+      `}</style>
+
+      <span
+        className="absolute top-14 left-[43%] text-2xl text-[#6C47FF] opacity-[0.5] pointer-events-none select-none font-black"
+        style={{ animation: "heroFloatY 6s ease-in-out 0.9s infinite" }}
       >
         ✳
-      </motion.span>
-      <motion.span
-        {...fadePop(1.1)}
-        className="absolute top-10 right-[10%] text-2xl text-[#FFE14D] pointer-events-none select-none font-black"
-        style={{ WebkitTextStroke: "1.5px black" }}
+      </span>
+      <span
+        className="absolute top-10 right-[10%] text-2xl text-[#FFE14D] opacity-90 pointer-events-none select-none font-black"
+        style={{ WebkitTextStroke: "1.5px black", animation: "heroFloatY 7s ease-in-out 1.1s infinite" }}
       >
         ✦
-      </motion.span>
-      <motion.span
-        {...fadePop(1.3)}
-        className="absolute bottom-28 right-[19%] text-lg text-[#6C47FF] opacity-40 pointer-events-none select-none font-black"
+      </span>
+      <span
+        className="absolute bottom-28 right-[19%] text-lg text-[#6C47FF] opacity-[0.4] pointer-events-none select-none font-black"
+        style={{ animation: "heroFloatY 8s ease-in-out 1.3s infinite" }}
       >
         ✦
-      </motion.span>
+      </span>
 
       <div className="max-w-7xl mx-auto px-6 py-16 lg:py-20 flex flex-col lg:flex-row items-center gap-14 lg:gap-16">
         <div className="flex-1 max-w-[480px]">
