@@ -120,10 +120,8 @@ const columns = [
 export default function Footer() {
   return (
     <footer className="bg-[#FFFBF0] border-t-[3px] border-black">
-      {/* ── Main body ── */}
       <div className="max-w-7xl mx-auto px-6 py-14">
         <div className="flex flex-col md:flex-row gap-12 md:gap-6">
-          {/* Brand column */}
           <div className="md:w-72 shrink-0">
             <a href="/" className="inline-flex items-center gap-2.5 mb-4">
               <AnveshLogo />
@@ -135,7 +133,6 @@ export default function Footer() {
               Your knowledge. Your sources. Your AI — grounded in what matters
               to you.
             </p>
-            {/* Social icons */}
             <div className="flex items-center gap-2.5">
               {[
                 {
@@ -167,10 +164,8 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Spacer */}
           <div className="flex-1" />
 
-          {/* Link columns */}
           <div className="flex gap-16 sm:gap-20">
             {columns.map((col) => (
               <div key={col.heading}>
@@ -195,7 +190,6 @@ export default function Footer() {
         </div>
       </div>
 
-      {/* ── Bottom bar ── */}
       <div className="border-t-[2px] border-black/10 px-6 py-4">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
           <p className="text-xs font-semibold text-gray-400">

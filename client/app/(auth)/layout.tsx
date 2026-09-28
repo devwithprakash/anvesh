@@ -1,14 +1,20 @@
-﻿"use client"
+﻿"use client";
 
 import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { useEffect, type ReactNode } from "react";
+import { motion } from "framer-motion";
 
-export default function AuthLayout({
-  children,
-}: {
-  children: ReactNode;
-}) {
+const itemVariants = {
+  hidden: { opacity: 0, y: -16 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.4, ease: "easeOut" } as any,
+  },
+};
+
+export default function AuthLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
 
   const { data: session, isPending } = authClient.useSession();
@@ -30,14 +36,79 @@ export default function AuthLayout({
     <div className="min-h-screen bg-[#FFFBF0] flex flex-col">
       <header className="w-full border-b-[3px] border-black bg-[#FFFBF0]">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center">
-          <a href="/" className="flex items-center gap-2.5 shrink-0">
-            <span className="inline-flex items-center justify-center w-9 h-9 rounded-lg border-2 border-black bg-[#6C47FF] text-white font-black text-sm shadow-[3px_3px_0px_#000] select-none">
-              A
-            </span>
+          <motion.a
+            variants={itemVariants}
+            href="/"
+            className="flex items-center shrink-0"
+          >
+            <svg
+              className="anvesh-logo"
+              viewBox="0 0 200 200"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <g className="anvesh-shadow">
+                <rect
+                  x="34"
+                  y="34"
+                  width="132"
+                  height="132"
+                  rx="32"
+                  fill="#0D0D0D"
+                />
+              </g>
+              <g className="anvesh-body">
+                <rect
+                  x="26"
+                  y="26"
+                  width="132"
+                  height="132"
+                  rx="32"
+                  fill="#6C5CE7"
+                  stroke="#0D0D0D"
+                  strokeWidth="6"
+                />
+                <circle
+                  cx="80"
+                  cy="86"
+                  r="32"
+                  fill="none"
+                  stroke="#FBF7EC"
+                  strokeWidth="9"
+                />
+                <path
+                  d="M67,98 L80,64 L93,98"
+                  fill="none"
+                  stroke="#FBF7EC"
+                  strokeWidth="8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <g className="anvesh-handle">
+                  <line
+                    x1="103"
+                    y1="109"
+                    x2="122"
+                    y2="128"
+                    stroke="#FBF7EC"
+                    strokeWidth="10"
+                    strokeLinecap="round"
+                  />
+                  <line
+                    x1="122"
+                    y1="128"
+                    x2="136"
+                    y2="142"
+                    stroke="#0D0D0D"
+                    strokeWidth="10"
+                    strokeLinecap="round"
+                  />
+                </g>
+              </g>
+            </svg>
             <span className="font-black text-lg text-black tracking-tight">
               Anvesh
             </span>
-          </a>
+          </motion.a>
         </div>
       </header>
 
