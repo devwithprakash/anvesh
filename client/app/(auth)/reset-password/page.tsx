@@ -1,10 +1,11 @@
 ﻿'use client';
 
-import { useState, useMemo } from 'react';
 import { Easing, motion } from 'framer-motion';
 import { Eye, EyeOff, ArrowRight, Lock, CheckCircle } from 'lucide-react';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
+import { useState, useMemo } from 'react';
+
 import { resetPassword } from '@/features/auth/auth';
 
 const fadeUp = (delay = 0) => ({
@@ -90,24 +91,24 @@ export default function ResetPasswordPage() {
       <div className="w-full max-w-md">
         <motion.div
           {...fadeUp(0)}
-          className="bg-white border-[3px] border-black rounded-2xl shadow-[6px_6px_0px_#000] overflow-hidden"
+          className="overflow-hidden rounded-2xl border-[3px] border-black bg-white shadow-[6px_6px_0px_#000]"
         >
-          <div className="bg-[#FF6B6B] border-b-[3px] border-black px-8 py-5">
-            <h1 className="text-2xl font-black text-white tracking-tight">
+          <div className="border-b-[3px] border-black bg-[#FF6B6B] px-8 py-5">
+            <h1 className="text-2xl font-black tracking-tight text-white">
               Invalid link 😕
             </h1>
-            <p className="text-sm font-semibold text-white/80 mt-1">
+            <p className="mt-1 text-sm font-semibold text-white/80">
               This reset link is missing or has expired
             </p>
           </div>
-          <div className="px-8 py-8 space-y-4">
-            <p className="text-sm font-semibold text-gray-600 leading-relaxed">
+          <div className="space-y-4 px-8 py-8">
+            <p className="text-sm leading-relaxed font-semibold text-gray-600">
               Password reset links are single-use and expire after 1 hour.
               Please request a new one.
             </p>
             <Link
               href="/forgot-password"
-              className="flex items-center justify-center gap-2 w-full rounded-xl border-[3px] border-black bg-[#6C47FF] px-4 py-3 text-sm font-black text-white shadow-[4px_4px_0px_#000] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] transition-all"
+              className="flex w-full items-center justify-center gap-2 rounded-xl border-[3px] border-black bg-[#6C47FF] px-4 py-3 text-sm font-black text-white shadow-[4px_4px_0px_#000] transition-all hover:translate-x-[4px] hover:translate-y-[4px] hover:shadow-none"
             >
               Request new reset link
               <ArrowRight size={15} />
@@ -123,27 +124,27 @@ export default function ResetPasswordPage() {
       <div className="w-full max-w-md">
         <motion.div
           {...fadeUp(0)}
-          className="bg-white border-[3px] border-black rounded-2xl shadow-[6px_6px_0px_#000] overflow-hidden"
+          className="overflow-hidden rounded-2xl border-[3px] border-black bg-white shadow-[6px_6px_0px_#000]"
         >
-          <div className="bg-[#00B87C] border-b-[3px] border-black px-8 py-5">
-            <h1 className="text-2xl font-black text-white tracking-tight">
+          <div className="border-b-[3px] border-black bg-[#00B87C] px-8 py-5">
+            <h1 className="text-2xl font-black tracking-tight text-white">
               Password updated! 🎉
             </h1>
-            <p className="text-sm font-semibold text-white/80 mt-1">
+            <p className="mt-1 text-sm font-semibold text-white/80">
               You&apos;re being redirected to sign in…
             </p>
           </div>
-          <div className="px-8 py-8 flex flex-col items-center gap-5">
+          <div className="flex flex-col items-center gap-5 px-8 py-8">
             <div className="flex size-20 items-center justify-center rounded-2xl border-[3px] border-black bg-[#F0FFF8] shadow-[4px_4px_0px_#000]">
               <CheckCircle size={36} className="text-[#00B87C]" />
             </div>
-            <p className="text-sm font-semibold text-gray-600 text-center leading-relaxed">
+            <p className="text-center text-sm leading-relaxed font-semibold text-gray-600">
               Your password has been reset. Redirecting you to sign in in a
               moment…
             </p>
             <Link
               href="/signin"
-              className="flex items-center justify-center gap-2 w-full rounded-xl border-[3px] border-black bg-[#6C47FF] px-4 py-3 text-sm font-black text-white shadow-[4px_4px_0px_#000] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] transition-all"
+              className="flex w-full items-center justify-center gap-2 rounded-xl border-[3px] border-black bg-[#6C47FF] px-4 py-3 text-sm font-black text-white shadow-[4px_4px_0px_#000] transition-all hover:translate-x-[4px] hover:translate-y-[4px] hover:shadow-none"
             >
               Go to sign in <ArrowRight size={15} />
             </Link>
@@ -157,18 +158,18 @@ export default function ResetPasswordPage() {
     <div className="w-full max-w-md">
       <motion.div
         {...fadeUp(0)}
-        className="bg-white border-[3px] border-black rounded-2xl shadow-[6px_6px_0px_#000] overflow-hidden"
+        className="overflow-hidden rounded-2xl border-[3px] border-black bg-white shadow-[6px_6px_0px_#000]"
       >
-        <div className="bg-[#6C47FF] border-b-[3px] border-black px-8 py-5">
-          <h1 className="text-2xl font-black text-white tracking-tight">
+        <div className="border-b-[3px] border-black bg-[#6C47FF] px-8 py-5">
+          <h1 className="text-2xl font-black tracking-tight text-white">
             Set new password 🔒
           </h1>
-          <p className="text-sm font-semibold text-white/80 mt-1">
+          <p className="mt-1 text-sm font-semibold text-white/80">
             Choose a strong password for your account
           </p>
         </div>
 
-        <div className="px-8 py-7 space-y-5">
+        <div className="space-y-5 px-8 py-7">
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* New password */}
             <motion.div {...fadeIn(0.08)} className="space-y-1.5">
@@ -178,7 +179,7 @@ export default function ResetPasswordPage() {
               <div className="relative">
                 <Lock
                   size={17}
-                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-black/40 pointer-events-none"
+                  className="pointer-events-none absolute top-1/2 left-3.5 -translate-y-1/2 text-black/40"
                 />
                 <input
                   type={showPassword ? 'text' : 'password'}
@@ -187,14 +188,14 @@ export default function ResetPasswordPage() {
                   minLength={8}
                   placeholder="Min. 8 characters"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-10 pr-11 py-3 rounded-xl border-[2.5px] border-black bg-[#FFFBF0] text-sm font-semibold text-black placeholder:text-black/30 outline-none focus:ring-2 focus:ring-[#6C47FF] focus:ring-offset-1 transition"
+                  onChange={e => setPassword(e.target.value)}
+                  className="w-full rounded-xl border-[2.5px] border-black bg-[#FFFBF0] py-3 pr-11 pl-10 text-sm font-semibold text-black transition outline-none placeholder:text-black/30 focus:ring-2 focus:ring-[#6C47FF] focus:ring-offset-1"
                 />
                 <button
                   type="button"
                   tabIndex={-1}
-                  onClick={() => setShowPassword((v) => !v)}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-black/40 hover:text-black transition-colors"
+                  onClick={() => setShowPassword(v => !v)}
+                  className="absolute top-1/2 right-3.5 -translate-y-1/2 text-black/40 transition-colors hover:text-black"
                 >
                   {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
                 </button>
@@ -202,7 +203,7 @@ export default function ResetPasswordPage() {
               {password.length > 0 && (
                 <div className="space-y-1 pt-0.5">
                   <div className="flex gap-1">
-                    {[1, 2, 3, 4].map((i) => (
+                    {[1, 2, 3, 4].map(i => (
                       <div
                         key={i}
                         className="h-1 flex-1 rounded-full transition-all duration-300"
@@ -233,7 +234,7 @@ export default function ResetPasswordPage() {
               <div className="relative">
                 <Lock
                   size={17}
-                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-black/40 pointer-events-none"
+                  className="pointer-events-none absolute top-1/2 left-3.5 -translate-y-1/2 text-black/40"
                 />
                 <input
                   type={showConfirm ? 'text' : 'password'}
@@ -241,14 +242,14 @@ export default function ResetPasswordPage() {
                   required
                   placeholder="Repeat your password"
                   value={confirm}
-                  onChange={(e) => setConfirm(e.target.value)}
-                  className={`w-full pl-10 pr-11 py-3 rounded-xl border-[2.5px] bg-[#FFFBF0] text-sm font-semibold text-black placeholder:text-black/30 outline-none focus:ring-2 focus:ring-offset-1 transition ${mismatch ? 'border-[#FF6B6B] focus:ring-[#FF6B6B]' : 'border-black focus:ring-[#6C47FF]'}`}
+                  onChange={e => setConfirm(e.target.value)}
+                  className={`w-full rounded-xl border-[2.5px] bg-[#FFFBF0] py-3 pr-11 pl-10 text-sm font-semibold text-black transition outline-none placeholder:text-black/30 focus:ring-2 focus:ring-offset-1 ${mismatch ? 'border-[#FF6B6B] focus:ring-[#FF6B6B]' : 'border-black focus:ring-[#6C47FF]'}`}
                 />
                 <button
                   type="button"
                   tabIndex={-1}
-                  onClick={() => setShowConfirm((v) => !v)}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-black/40 hover:text-black transition-colors"
+                  onClick={() => setShowConfirm(v => !v)}
+                  className="absolute top-1/2 right-3.5 -translate-y-1/2 text-black/40 transition-colors hover:text-black"
                 >
                   {showConfirm ? <EyeOff size={17} /> : <Eye size={17} />}
                 </button>
@@ -265,7 +266,7 @@ export default function ResetPasswordPage() {
               {...fadeIn(0.15)}
               className="rounded-xl border-[2px] border-black/10 bg-[#FFFBF0] px-3 py-2.5"
             >
-              <p className="text-[11px] font-bold text-gray-500 leading-relaxed">
+              <p className="text-[11px] leading-relaxed font-bold text-gray-500">
                 Use at least 8 characters with a mix of uppercase, numbers, and
                 symbols for a strong password.
               </p>
@@ -285,10 +286,10 @@ export default function ResetPasswordPage() {
               <button
                 type="submit"
                 disabled={isLoading || mismatch || password.length < 8}
-                className="w-full flex items-center justify-center gap-2 px-4 py-3 mt-1 rounded-xl border-[3px] border-black bg-[#6C47FF] text-white text-sm font-black shadow-[4px_4px_0px_#000] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] transition-all disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:shadow-[4px_4px_0px_#000] disabled:hover:translate-x-0 disabled:hover:translate-y-0"
+                className="mt-1 flex w-full items-center justify-center gap-2 rounded-xl border-[3px] border-black bg-[#6C47FF] px-4 py-3 text-sm font-black text-white shadow-[4px_4px_0px_#000] transition-all hover:translate-x-[4px] hover:translate-y-[4px] hover:shadow-none disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-x-0 disabled:hover:translate-y-0 disabled:hover:shadow-[4px_4px_0px_#000]"
               >
                 {isLoading ? (
-                  <span className="inline-block w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                  <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
                 ) : (
                   <>
                     Reset password <ArrowRight size={15} />
@@ -307,7 +308,7 @@ export default function ResetPasswordPage() {
             Remember your password?{' '}
             <Link
               href="/signin"
-              className="font-black text-[#6C47FF] hover:underline underline-offset-2"
+              className="font-black text-[#6C47FF] underline-offset-2 hover:underline"
             >
               Sign in
             </Link>

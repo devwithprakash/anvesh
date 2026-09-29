@@ -1,4 +1,4 @@
-import { deleteWorkspaceVectors } from "../lib/pinecone.js";
+import { deleteWorkspaceVectors } from '../lib/pinecone.js';
 import {
   createWorkspaceWithQuota,
   deleteWorkspaceRecord,
@@ -9,12 +9,13 @@ import {
   getSubscriptionByUserId,
   updateWorkspaceRecord,
   type WorkspaceRecord,
-} from "../repositories/workspace.repository.js";
-import { NotFoundError } from "../types/app-error.js";
+} from '../repositories/workspace.repository.js';
+import { NotFoundError } from '../types/app-error.js';
+
 import type {
   CreateWorkspaceInput,
   UpdateWorkspaceInput,
-} from "../validators/workspace.validator.js";
+} from '../validators/workspace.validator.js';
 
 export function listWorkspacesByUser(userId: string) {
   return findWorkspacesByUserId(userId);
@@ -27,7 +28,7 @@ export async function getWorkspaceByIdForUser(
   const workspace = await findWorkspaceByIdAndUserId(workspaceId, userId);
 
   if (!workspace) {
-    throw new NotFoundError("Workspace not found");
+    throw new NotFoundError('Workspace not found');
   }
 
   return workspace;
@@ -44,7 +45,7 @@ export async function createWorkspaceForUser(
     : await getFreePlan();
 
   if (!plan) {
-    throw new Error("Plan not found");
+    throw new Error('Plan not found');
   }
 
   const result = await createWorkspaceWithQuota(
@@ -74,7 +75,7 @@ export async function deleteWorkspaceForUser(
   try {
     await deleteWorkspaceVectors(workspaceId);
   } catch (error) {
-    console.error("Failed to delete Pinecone namespace:", error);
+    console.error('Failed to delete Pinecone namespace:', error);
   }
 
   await deleteWorkspaceRecord(workspaceId, userId);

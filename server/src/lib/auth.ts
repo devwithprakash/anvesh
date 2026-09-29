@@ -1,9 +1,10 @@
-import { betterAuth } from "better-auth";
-import { prismaAdapter } from "better-auth/adapters/prisma";
-import prisma from "./db.js";
-import { sendEmail } from "./email.js";
+import { betterAuth } from 'better-auth';
+import { prismaAdapter } from 'better-auth/adapters/prisma';
 
-const clientUrl = process.env.FRONTEND_URL || "http://localhost:3000";
+import prisma from './db.js';
+import { sendEmail } from './email.js';
+
+const clientUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
 
 function addOneMonth(date: Date): Date {
   const d = new Date(date.getTime());
@@ -18,13 +19,13 @@ export const auth = betterAuth({
   trustedOrigins: [clientUrl],
 
   database: prismaAdapter(prisma, {
-    provider: "postgresql",
+    provider: 'postgresql',
   }),
 
   databaseHooks: {
     user: {
       create: {
-        after: async (user) => {
+        after: async user => {
           // Seed a UsageRecords row for every new user so quota checks work
           // from the very first action.
           const now = new Date();
@@ -55,7 +56,7 @@ export const auth = betterAuth({
     sendResetPassword: async ({ user, url }) => {
       void sendEmail({
         to: user.email,
-        subject: "Reset your password",
+        subject: 'Reset your password',
         html: `
           <h2>Reset your password</h2>
           <p>Click the button below to reset your password.</p>
@@ -79,7 +80,7 @@ export const auth = betterAuth({
     sendVerificationEmail: async ({ user, url }) => {
       void sendEmail({
         to: user.email,
-        subject: "Verify your email",
+        subject: 'Verify your email',
         html: `
           <h2>Verify your email</h2>
 

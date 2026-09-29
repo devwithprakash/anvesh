@@ -1,8 +1,8 @@
-import { authClient } from "@/lib/auth-client";
-import { SignIn, SignUp } from "./types";
+import { authClient } from '@/lib/auth-client';
 
+import { SignIn, SignUp } from './types';
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 
 export async function forgotPassword(email: string) {
   return authClient.requestPasswordReset({

@@ -1,6 +1,8 @@
-import { v2 as cloudinary } from 'cloudinary';
-import type { UploadApiResponse } from 'cloudinary';
 import { Readable } from 'stream';
+
+import { v2 as cloudinary } from 'cloudinary';
+
+import type { UploadApiResponse } from 'cloudinary';
 
 const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
 const apiKey = process.env.CLOUDINARY_API_KEY;

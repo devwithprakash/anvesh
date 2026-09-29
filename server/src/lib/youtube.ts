@@ -1,4 +1,5 @@
 import { YoutubeTranscript } from 'youtube-transcript';
+
 import { ValidationError } from '../types/app-error.js';
 
 export async function fetchYoutubeTranscript(url: string) {
@@ -15,7 +16,7 @@ export async function fetchYoutubeTranscript(url: string) {
     const segments = await YoutubeTranscript.fetchTranscript(videoId);
 
     const content = segments
-      .map((segment) => segment.text)
+      .map(segment => segment.text)
       .join(' ')
       .trim();
 

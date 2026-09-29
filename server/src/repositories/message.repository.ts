@@ -1,5 +1,6 @@
-import type { Prisma } from "../generated/prisma/client.js";
-import prisma from "../lib/db.js";
+import prisma from '../lib/db.js';
+
+import type { Prisma } from '../generated/prisma/client.js';
 
 export const messageSelect = {
   id: true,
@@ -15,7 +16,7 @@ export type MessageRecord = Prisma.MessageGetPayload<{
 
 export type CreateMessageData = {
   conversationId: string;
-  role: MessageRecord["role"];
+  role: MessageRecord['role'];
   content: string;
 };
 
@@ -23,7 +24,7 @@ export function findMessagesByConversationId(conversationId: string) {
   return prisma.message.findMany({
     where: { conversationId },
     select: messageSelect,
-    orderBy: { createdAt: "asc" },
+    orderBy: { createdAt: 'asc' },
   });
 }
 

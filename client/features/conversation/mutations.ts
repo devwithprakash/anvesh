@@ -1,6 +1,7 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createConversation, deleteConversation } from "./api";
-import { CreateConversationVariables, DeleteConversation } from "./types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+
+import { createConversation, deleteConversation } from './api';
+import { CreateConversationVariables, DeleteConversation } from './types';
 
 export function useCreateConversation() {
   const queryClient = useQueryClient();
@@ -11,7 +12,7 @@ export function useCreateConversation() {
 
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: ["conversations", variables.workspaceId],
+        queryKey: ['conversations', variables.workspaceId],
       });
     },
   });
@@ -25,12 +26,12 @@ export function useDeleteConversation() {
 
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: ["conversations", variables.workspaceId],
+        queryKey: ['conversations', variables.workspaceId],
       });
     },
 
-    onError: (error) => {
-      console.error("Failed to delete conversation:", error);
+    onError: error => {
+      console.error('Failed to delete conversation:', error);
     },
   });
 }

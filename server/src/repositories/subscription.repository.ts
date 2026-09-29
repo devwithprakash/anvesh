@@ -1,5 +1,6 @@
-import type { Prisma, SubscriptionStatus } from '../generated/prisma/client.js';
 import prisma from '../lib/db.js';
+
+import type { Prisma, SubscriptionStatus } from '../generated/prisma/client.js';
 
 // ── Subscription ─────────────────────────────────────────────────────────────
 

@@ -1,11 +1,12 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createWorkspace, deleteWorkspace, updateWorkspace } from "./api";
-import { CreateWorkspaceInput, UpdateWorkspaceInput } from "./types";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+
+import { createWorkspace, deleteWorkspace, updateWorkspace } from './api';
+import { CreateWorkspaceInput, UpdateWorkspaceInput } from './types';
 
 export const workspaceKeys = {
-  all: ["workspaces"] as const,
+  all: ['workspaces'] as const,
 
-  detail: (workspaceId: string) => ["workspace", workspaceId] as const,
+  detail: (workspaceId: string) => ['workspace', workspaceId] as const,
 };
 
 export function useCreateWorkspace() {

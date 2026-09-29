@@ -1,6 +1,7 @@
-"use client";
+'use client';
 
-import React, { createContext, useContext, useState, useCallback } from "react";
+import React, { createContext, useContext, useState, useCallback } from 'react';
+
 import {
   MOCK_WORKSPACES,
   MOCK_CONVERSATIONS,
@@ -10,7 +11,7 @@ import {
   type Conversation,
   type Message,
   type Source,
-} from "@/lib/mock-data";
+} from '@/lib/mock-data';
 
 interface AppState {
   workspaces: Workspace[];
@@ -51,11 +52,20 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     useState<Record<string, Message[]>>(MOCK_MESSAGES);
   const [sources, setSources] =
     useState<Record<string, Source[]>>(MOCK_SOURCES);
-  const [activeWorkspaceId, setActiveWorkspaceId] = useState<string | null>(null);
-  const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
+  const [activeWorkspaceId, setActiveWorkspaceId] = useState<string | null>(
+    null,
+  );
+  const [activeConversationId, setActiveConversationId] = useState<
+    string | null
+  >(null);
 
   const createWorkspace = useCallback(
-    (data: { title: string; description?: string; icon: string; defaultModel: string }) => {
+    (data: {
+      title: string;
+      description?: string;
+      icon: string;
+      defaultModel: string;
+    }) => {
       const newWorkspace: Workspace = {
         id: `ws-${Date.now()}`,
         ...data,
@@ -63,28 +73,31 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         sourceCount: 0,
         conversationCount: 0,
       };
-      setWorkspaces((prev) => [newWorkspace, ...prev]);
-      setConversations((prev) => ({ ...prev, [newWorkspace.id]: [] }));
-      setSources((prev) => ({ ...prev, [newWorkspace.id]: [] }));
+      setWorkspaces(prev => [newWorkspace, ...prev]);
+      setConversations(prev => ({ ...prev, [newWorkspace.id]: [] }));
+      setSources(prev => ({ ...prev, [newWorkspace.id]: [] }));
       return newWorkspace;
     },
-    []
+    [],
   );
 
-  const updateWorkspace = useCallback((id: string, data: Partial<Workspace>) => {
-    setWorkspaces((prev) =>
-      prev.map((ws) => (ws.id === id ? { ...ws, ...data } : ws))
-    );
-  }, []);
+  const updateWorkspace = useCallback(
+    (id: string, data: Partial<Workspace>) => {
+      setWorkspaces(prev =>
+        prev.map(ws => (ws.id === id ? { ...ws, ...data } : ws)),
+      );
+    },
+    [],
+  );
 
   const deleteWorkspace = useCallback((id: string) => {
-    setWorkspaces((prev) => prev.filter((ws) => ws.id !== id));
-    setConversations((prev) => {
+    setWorkspaces(prev => prev.filter(ws => ws.id !== id));
+    setConversations(prev => {
       const next = { ...prev };
       delete next[id];
       return next;
     });
-    setSources((prev) => {
+    setSources(prev => {
       const next = { ...prev };
       delete next[id];
       return next;
@@ -101,42 +114,42 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       const newConv: Conversation = {
         id: `conv-${Date.now()}`,
         workspaceId,
-        title: title || "New conversation",
+        title: title || 'New conversation',
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       };
-      setConversations((prev) => ({
+      setConversations(prev => ({
         ...prev,
         [workspaceId]: [newConv, ...(prev[workspaceId] ?? [])],
       }));
-      setWorkspaces((prev) =>
-        prev.map((ws) =>
+      setWorkspaces(prev =>
+        prev.map(ws =>
           ws.id === workspaceId
             ? { ...ws, conversationCount: ws.conversationCount + 1 }
-            : ws
-        )
+            : ws,
+        ),
       );
-      setMessages((prev) => ({ ...prev, [newConv.id]: [] }));
+      setMessages(prev => ({ ...prev, [newConv.id]: [] }));
       return newConv;
     },
-    []
+    [],
   );
 
   const deleteConversation = useCallback(
     (workspaceId: string, conversationId: string) => {
-      setConversations((prev) => ({
+      setConversations(prev => ({
         ...prev,
         [workspaceId]: (prev[workspaceId] ?? []).filter(
-          (c) => c.id !== conversationId
+          c => c.id !== conversationId,
         ),
       }));
-      setMessages((prev) => {
+      setMessages(prev => {
         const next = { ...prev };
         delete next[conversationId];
         return next;
       });
     },
-    []
+    [],
   );
 
   const setActiveConversation = useCallback((id: string | null) => {
@@ -144,18 +157,18 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const addMessage = useCallback((conversationId: string, message: Message) => {
-    setMessages((prev) => ({
+    setMessages(prev => ({
       ...prev,
       [conversationId]: [...(prev[conversationId] ?? []), message],
     }));
     // Update conversation updatedAt
-    setConversations((prev) => {
+    setConversations(prev => {
       const next = { ...prev };
       for (const wsId in next) {
-        next[wsId] = next[wsId].map((c) =>
+        next[wsId] = next[wsId].map(c =>
           c.id === conversationId
             ? { ...c, updatedAt: new Date().toISOString() }
-            : c
+            : c,
         );
       }
       return next;
@@ -163,30 +176,28 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const addSource = useCallback((workspaceId: string, source: Source) => {
-    setSources((prev) => ({
+    setSources(prev => ({
       ...prev,
       [workspaceId]: [source, ...(prev[workspaceId] ?? [])],
     }));
-    setWorkspaces((prev) =>
-      prev.map((ws) =>
-        ws.id === workspaceId
-          ? { ...ws, sourceCount: ws.sourceCount + 1 }
-          : ws
-      )
+    setWorkspaces(prev =>
+      prev.map(ws =>
+        ws.id === workspaceId ? { ...ws, sourceCount: ws.sourceCount + 1 } : ws,
+      ),
     );
   }, []);
 
   const deleteSource = useCallback((workspaceId: string, sourceId: string) => {
-    setSources((prev) => ({
+    setSources(prev => ({
       ...prev,
-      [workspaceId]: (prev[workspaceId] ?? []).filter((s) => s.id !== sourceId),
+      [workspaceId]: (prev[workspaceId] ?? []).filter(s => s.id !== sourceId),
     }));
-    setWorkspaces((prev) =>
-      prev.map((ws) =>
+    setWorkspaces(prev =>
+      prev.map(ws =>
         ws.id === workspaceId
           ? { ...ws, sourceCount: Math.max(0, ws.sourceCount - 1) }
-          : ws
-      )
+          : ws,
+      ),
     );
   }, []);
 
@@ -218,6 +229,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
 export function useAppState() {
   const ctx = useContext(AppContext);
-  if (!ctx) throw new Error("useAppState must be used within AppProvider");
+  if (!ctx) throw new Error('useAppState must be used within AppProvider');
   return ctx;
 }

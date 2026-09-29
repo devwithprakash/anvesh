@@ -1,7 +1,8 @@
-import type { Prisma } from "../generated/prisma/client.js";
-import prisma from "../lib/db.js";
-import { AppError } from "../types/app-error.js";
-import { type ListSourcesQuery } from "../validators/source.validator.js";
+import prisma from '../lib/db.js';
+import { AppError } from '../types/app-error.js';
+import { type ListSourcesQuery } from '../validators/source.validator.js';
+
+import type { Prisma } from '../generated/prisma/client.js';
 
 export const sourceSelect = {
   id: true,
@@ -18,11 +19,11 @@ export const sourceSelect = {
 
 export type CreateSourceData = {
   workspaceId: string;
-  type: SourceRecord["type"];
+  type: SourceRecord['type'];
   title: string;
   content?: string | null;
   url?: string | null;
-  status?: SourceRecord["status"];
+  status?: SourceRecord['status'];
   metadata?: Prisma.InputJsonValue;
 };
 
@@ -34,7 +35,7 @@ export function createSourceRecord(
   data: CreateSourceData,
   maxSourcesPerWorkspace: number,
 ) {
-  return prisma.$transaction(async (tx) => {
+  return prisma.$transaction(async tx => {
     const sourceCount = await tx.source.count({
       where: {
         workspaceId: data.workspaceId,
@@ -55,7 +56,7 @@ export function createSourceRecord(
         title: data.title,
         content: data.content ?? null,
         url: data.url ?? null,
-        status: data.status ?? "PENDING",
+        status: data.status ?? 'PENDING',
         ...(data.metadata !== undefined && {
           metadata: data.metadata,
         }),
@@ -81,15 +82,15 @@ export function findSourcesByWorkspaceId(
 
   if (filters.q) {
     where.OR = [
-      { title: { contains: filters.q, mode: "insensitive" } },
-      { content: { contains: filters.q, mode: "insensitive" } },
+      { title: { contains: filters.q, mode: 'insensitive' } },
+      { content: { contains: filters.q, mode: 'insensitive' } },
     ];
   }
 
   return prisma.source.findMany({
     where,
     select: sourceSelect,
-    orderBy: { createdAt: "desc" },
+    orderBy: { createdAt: 'desc' },
   });
 }
 
@@ -120,7 +121,7 @@ export function updateSourceRecord(
   sourceId: string,
   data: {
     content?: string | null;
-    status?: SourceRecord["status"];
+    status?: SourceRecord['status'];
     metadata?: Prisma.InputJsonValue;
   },
 ) {

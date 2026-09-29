@@ -1,15 +1,3 @@
-import type { Request, Response } from "express";
-import { ValidationError } from "../types/app-error.js";
-import { getZodFieldErrors } from "../utils/zod-error.js";
-import {
-  bulkDeleteSourcesSchema,
-  createSourceSchema,
-  importWebsiteSchema,
-  importYoutubeSchema,
-  listSourcesQuerySchema,
-  sourceIdParamSchema,
-} from "../validators/source.validator.js";
-import { workspaceIdParamSchema } from "../validators/workspace.validator.js";
 import {
   bulkDeleteSourcesForWorkspace,
   createTextOrMarkdownSource,
@@ -19,14 +7,27 @@ import {
   importYoutubeSource,
   listSourcesForWorkspace,
   uploadFileSource,
-} from "../services/source.service.js";
+} from '../services/source.service.js';
+import { ValidationError } from '../types/app-error.js';
+import { getZodFieldErrors } from '../utils/zod-error.js';
+import {
+  bulkDeleteSourcesSchema,
+  createSourceSchema,
+  importWebsiteSchema,
+  importYoutubeSchema,
+  listSourcesQuerySchema,
+  sourceIdParamSchema,
+} from '../validators/source.validator.js';
+import { workspaceIdParamSchema } from '../validators/workspace.validator.js';
 
-function parseWorkspaceId(params: Request["params"]) {
+import type { Request, Response } from 'express';
+
+function parseWorkspaceId(params: Request['params']) {
   const parsed = workspaceIdParamSchema.safeParse(params);
 
   if (!parsed.success) {
     throw new ValidationError(
-      "Invalid workspace id",
+      'Invalid workspace id',
       getZodFieldErrors(parsed.error),
     );
   }
@@ -34,12 +35,12 @@ function parseWorkspaceId(params: Request["params"]) {
   return parsed.data;
 }
 
-function parseSourceParams(params: Request["params"]) {
+function parseSourceParams(params: Request['params']) {
   const parsed = sourceIdParamSchema.safeParse(params);
 
   if (!parsed.success) {
     throw new ValidationError(
-      "Invalid source id",
+      'Invalid source id',
       getZodFieldErrors(parsed.error),
     );
   }
@@ -47,12 +48,12 @@ function parseSourceParams(params: Request["params"]) {
   return parsed.data;
 }
 
-function parseListQuery(query: Request["query"]) {
+function parseListQuery(query: Request['query']) {
   const parsed = listSourcesQuerySchema.safeParse(query);
 
   if (!parsed.success) {
     throw new ValidationError(
-      "Invalid query parameters",
+      'Invalid query parameters',
       getZodFieldErrors(parsed.error),
     );
   }
@@ -65,7 +66,7 @@ function parseCreateBody(body: unknown) {
 
   if (!parsed.success) {
     throw new ValidationError(
-      "Validation failed",
+      'Validation failed',
       getZodFieldErrors(parsed.error),
     );
   }
@@ -78,7 +79,7 @@ function parseBulkDeleteBody(body: unknown) {
 
   if (!parsed.success) {
     throw new ValidationError(
-      "Validation failed",
+      'Validation failed',
       getZodFieldErrors(parsed.error),
     );
   }
@@ -139,10 +140,10 @@ export async function uploadFile(req: Request, res: Response) {
   const { workspaceId } = workspaceIdParamSchema.parse(req.params);
 
   if (!req.file) {
-    throw new ValidationError("Source file is required");
+    throw new ValidationError('Source file is required');
   }
 
-  const title = typeof req.body.title === "string" ? req.body.title : undefined;
+  const title = typeof req.body.title === 'string' ? req.body.title : undefined;
 
   const source = await uploadFileSource(
     workspaceId,

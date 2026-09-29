@@ -1,18 +1,19 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { Easing, motion } from "framer-motion";
-import { Eye, EyeOff, ArrowRight, Mail, Lock, AlertCircle } from "lucide-react";
-import Link from "next/link";
-import { signIn } from "@/features/auth/auth";
-import { authClient } from "@/lib/auth-client";
+import { Easing, motion } from 'framer-motion';
+import { Eye, EyeOff, ArrowRight, Mail, Lock, AlertCircle } from 'lucide-react';
+import Link from 'next/link';
+import { useState } from 'react';
+
+import { signIn } from '@/features/auth/auth';
+import { authClient } from '@/lib/auth-client';
 
 const fadeUp = (delay = 0) => ({
   initial: { opacity: 0, y: 24 },
   animate: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.5, ease: "easeOut" as Easing, delay },
+    transition: { duration: 0.5, ease: 'easeOut' as Easing, delay },
   },
 });
 
@@ -20,7 +21,7 @@ const fadeIn = (delay = 0) => ({
   initial: { opacity: 0 },
   animate: {
     opacity: 1,
-    transition: { duration: 0.35, ease: "easeOut" as Easing, delay },
+    transition: { duration: 0.35, ease: 'easeOut' as Easing, delay },
   },
 });
 
@@ -28,7 +29,7 @@ export default function SignInPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
-  const [form, setForm] = useState({ email: "", password: "" });
+  const [form, setForm] = useState({ email: '', password: '' });
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -40,12 +41,12 @@ export default function SignInPage() {
       const response = await signIn(form);
 
       if (response?.error) {
-        setError("Incorrect email or password. Please try again.");
+        setError('Incorrect email or password. Please try again.');
         return;
       }
     } catch (error) {
       console.error(error);
-      setError("Incorrect email or password. Please try again.");
+      setError('Incorrect email or password. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -56,13 +57,13 @@ export default function SignInPage() {
     setGoogleLoading(true);
     try {
       await authClient.signIn.social({
-        provider: "google",
+        provider: 'google',
         callbackURL: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`,
       });
     } catch (error) {
       console.error(error);
       setError(
-        "Something went wrong signing in with Google. Please try again.",
+        'Something went wrong signing in with Google. Please try again.',
       );
     } finally {
       setGoogleLoading(false);
@@ -73,29 +74,29 @@ export default function SignInPage() {
     <div className="w-full max-w-md">
       <motion.div
         {...fadeUp(0)}
-        className="bg-white border-[3px] border-black rounded-2xl shadow-[6px_6px_0px_#000] overflow-hidden"
+        className="overflow-hidden rounded-2xl border-[3px] border-black bg-white shadow-[6px_6px_0px_#000]"
       >
         {/* Card header stripe */}
-        <div className="bg-[#6C47FF] border-b-[3px] border-black px-8 py-5">
-          <h1 className="text-2xl font-black text-white tracking-tight">
+        <div className="border-b-[3px] border-black bg-[#6C47FF] px-8 py-5">
+          <h1 className="text-2xl font-black tracking-tight text-white">
             Welcome back 👋
           </h1>
-          <p className="text-sm font-semibold text-white/80 mt-1">
+          <p className="mt-1 text-sm font-semibold text-white/80">
             Sign in to your Anvesh account
           </p>
         </div>
 
-        <div className="px-8 py-7 space-y-5">
+        <div className="space-y-5 px-8 py-7">
           <motion.div {...fadeIn(0.05)}>
             <button
               onClick={handleGoogleSignIn}
               type="button"
               disabled={googleLoading}
-              className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl border-[3px] border-black bg-white font-black text-sm text-black shadow-[4px_4px_0px_#000] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] transition-all disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:shadow-[4px_4px_0px_#000] disabled:hover:translate-x-0 disabled:hover:translate-y-0"
+              className="flex w-full items-center justify-center gap-3 rounded-xl border-[3px] border-black bg-white px-4 py-3 text-sm font-black text-black shadow-[4px_4px_0px_#000] transition-all hover:translate-x-[4px] hover:translate-y-[4px] hover:shadow-none disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-x-0 disabled:hover:translate-y-0 disabled:hover:shadow-[4px_4px_0px_#000]"
             >
               {googleLoading ? (
                 <>
-                  <span className="inline-block w-4 h-4 border-2 border-black/20 border-t-black rounded-full animate-spin" />
+                  <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-black/20 border-t-black" />
                   Connecting...
                 </>
               ) : (
@@ -130,11 +131,11 @@ export default function SignInPage() {
           </motion.div>
 
           <motion.div {...fadeIn(0.1)} className="flex items-center gap-3">
-            <div className="flex-1 h-[2px] bg-black/10" />
-            <span className="text-xs font-black text-black/40 uppercase tracking-widest">
+            <div className="h-[2px] flex-1 bg-black/10" />
+            <span className="text-xs font-black tracking-widest text-black/40 uppercase">
               or
             </span>
-            <div className="flex-1 h-[2px] bg-black/10" />
+            <div className="h-[2px] flex-1 bg-black/10" />
           </motion.div>
 
           {/* Form */}
@@ -146,7 +147,7 @@ export default function SignInPage() {
               <div className="relative">
                 <Mail
                   size={17}
-                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-black/40 pointer-events-none"
+                  className="pointer-events-none absolute top-1/2 left-3.5 -translate-y-1/2 text-black/40"
                 />
                 <input
                   type="email"
@@ -154,14 +155,14 @@ export default function SignInPage() {
                   required
                   placeholder="you@example.com"
                   value={form.email}
-                  onChange={(e) => {
-                    setForm((f) => ({ ...f, email: e.target.value }));
+                  onChange={e => {
+                    setForm(f => ({ ...f, email: e.target.value }));
                     if (error) setError(null);
                   }}
-                  className={`w-full pl-10 pr-4 py-3 rounded-xl border-[2.5px] bg-[#FFFBF0] text-sm font-semibold text-black placeholder:text-black/30 outline-none focus:ring-2 focus:ring-offset-1 transition ${
+                  className={`w-full rounded-xl border-[2.5px] bg-[#FFFBF0] py-3 pr-4 pl-10 text-sm font-semibold text-black transition outline-none placeholder:text-black/30 focus:ring-2 focus:ring-offset-1 ${
                     error
-                      ? "border-red-500 focus:ring-red-500"
-                      : "border-black focus:ring-[#6C47FF]"
+                      ? 'border-red-500 focus:ring-red-500'
+                      : 'border-black focus:ring-[#6C47FF]'
                   }`}
                 />
               </div>
@@ -182,31 +183,31 @@ export default function SignInPage() {
               <div className="relative">
                 <Lock
                   size={17}
-                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-black/40 pointer-events-none"
+                  className="pointer-events-none absolute top-1/2 left-3.5 -translate-y-1/2 text-black/40"
                 />
                 <input
-                  type={showPassword ? "text" : "password"}
+                  type={showPassword ? 'text' : 'password'}
                   autoComplete="current-password"
                   required
                   placeholder="••••••••"
                   value={form.password}
-                  onChange={(e) => {
-                    setForm((f) => ({ ...f, password: e.target.value }));
+                  onChange={e => {
+                    setForm(f => ({ ...f, password: e.target.value }));
                     if (error) setError(null);
                   }}
                   aria-invalid={!!error}
-                  aria-describedby={error ? "signin-error" : undefined}
-                  className={`w-full pl-10 pr-11 py-3 rounded-xl border-[2.5px] bg-[#FFFBF0] text-sm font-semibold text-black placeholder:text-black/30 outline-none focus:ring-2 focus:ring-offset-1 transition ${
+                  aria-describedby={error ? 'signin-error' : undefined}
+                  className={`w-full rounded-xl border-[2.5px] bg-[#FFFBF0] py-3 pr-11 pl-10 text-sm font-semibold text-black transition outline-none placeholder:text-black/30 focus:ring-2 focus:ring-offset-1 ${
                     error
-                      ? "border-red-500 focus:ring-red-500"
-                      : "border-black focus:ring-[#6C47FF]"
+                      ? 'border-red-500 focus:ring-red-500'
+                      : 'border-black focus:ring-[#6C47FF]'
                   }`}
                 />
                 <button
                   type="button"
                   tabIndex={-1}
-                  onClick={() => setShowPassword((v) => !v)}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-black/40 hover:text-black transition-colors"
+                  onClick={() => setShowPassword(v => !v)}
+                  className="absolute top-1/2 right-3.5 -translate-y-1/2 text-black/40 transition-colors hover:text-black"
                 >
                   {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
                 </button>
@@ -218,7 +219,7 @@ export default function SignInPage() {
                   animate={{ opacity: 1, y: 0 }}
                   id="signin-error"
                   role="alert"
-                  className="flex items-center gap-1.5 text-xs font-bold text-red-600 pt-0.5"
+                  className="flex items-center gap-1.5 pt-0.5 text-xs font-bold text-red-600"
                 >
                   <AlertCircle size={13} className="shrink-0" />
                   {error}
@@ -230,10 +231,10 @@ export default function SignInPage() {
               <button
                 type="submit"
                 disabled={isLoading || googleLoading}
-                className="w-full flex items-center justify-center gap-2 px-4 py-3 mt-1 rounded-xl border-[3px] border-black bg-[#6C47FF] text-white text-sm font-black shadow-[4px_4px_0px_#000] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] transition-all disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:shadow-[4px_4px_0px_#000] disabled:hover:translate-x-0 disabled:hover:translate-y-0"
+                className="mt-1 flex w-full items-center justify-center gap-2 rounded-xl border-[3px] border-black bg-[#6C47FF] px-4 py-3 text-sm font-black text-white shadow-[4px_4px_0px_#000] transition-all hover:translate-x-[4px] hover:translate-y-[4px] hover:shadow-none disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-x-0 disabled:hover:translate-y-0 disabled:hover:shadow-[4px_4px_0px_#000]"
               >
                 {isLoading ? (
-                  <span className="inline-block w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                  <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
                 ) : (
                   <>
                     Sign in
@@ -250,10 +251,10 @@ export default function SignInPage() {
           className="border-t-[3px] border-black bg-[#FFFBF0] px-8 py-4 text-center"
         >
           <p className="text-sm font-semibold text-black/70">
-            Don&apos;t have an account?{" "}
+            Don&apos;t have an account?{' '}
             <Link
               href="/signup"
-              className="font-black text-[#6C47FF] hover:underline underline-offset-2"
+              className="font-black text-[#6C47FF] underline-offset-2 hover:underline"
             >
               Create one free
             </Link>
@@ -265,11 +266,11 @@ export default function SignInPage() {
         {...fadeIn(0.28)}
         className="mt-5 text-center text-xs font-semibold text-black/40"
       >
-        By continuing, you agree to Anvesh&apos;s{" "}
+        By continuing, you agree to Anvesh&apos;s{' '}
         <a href="#" className="underline hover:text-black/70">
           Terms
-        </a>{" "}
-        and{" "}
+        </a>{' '}
+        and{' '}
         <a href="#" className="underline hover:text-black/70">
           Privacy Policy
         </a>

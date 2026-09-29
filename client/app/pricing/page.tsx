@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import { motion, AnimatePresence, Easing } from 'framer-motion';
 import {
   Check,
@@ -13,14 +12,16 @@ import {
   Minus,
   X,
 } from 'lucide-react';
+import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
 import { useRouter } from 'next/navigation';
-import Navbar from '@/components/landing/Navbar';
+import { useState } from 'react';
+
 import Footer from '@/components/landing/Footer';
-import { authClient } from '@/lib/auth-client';
+import Navbar from '@/components/landing/Navbar';
 import { useCreateCheckout } from '@/features/subscription/mutations';
 import { useSubscriptionStatus } from '@/features/subscription/queries';
 import type { CheckoutResponse } from '@/features/subscription/types';
-import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
+import { authClient } from '@/lib/auth-client';
 
 const plans = [
   {
@@ -140,7 +141,10 @@ const cardVariants = {
   }),
 };
 
-function openRazorpayModal(checkout: CheckoutResponse, router: AppRouterInstance) {
+function openRazorpayModal(
+  checkout: CheckoutResponse,
+  router: AppRouterInstance,
+) {
   if (!window.Razorpay) {
     alert('Payment SDK not loaded. Please refresh and try again.');
     return;
@@ -151,7 +155,7 @@ function openRazorpayModal(checkout: CheckoutResponse, router: AppRouterInstance
     name: 'Anvesh',
     description: `${checkout.planName} Plan`,
     handler: () => {
-      router.push("/dashboard")
+      router.push('/dashboard');
     },
     theme: { color: '#6C47FF' },
   };
@@ -177,25 +181,25 @@ function FAQItem({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.45, ease: 'easeOut', delay: index * 0.07 }}
-      className="border-[2.5px] border-black rounded-2xl overflow-hidden shadow-[4px_4px_0px_#000] hover:shadow-[6px_6px_0px_#000] transition-shadow"
+      className="overflow-hidden rounded-2xl border-[2.5px] border-black shadow-[4px_4px_0px_#000] transition-shadow hover:shadow-[6px_6px_0px_#000]"
     >
       {/* Question row */}
       <button
         onClick={onToggle}
-        className="w-full flex items-center justify-between gap-4 px-6 py-4 bg-white text-left group"
+        className="group flex w-full items-center justify-between gap-4 bg-white px-6 py-4 text-left"
       >
         <div className="flex items-center gap-3">
           <span
-            className={`inline-flex items-center justify-center w-7 h-7 rounded-lg border-[2px] border-black ${accentColors[index % accentColors.length]} text-[11px] font-black shadow-[2px_2px_0px_#000] shrink-0`}
+            className={`inline-flex h-7 w-7 items-center justify-center rounded-lg border-[2px] border-black ${accentColors[index % accentColors.length]} shrink-0 text-[11px] font-black shadow-[2px_2px_0px_#000]`}
           >
             {String(index + 1).padStart(2, '0')}
           </span>
-          <span className="font-black text-black text-[0.95rem] leading-snug">
+          <span className="text-[0.95rem] leading-snug font-black text-black">
             {faq.q}
           </span>
         </div>
         <span
-          className={`shrink-0 inline-flex items-center justify-center w-8 h-8 rounded-xl border-[2px] border-black shadow-[2px_2px_0px_#000] transition-colors ${isOpen ? 'bg-black text-white' : 'bg-white text-black group-hover:bg-black group-hover:text-white'}`}
+          className={`inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border-[2px] border-black shadow-[2px_2px_0px_#000] transition-colors ${isOpen ? 'bg-black text-white' : 'bg-white text-black group-hover:bg-black group-hover:text-white'}`}
         >
           {isOpen ? <Minus size={14} /> : <Plus size={14} />}
         </span>
@@ -213,9 +217,9 @@ function FAQItem({
             className="overflow-hidden"
           >
             <div
-              className={`px-6 pb-5 pt-1 border-t-[2px] border-black ${accentColors[index % accentColors.length]}`}
+              className={`border-t-[2px] border-black px-6 pt-1 pb-5 ${accentColors[index % accentColors.length]}`}
             >
-              <p className="text-sm font-semibold text-gray-800 leading-relaxed">
+              <p className="text-sm leading-relaxed font-semibold text-gray-800">
                 {faq.a}
               </p>
             </div>
@@ -262,25 +266,25 @@ export default function PricingPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#FFFBF0]">
+    <div className="flex min-h-screen flex-col bg-[#FFFBF0]">
       <Navbar />
 
       <main className="flex-1">
         {/* ── Hero — same style as other landing section headings ── */}
-        <section className="bg-[#FFFBF0] pt-20 pb-14 px-6 border-b-[3px] border-black">
+        <section className="border-b-[3px] border-black bg-[#FFFBF0] px-6 pt-20 pb-14">
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="max-w-2xl mx-auto text-center"
+            className="mx-auto max-w-2xl text-center"
           >
-            <span className="inline-block border-[2.5px] border-black bg-[#C4F0D8] px-4 py-1 text-xs font-black shadow-[3px_3px_0px_#000] mb-4 rounded-full">
+            <span className="mb-4 inline-block rounded-full border-[2.5px] border-black bg-[#C4F0D8] px-4 py-1 text-xs font-black shadow-[3px_3px_0px_#000]">
               PRICING
             </span>
-            <h1 className="text-4xl sm:text-5xl font-black text-black tracking-tight mb-3">
+            <h1 className="mb-3 text-4xl font-black tracking-tight text-black sm:text-5xl">
               Simple, honest pricing.
             </h1>
-            <p className="text-gray-600 font-semibold text-base max-w-md mx-auto">
+            <p className="mx-auto max-w-md text-base font-semibold text-gray-600">
               Start free. Upgrade when you need more. Cancel anytime — no
               questions asked.
             </p>
@@ -288,9 +292,9 @@ export default function PricingPage() {
         </section>
 
         {/* ── Plan cards — exact same markup as PricingSection.tsx ── */}
-        <section className="bg-[#FFFBF0] py-20 px-6">
-          <div className="max-w-6xl mx-auto">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
+        <section className="bg-[#FFFBF0] px-6 py-20">
+          <div className="mx-auto max-w-6xl">
+            <div className="grid grid-cols-1 items-start gap-6 md:grid-cols-3">
               {plans.map((plan, i) => {
                 const isPopular = plan.popular;
                 const textColor = isPopular ? 'text-white' : 'text-black';
@@ -319,31 +323,31 @@ export default function PricingPage() {
                     whileInView="visible"
                     viewport={{ once: true }}
                     whileHover={{ y: -6, transition: { duration: 0.15 } }}
-                    className={`relative ${plan.cardBg} border-[2.5px] border-black rounded-2xl p-7 shadow-[6px_6px_0px_#000] hover:shadow-[8px_8px_0px_#000] transition-shadow flex flex-col`}
+                    className={`relative ${plan.cardBg} flex flex-col rounded-2xl border-[2.5px] border-black p-7 shadow-[6px_6px_0px_#000] transition-shadow hover:shadow-[8px_8px_0px_#000]`}
                   >
                     {/* Popular badge */}
                     {isPopular && (
-                      <div className="absolute -top-4 left-1/2 -translate-x-1/2 border-[2px] border-black bg-[#FFE14D] px-4 py-1 rounded-full text-[11px] font-black text-black shadow-[3px_3px_0px_#000] whitespace-nowrap">
+                      <div className="absolute -top-4 left-1/2 -translate-x-1/2 rounded-full border-[2px] border-black bg-[#FFE14D] px-4 py-1 text-[11px] font-black whitespace-nowrap text-black shadow-[3px_3px_0px_#000]">
                         ⚡ MOST POPULAR
                       </div>
                     )}
 
                     {/* Current plan ribbon */}
                     {isCurrentPlan && !isPopular && (
-                      <div className="absolute -top-4 right-4 border-[2px] border-black bg-[#C4F0D8] px-3 py-1 rounded-full text-[11px] font-black text-black shadow-[2px_2px_0px_#000]">
+                      <div className="absolute -top-4 right-4 rounded-full border-[2px] border-black bg-[#C4F0D8] px-3 py-1 text-[11px] font-black text-black shadow-[2px_2px_0px_#000]">
                         ✓ Active
                       </div>
                     )}
                     {isCurrentPlan && isPopular && (
-                      <div className="absolute -top-4 right-4 border-[2px] border-black bg-[#C4F0D8] px-3 py-1 rounded-full text-[11px] font-black text-black shadow-[2px_2px_0px_#000]">
+                      <div className="absolute -top-4 right-4 rounded-full border-[2px] border-black bg-[#C4F0D8] px-3 py-1 text-[11px] font-black text-black shadow-[2px_2px_0px_#000]">
                         ✓ Active
                       </div>
                     )}
 
                     {/* Icon + Name */}
-                    <div className="flex items-center gap-3 mb-5">
+                    <div className="mb-5 flex items-center gap-3">
                       <span
-                        className={`inline-flex items-center justify-center w-10 h-10 rounded-xl border-[2px] border-black ${plan.iconBg} ${isPopular ? 'text-white' : 'text-black'} shadow-[2px_2px_0px_#000]`}
+                        className={`inline-flex h-10 w-10 items-center justify-center rounded-xl border-[2px] border-black ${plan.iconBg} ${isPopular ? 'text-white' : 'text-black'} shadow-[2px_2px_0px_#000]`}
                       >
                         {plan.icon}
                       </span>
@@ -360,7 +364,7 @@ export default function PricingPage() {
                         {plan.price}
                       </span>
                       <span
-                        className={`text-sm font-bold ml-2 ${subTextColor}`}
+                        className={`ml-2 text-sm font-bold ${subTextColor}`}
                       >
                         / {plan.period}
                       </span>
@@ -376,11 +380,11 @@ export default function PricingPage() {
                     <div className={`border-t-[2px] ${dividerColor} mb-6`} />
 
                     {/* Features */}
-                    <ul className="space-y-3 flex-1 mb-8">
-                      {plan.features.map((feat) => (
+                    <ul className="mb-8 flex-1 space-y-3">
+                      {plan.features.map(feat => (
                         <li key={feat} className="flex items-start gap-2.5">
                           <span
-                            className={`inline-flex items-center justify-center w-5 h-5 rounded-full border-[2px] border-black shrink-0 mt-0.5 ${checkBg}`}
+                            className={`mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-[2px] border-black ${checkBg}`}
                           >
                             <Check size={10} />
                           </span>
@@ -396,7 +400,7 @@ export default function PricingPage() {
                     {/* CTA — identical classes to PricingSection.tsx, no disabled attr */}
                     <button
                       onClick={() => handleCtaClick(plan.planKey)}
-                      className={`flex items-center justify-center gap-2 w-full py-3 rounded-xl border-[2.5px] border-black ${plan.ctaBg} ${plan.ctaText} font-black text-sm shadow-[4px_4px_0px_#000] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] transition-all`}
+                      className={`flex w-full items-center justify-center gap-2 rounded-xl border-[2.5px] border-black py-3 ${plan.ctaBg} ${plan.ctaText} text-sm font-black shadow-[4px_4px_0px_#000] transition-all hover:translate-x-[4px] hover:translate-y-[4px] hover:shadow-none`}
                     >
                       {isLoading ? (
                         <Loader size={14} className="animate-spin" />
@@ -418,7 +422,7 @@ export default function PricingPage() {
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: 0.4 }}
-              className="text-center text-sm font-bold text-gray-500 mt-10"
+              className="mt-10 text-center text-sm font-bold text-gray-500"
             >
               All paid plans include a{' '}
               <span className="text-black underline decoration-[#FFE14D] decoration-2 underline-offset-2">
@@ -430,21 +434,21 @@ export default function PricingPage() {
         </section>
 
         {/* ── Feature comparison table ── */}
-        <section className="bg-white py-20 px-6 border-t-[3px] border-black">
-          <div className="max-w-4xl mx-auto">
+        <section className="border-t-[3px] border-black bg-white px-6 py-20">
+          <div className="mx-auto max-w-4xl">
             <motion.div
               initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="text-center mb-12"
+              className="mb-12 text-center"
             >
-              <span className="inline-block border-[2.5px] border-black bg-[#E8DFFF] px-4 py-1 text-xs font-black shadow-[3px_3px_0px_#000] mb-4 rounded-full">
+              <span className="mb-4 inline-block rounded-full border-[2.5px] border-black bg-[#E8DFFF] px-4 py-1 text-xs font-black shadow-[3px_3px_0px_#000]">
                 COMPARE
               </span>
-              <h2 className="text-4xl sm:text-5xl font-black text-black tracking-tight mb-3">
+              <h2 className="mb-3 text-4xl font-black tracking-tight text-black sm:text-5xl">
                 Everything at a glance.
               </h2>
-              <p className="text-gray-600 font-semibold text-base">
+              <p className="text-base font-semibold text-gray-600">
                 Every feature, every plan — side by side.
               </p>
             </motion.div>
@@ -454,17 +458,17 @@ export default function PricingPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5 }}
-              className="rounded-2xl border-[2.5px] border-black overflow-hidden shadow-[6px_6px_0px_#000]"
+              className="overflow-hidden rounded-2xl border-[2.5px] border-black shadow-[6px_6px_0px_#000]"
             >
               {/* Table header */}
               <div className="grid grid-cols-4 border-b-[2.5px] border-black bg-[#FFFBF0]">
-                <div className="p-4 font-black text-xs text-gray-500 uppercase tracking-widest">
+                <div className="p-4 text-xs font-black tracking-widest text-gray-500 uppercase">
                   Feature
                 </div>
-                {plans.map((p) => (
+                {plans.map(p => (
                   <div
                     key={p.planKey}
-                    className={`p-4 text-center font-black text-sm border-l-[2px] border-black ${p.popular ? 'bg-[#6C47FF] text-white' : 'text-black'}`}
+                    className={`border-l-[2px] border-black p-4 text-center text-sm font-black ${p.popular ? 'bg-[#6C47FF] text-white' : 'text-black'}`}
                   >
                     {p.name}
                   </div>
@@ -492,15 +496,15 @@ export default function PricingPage() {
                   {row.values.map((val, idx) => (
                     <div
                       key={idx}
-                      className={`p-4 flex items-center justify-center border-l-[1px] border-gray-200 ${idx === 1 ? 'bg-purple-50' : ''}`}
+                      className={`flex items-center justify-center border-l-[1px] border-gray-200 p-4 ${idx === 1 ? 'bg-purple-50' : ''}`}
                     >
                       {typeof val === 'boolean' ? (
                         val ? (
-                          <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-[#C4F0D8] border-[2px] border-black">
+                          <span className="inline-flex h-5 w-5 items-center justify-center rounded-full border-[2px] border-black bg-[#C4F0D8]">
                             <Check size={10} className="text-black" />
                           </span>
                         ) : (
-                          <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-gray-100 border-[1px] border-gray-300">
+                          <span className="inline-flex h-5 w-5 items-center justify-center rounded-full border-[1px] border-gray-300 bg-gray-100">
                             <X size={10} className="text-gray-400" />
                           </span>
                         )
@@ -520,23 +524,23 @@ export default function PricingPage() {
         </section>
 
         {/* ── FAQ — exact same style as FAQSection.tsx ── */}
-        <section className="bg-[#FFFBF0] py-20 border-t-[3px] border-black">
-          <div className="max-w-3xl mx-auto px-6">
+        <section className="border-t-[3px] border-black bg-[#FFFBF0] py-20">
+          <div className="mx-auto max-w-3xl px-6">
             {/* Heading */}
             <motion.div
               initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5 }}
-              className="text-center mb-12"
+              className="mb-12 text-center"
             >
-              <span className="inline-block border-[2.5px] border-black bg-[#FFD6CC] px-4 py-1 text-xs font-black shadow-[3px_3px_0px_#000] mb-4 rounded-full">
+              <span className="mb-4 inline-block rounded-full border-[2.5px] border-black bg-[#FFD6CC] px-4 py-1 text-xs font-black shadow-[3px_3px_0px_#000]">
                 FAQ
               </span>
-              <h2 className="text-4xl sm:text-5xl font-black text-black tracking-tight mb-3">
+              <h2 className="mb-3 text-4xl font-black tracking-tight text-black sm:text-5xl">
                 Got questions?
               </h2>
-              <p className="text-gray-600 font-semibold text-base">
+              <p className="text-base font-semibold text-gray-600">
                 Here are the ones we get asked the most.
               </p>
             </motion.div>
@@ -564,12 +568,12 @@ export default function PricingPage() {
               transition={{ duration: 0.5, delay: 0.3 }}
               className="mt-12 text-center"
             >
-              <p className="text-sm font-bold text-gray-600 mb-4">
+              <p className="mb-4 text-sm font-bold text-gray-600">
                 Still have questions? We are happy to help.
               </p>
               <a
                 href="mailto:support@anvesh.ai"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border-[2.5px] border-black bg-black text-white font-black text-sm shadow-[5px_5px_0px_#6C47FF] hover:shadow-none hover:translate-x-[5px] hover:translate-y-[5px] transition-all"
+                className="inline-flex items-center gap-2 rounded-xl border-[2.5px] border-black bg-black px-6 py-3 text-sm font-black text-white shadow-[5px_5px_0px_#6C47FF] transition-all hover:translate-x-[5px] hover:translate-y-[5px] hover:shadow-none"
               >
                 Contact support
               </a>

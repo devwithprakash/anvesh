@@ -1,14 +1,15 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { AppNavbar } from "@/components/workspace/app-navbar";
-import { ConversationList } from "@/components/workspace/conversation-list";
-import { SourcesPanel } from "@/components/workspace/sources-panel";
-import { Plus, MessageSquare, FileText, ArrowRight } from "lucide-react";
-import { useGetWorkspace } from "@/features/workspace/queries";
-import { useConversations } from "@/features/conversation/queries";
-import { useSources } from "@/features/source/queries";
+import { Plus, MessageSquare, FileText, ArrowRight } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+
+import { AppNavbar } from '@/components/workspace/app-navbar';
+import { ConversationList } from '@/components/workspace/conversation-list';
+import { SourcesPanel } from '@/components/workspace/sources-panel';
+import { useConversations } from '@/features/conversation/queries';
+import { useSources } from '@/features/source/queries';
+import { useGetWorkspace } from '@/features/workspace/queries';
 
 export function WorkspacePageInner({ workspaceId }: { workspaceId: string }) {
   const [chatsOpen, setChatsOpen] = useState(false);
@@ -23,13 +24,13 @@ export function WorkspacePageInner({ workspaceId }: { workspaceId: string }) {
   // Close drawers on Escape
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
+      if (e.key === 'Escape') {
         setChatsOpen(false);
         setSourcesOpen(false);
       }
     };
-    window.addEventListener("keydown", handler);
-    return () => window.removeEventListener("keydown", handler);
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
   }, []);
 
   if (isPending || !conversations) {
@@ -43,54 +44,54 @@ export function WorkspacePageInner({ workspaceId }: { workspaceId: string }) {
   };
 
   return (
-    <div className="flex flex-col bg-[#FFFBF0]" style={{ height: "100svh" }}>
+    <div className="flex flex-col bg-[#FFFBF0]" style={{ height: '100svh' }}>
       <AppNavbar activeWorkspaceId={workspaceId} />
 
       {/* Three-panel body */}
-      <div className="flex flex-1 overflow-hidden min-h-0">
+      <div className="flex min-h-0 flex-1 overflow-hidden">
         {/* Left sidebar — hidden on mobile */}
-        <div className="hidden md:flex md:w-[260px] md:shrink-0 h-full">
+        <div className="hidden h-full md:flex md:w-[260px] md:shrink-0">
           <ConversationList workspaceId={workspaceId} />
         </div>
 
         {/* Center: workspace overview */}
-        <div className="flex flex-1 flex-col items-center justify-center p-4 sm:p-8 overflow-auto relative">
+        <div className="relative flex flex-1 flex-col items-center justify-center overflow-auto p-4 sm:p-8">
           {/* dot grid */}
           <div
-            className="absolute inset-0 pointer-events-none opacity-[0.04]"
+            className="pointer-events-none absolute inset-0 opacity-[0.04]"
             style={{
               backgroundImage:
-                "radial-gradient(circle, #000 1px, transparent 1px)",
-              backgroundSize: "28px 28px",
+                'radial-gradient(circle, #000 1px, transparent 1px)',
+              backgroundSize: '28px 28px',
             }}
           />
 
           {/* Mobile sidebar toggle buttons */}
-          <div className="md:hidden flex gap-2 mb-4 relative">
+          <div className="relative mb-4 flex gap-2 md:hidden">
             <button
               onClick={() => setChatsOpen(true)}
-              className="flex items-center gap-1.5 rounded-lg border-[2px] border-black bg-white px-3 py-1.5 text-xs font-black shadow-[2px_2px_0px_#000] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+              className="flex items-center gap-1.5 rounded-lg border-[2px] border-black bg-white px-3 py-1.5 text-xs font-black shadow-[2px_2px_0px_#000] transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
             >
               <MessageSquare size={12} />
               Chats
             </button>
             <button
               onClick={() => setSourcesOpen(true)}
-              className="flex items-center gap-1.5 rounded-lg border-[2px] border-black bg-white px-3 py-1.5 text-xs font-black shadow-[2px_2px_0px_#000] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+              className="flex items-center gap-1.5 rounded-lg border-[2px] border-black bg-white px-3 py-1.5 text-xs font-black shadow-[2px_2px_0px_#000] transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
             >
               <FileText size={12} />
               Sources
             </button>
           </div>
 
-          <div className="relative flex flex-col items-center gap-6 text-center max-w-md w-full">
+          <div className="relative flex w-full max-w-md flex-col items-center gap-6 text-center">
             {/* Title card */}
-            <div className="w-full rounded-2xl border-[3px] border-black bg-white shadow-[5px_5px_0px_#000] p-6">
-              <h2 className="font-black text-2xl text-black">
+            <div className="w-full rounded-2xl border-[3px] border-black bg-white p-6 shadow-[5px_5px_0px_#000]">
+              <h2 className="text-2xl font-black text-black">
                 {workspace.title}
               </h2>
               {workspace.description && (
-                <p className="text-sm font-semibold text-gray-600 mt-2 leading-relaxed">
+                <p className="mt-2 text-sm leading-relaxed font-semibold text-gray-600">
                   {workspace.description}
                 </p>
               )}
@@ -98,18 +99,18 @@ export function WorkspacePageInner({ workspaceId }: { workspaceId: string }) {
               {/* Stats */}
               <div className="mt-4 grid grid-cols-2 gap-3">
                 <div className="rounded-xl border-[2px] border-black bg-[#FFFBF0] p-3 text-center shadow-[2px_2px_0px_#000]">
-                  <div className="font-black text-2xl text-black">
+                  <div className="text-2xl font-black text-black">
                     {conversations?.length ?? 0}
                   </div>
-                  <div className="text-xs font-bold text-gray-600 mt-0.5">
+                  <div className="mt-0.5 text-xs font-bold text-gray-600">
                     Conversations
                   </div>
                 </div>
                 <div className="rounded-xl border-[2px] border-black bg-[#FFFBF0] p-3 text-center shadow-[2px_2px_0px_#000]">
-                  <div className="font-black text-2xl text-black">
+                  <div className="text-2xl font-black text-black">
                     {sources?.length}
                   </div>
-                  <div className="text-xs font-bold text-gray-600 mt-0.5">
+                  <div className="mt-0.5 text-xs font-bold text-gray-600">
                     Sources
                   </div>
                 </div>
@@ -117,10 +118,10 @@ export function WorkspacePageInner({ workspaceId }: { workspaceId: string }) {
             </div>
 
             {/* Actions */}
-            <div className="flex flex-col gap-2.5 w-full">
+            <div className="flex w-full flex-col gap-2.5">
               <button
                 onClick={handleNewChat}
-                className="flex items-center justify-center gap-2 w-full rounded-xl border-[2.5px] border-black bg-[#6C47FF] px-5 py-3 text-sm font-black text-white shadow-[4px_4px_0px_#000] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] transition-all"
+                className="flex w-full items-center justify-center gap-2 rounded-xl border-[2.5px] border-black bg-[#6C47FF] px-5 py-3 text-sm font-black text-white shadow-[4px_4px_0px_#000] transition-all hover:translate-x-[4px] hover:translate-y-[4px] hover:shadow-none"
               >
                 <Plus size={16} />
                 Start new conversation
@@ -133,7 +134,7 @@ export function WorkspacePageInner({ workspaceId }: { workspaceId: string }) {
                       `/workspace/${workspaceId}/${conversations[0].id}`,
                     )
                   }
-                  className="flex items-center justify-center gap-2 w-full rounded-xl border-[2.5px] border-black bg-white px-5 py-3 text-sm font-black text-black shadow-[4px_4px_0px_#000] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] transition-all"
+                  className="flex w-full items-center justify-center gap-2 rounded-xl border-[2.5px] border-black bg-white px-5 py-3 text-sm font-black text-black shadow-[4px_4px_0px_#000] transition-all hover:translate-x-[4px] hover:translate-y-[4px] hover:shadow-none"
                 >
                   <MessageSquare size={16} />
                   Continue last chat
@@ -144,28 +145,28 @@ export function WorkspacePageInner({ workspaceId }: { workspaceId: string }) {
             {/* Recent chats */}
             {conversations.length > 0 && (
               <div className="w-full">
-                <p className="text-xs font-black text-black mb-2 text-left uppercase tracking-wide">
+                <p className="mb-2 text-left text-xs font-black tracking-wide text-black uppercase">
                   Recent
                 </p>
                 <div className="flex flex-col gap-1.5">
-                  {conversations.slice(0, 4).map((conv) => (
+                  {conversations.slice(0, 4).map(conv => (
                     <button
                       key={conv.id}
                       onClick={() =>
                         router.push(`/workspace/${workspaceId}/${conv.id}`)
                       }
-                      className="flex items-center gap-2.5 w-full rounded-xl border-[2px] border-black/10 bg-white px-3 py-2.5 text-left hover:border-black hover:shadow-[3px_3px_0px_#000] transition-all group"
+                      className="group flex w-full items-center gap-2.5 rounded-xl border-[2px] border-black/10 bg-white px-3 py-2.5 text-left transition-all hover:border-black hover:shadow-[3px_3px_0px_#000]"
                     >
                       <MessageSquare
                         size={13}
-                        className="text-gray-400 shrink-0"
+                        className="shrink-0 text-gray-400"
                       />
                       <span className="flex-1 truncate text-xs font-bold text-black">
                         {conv.title}
                       </span>
                       <ArrowRight
                         size={13}
-                        className="text-gray-300 group-hover:text-black transition-colors shrink-0"
+                        className="shrink-0 text-gray-300 transition-colors group-hover:text-black"
                       />
                     </button>
                   ))}
@@ -176,7 +177,7 @@ export function WorkspacePageInner({ workspaceId }: { workspaceId: string }) {
         </div>
 
         {/* Right sidebar — hidden on mobile */}
-        <div className="hidden md:flex md:w-[260px] md:shrink-0 h-full">
+        <div className="hidden h-full md:flex md:w-[260px] md:shrink-0">
           <SourcesPanel workspaceId={workspaceId} />
         </div>
       </div>
@@ -188,7 +189,7 @@ export function WorkspacePageInner({ workspaceId }: { workspaceId: string }) {
             className="absolute inset-0 bg-black/40"
             onClick={() => setChatsOpen(false)}
           />
-          <div className="relative z-10 flex w-[300px] max-w-[85vw] h-full">
+          <div className="relative z-10 flex h-full w-[300px] max-w-[85vw]">
             <ConversationList
               workspaceId={workspaceId}
               onClose={() => setChatsOpen(false)}
@@ -204,7 +205,7 @@ export function WorkspacePageInner({ workspaceId }: { workspaceId: string }) {
             className="absolute inset-0 bg-black/40"
             onClick={() => setSourcesOpen(false)}
           />
-          <div className="relative z-10 flex w-[300px] max-w-[85vw] h-full">
+          <div className="relative z-10 flex h-full w-[300px] max-w-[85vw]">
             <SourcesPanel
               workspaceId={workspaceId}
               onClose={() => setSourcesOpen(false)}

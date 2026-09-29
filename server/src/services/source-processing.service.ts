@@ -1,33 +1,35 @@
-import { encode, decode } from "gpt-tokenizer";
-import type { PineconeRecord } from "@pinecone-database/pinecone";
-import type { Prisma } from "../generated/prisma/client.js";
-import { chunkPages, chunkText } from "../lib/chunking.js";
-import { embedTexts } from "../lib/ai/indexing.js";
-import { extractPdfFromCloudinary } from "../lib/pdf.js";
+import { encode, decode } from 'gpt-tokenizer';
+
+import { SAFE_EMBED_TOKENS } from '../lib/ai/ai-config.js';
+import { embedTexts } from '../lib/ai/indexing.js';
+import { chunkPages, chunkText } from '../lib/chunking.js';
+import { extractPdfFromCloudinary } from '../lib/pdf.js';
 import {
   deleteSourceVectors,
   type VectorMetadata,
   upsertSourceVectors,
-} from "../lib/pinecone.js";
+} from '../lib/pinecone.js';
 import {
   createSourceChunks,
   deleteChunksBySourceId,
   findChunksBySourceId,
   type SourceChunkRecord,
-} from "../repositories/source-chunk.repository.js";
+} from '../repositories/source-chunk.repository.js';
 import {
   findSourceById,
   updateSourceRecord,
   type SourceRecord,
-} from "../repositories/source.repository.js";
-import { SAFE_EMBED_TOKENS } from "../lib/ai/ai-config.js";
+} from '../repositories/source.repository.js';
+
+import type { Prisma } from '../generated/prisma/client.js';
+import type { PineconeRecord } from '@pinecone-database/pinecone';
 
 type SourceMetadata = {
   fileUrl?: string;
   fileName?: string;
   fileSize?: number;
   publicId?: string;
-  resourceType?: "raw" | "image";
+  resourceType?: 'raw' | 'image';
   importedFrom?: string;
   videoId?: string;
   processingError?: string;
@@ -49,7 +51,7 @@ async function extractSourceText(source: SourceRecord) {
 
   const metadata =
     source.metadata &&
-    typeof source.metadata === "object" &&
+    typeof source.metadata === 'object' &&
     !Array.isArray(source.metadata)
       ? (source.metadata as SourceMetadata)
       : {};
@@ -58,13 +60,13 @@ async function extractSourceText(source: SourceRecord) {
     throw new Error(`Source ${source.id} is missing fileUrl metadata`);
   }
 
-  if (source.type === "PDF") {
+  if (source.type === 'PDF') {
     const extracted = await extractPdfFromCloudinary({
       fileUrl: metadata.fileUrl,
       ...(metadata.publicId !== undefined && {
         publicId: metadata.publicId,
       }),
-      resourceType: metadata.resourceType ?? "raw",
+      resourceType: metadata.resourceType ?? 'raw',
     });
 
     return {
@@ -74,7 +76,7 @@ async function extractSourceText(source: SourceRecord) {
     };
   }
 
-  if (source.type === "TEXT") {
+  if (source.type === 'TEXT') {
     const response = await fetch(metadata.fileUrl);
 
     if (!response.ok) {
@@ -84,7 +86,7 @@ async function extractSourceText(source: SourceRecord) {
     const buffer = Buffer.from(await response.arrayBuffer());
 
     return {
-      text: buffer.toString("utf-8").trim(),
+      text: buffer.toString('utf-8').trim(),
       pageCount: undefined,
       pages: undefined,
     };
@@ -94,26 +96,26 @@ async function extractSourceText(source: SourceRecord) {
 }
 
 export function markSourceProcessing(sourceId: string) {
-  return updateSourceRecord(sourceId, { status: "PROCESSING" });
+  return updateSourceRecord(sourceId, { status: 'PROCESSING' });
 }
 
 export async function markSourceFailed(
   sourceId: string,
   error: unknown,
-  existingMetadata: SourceRecord["metadata"],
+  existingMetadata: SourceRecord['metadata'],
 ) {
   const message =
-    error instanceof Error ? error.message : "Source processing failed";
+    error instanceof Error ? error.message : 'Source processing failed';
 
   const metadata =
     existingMetadata &&
-    typeof existingMetadata === "object" &&
+    typeof existingMetadata === 'object' &&
     !Array.isArray(existingMetadata)
       ? (existingMetadata as SourceMetadata)
       : {};
 
   return updateSourceRecord(sourceId, {
-    status: "FAILED",
+    status: 'FAILED',
     metadata: {
       ...metadata,
       processingError: message,
@@ -124,13 +126,13 @@ export async function markSourceFailed(
 export async function extractSourceContent(sourceId: string) {
   const source = await findSourceById(sourceId);
   if (!source) {
-    throw new Error("Source not found");
+    throw new Error('Source not found');
   }
 
   const extracted = await extractSourceText(source);
   const metadata =
     source.metadata &&
-    typeof source.metadata === "object" &&
+    typeof source.metadata === 'object' &&
     !Array.isArray(source.metadata)
       ? (source.metadata as SourceMetadata)
       : {};
@@ -162,11 +164,11 @@ export async function chunkSourceContent(
   const chunks = pages?.length ? chunkPages(pages) : chunkText(text);
 
   if (chunks.length === 0) {
-    throw new Error("No chunks were generated from source content");
+    throw new Error('No chunks were generated from source content');
   }
 
   return createSourceChunks(
-    chunks.map((chunk) => ({
+    chunks.map(chunk => ({
       sourceId,
       index: chunk.index,
       content: chunk.content,
@@ -222,14 +224,14 @@ export async function embedAndIndexSource(
 
   for (let i = 0; i < safeChunks.length; i += batchSize) {
     const batch = safeChunks.slice(i, i + batchSize);
-    const embeddings = await embedTexts(batch.map((chunk) => chunk.content));
+    const embeddings = await embedTexts(batch.map(chunk => chunk.content));
 
     for (let j = 0; j < batch.length; j += 1) {
       const chunk = batch[j]!;
       const embedding = embeddings[j]!;
       const chunkMetadata =
         chunk.metadata &&
-        typeof chunk.metadata === "object" &&
+        typeof chunk.metadata === 'object' &&
         !Array.isArray(chunk.metadata)
           ? (chunk.metadata as Record<string, unknown>)
           : {};
@@ -245,7 +247,7 @@ export async function embedAndIndexSource(
           sourceTitle: source.title,
           sourceType: source.type,
           text: chunk.content.slice(0, 35000),
-          ...(typeof chunkMetadata.page === "number"
+          ...(typeof chunkMetadata.page === 'number'
             ? { page: chunkMetadata.page }
             : {}),
         },
@@ -257,13 +259,13 @@ export async function embedAndIndexSource(
 
   const metadata =
     source.metadata &&
-    typeof source.metadata === "object" &&
+    typeof source.metadata === 'object' &&
     !Array.isArray(source.metadata)
       ? (source.metadata as SourceMetadata)
       : {};
 
   return updateSourceRecord(source.id, {
-    status: "READY",
+    status: 'READY',
     metadata: {
       ...metadata,
       chunkCount: safeChunks.length,

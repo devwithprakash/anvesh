@@ -4,13 +4,35 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "lint-staged": "lint-staged",
+    "prepare": "husky",
+    "lint": "pnpm --dir client lint && pnpm --dir server lint",
+    "typecheck": "pnpm --dir client typecheck && pnpm --dir server typecheck",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "packageManager": "pnpm@10.33.0",
   "devDependencies": {
+    "@commitlint/cli": "^21.2.3",
+    "@commitlint/config-conventional": "^21.2.3",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.6.0",
     "prettier": "^3.9.9"
+  },
+  "lint-staged": {
+    "client/**/*.{js,jsx,ts,tsx,mjs}": [
+      "pnpm --dir client exec eslint --fix --no-warn-ignored",
+      "prettier --write"
+    ],
+    "server/**/*.{js,jsx,ts,tsx}": [
+      "pnpm --dir server exec eslint --fix --no-warn-ignored",
+      "prettier --write"
+    ],
+    "*.{json,md,css}": [
+      "prettier --write"
+    ]
   }
 }

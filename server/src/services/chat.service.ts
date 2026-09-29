@@ -1,6 +1,4 @@
-import { openai } from "@ai-sdk/openai";
-import type { Response } from "express";
-import { z } from "zod";
+import { openai } from '@ai-sdk/openai';
 import {
   convertToModelMessages,
   createUIMessageStream,
@@ -10,17 +8,26 @@ import {
   toUIMessageStream,
   tool,
   type UIMessage,
-} from "ai";
+} from 'ai';
+import { logger } from 'better-auth';
+import { z } from 'zod';
+
+import { getWorkspaceByIdForUser } from './workspace.service.js';
 import {
   CHAT_MODEL,
   CONVERSATION_SUMMARY_INTERVAL,
   RECENT_MESSAGE_WINDOW,
-} from "../lib/ai/ai-config.js";
-import { enqueueConversationSummarize } from "../lib/events/conversation-events.js";
+} from '../lib/ai/ai-config.js';
+import { enqueueConversationSummarize } from '../lib/events/conversation-events.js';
+import {
+  formatTavilyResultsForPrompt,
+  searchWeb,
+  type TavilySearchResponse,
+} from '../lib/external/tavily.js';
 import {
   buildChatSystemPrompt,
   retrieveWorkspaceContext,
-} from "../lib/rag/retrieve.js";
+} from '../lib/rag/retrieve.js';
 import {
   createConversationRecord,
   findConversationByIdAndWorkspaceId,
@@ -28,32 +35,26 @@ import {
   touchConversation,
   updateConversationRecord,
   deleteConversationRecord,
-} from "../repositories/conversation.repository.js";
+} from '../repositories/conversation.repository.js';
 import {
   createMessageRecord,
   countMessagesByConversationId,
   findMessagesByConversationId,
-} from "../repositories/message.repository.js";
-
-import {
-  formatTavilyResultsForPrompt,
-  searchWeb,
-  type TavilySearchResponse,
-} from "../lib/external/tavily.js";
-import { NotFoundError, ValidationError } from "../types/app-error.js";
-import {
-  buildConversationTitle,
-  getLastUserMessageText,
-  getTextFromUIMessage,
-} from "../utils/chat-message.js";
-import { getWorkspaceByIdForUser } from "./workspace.service.js";
+} from '../repositories/message.repository.js';
 import {
   getFreePlan,
   getPlanById,
   getSubscriptionByUserId,
   updateAiQueryUsageRecord,
-} from "../repositories/workspace.repository.js";
-import { logger } from "better-auth";
+} from '../repositories/workspace.repository.js';
+import { NotFoundError, ValidationError } from '../types/app-error.js';
+import {
+  buildConversationTitle,
+  getLastUserMessageText,
+  getTextFromUIMessage,
+} from '../utils/chat-message.js';
+
+import type { Response } from 'express';
 
 export async function listConversationsForWorkspace(
   workspaceId: string,
@@ -85,7 +86,7 @@ export async function getConversationMessagesForWorkspace(
   );
 
   if (!conversation) {
-    throw new NotFoundError("Conversation not found");
+    throw new NotFoundError('Conversation not found');
   }
 
   return findMessagesByConversationId(conversationId);
@@ -104,7 +105,7 @@ export async function deleteConversationForWorkspace(
   );
 
   if (!conversation) {
-    throw new NotFoundError("Conversation not found");
+    throw new NotFoundError('Conversation not found');
   }
 
   await deleteConversationRecord(conversationId);
@@ -122,7 +123,7 @@ async function resolveConversation(
     );
 
     if (!existing) {
-      throw new NotFoundError("Conversation not found");
+      throw new NotFoundError('Conversation not found');
     }
 
     return existing;
@@ -152,7 +153,7 @@ export async function streamWorkspaceChat(
       ? await getPlanById(subscription.planId)
       : await getFreePlan();
 
-    if (!plan) throw new Error("Plan not found");
+    if (!plan) throw new Error('Plan not found');
 
     await updateAiQueryUsageRecord(userId, plan.maxAiQueries);
 
@@ -165,7 +166,7 @@ export async function streamWorkspaceChat(
 
     const userText = getLastUserMessageText(input.messages);
 
-    if (!userText) throw new ValidationError("A user message is required");
+    if (!userText) throw new ValidationError('A user message is required');
 
     // get the conversation, if not exist then first create and then get
     const conversation = await resolveConversation(
@@ -174,7 +175,7 @@ export async function streamWorkspaceChat(
       userText,
     );
 
-    logger.info("AI query started", {
+    logger.info('AI query started', {
       workspaceId,
       conversationId: conversation.id,
       model: chatModel,
@@ -183,7 +184,7 @@ export async function streamWorkspaceChat(
 
     await createMessageRecord({
       conversationId: conversation.id,
-      role: "USER",
+      role: 'USER',
       content: userText,
     });
 
@@ -191,7 +192,7 @@ export async function streamWorkspaceChat(
       retrieveWorkspaceContext(workspaceId, userText),
     ]);
 
-    logger.debug("Workspace context retrieved", {
+    logger.debug('Workspace context retrieved', {
       workspaceId,
       conversationId: conversation.id,
       chunkCount: retrievedChunks.chunks.length,
@@ -218,21 +219,21 @@ export async function streamWorkspaceChat(
           ? {
               web_search: tool({
                 description:
-                  "Search the web for up-to-date information outside the workspace sources.",
+                  'Search the web for up-to-date information outside the workspace sources.',
                 inputSchema: z.object({
                   query: z
                     .string()
-                    .describe("The search query for current web information"),
+                    .describe('The search query for current web information'),
                 }),
                 execute: async ({ query }) => {
-                  logger.info("Web search started", {
+                  logger.info('Web search started', {
                     workspaceId,
                     conversationId: conversation.id,
                   });
 
                   webSearchResults = await searchWeb(query);
 
-                  logger.debug("Web search completed", {
+                  logger.debug('Web search completed', {
                     workspaceId,
                     conversationId: conversation.id,
                     resultCount: webSearchResults?.results?.length ?? 0,
@@ -265,7 +266,7 @@ export async function streamWorkspaceChat(
 
         await createMessageRecord({
           conversationId: conversation.id,
-          role: "ASSISTANT",
+          role: 'ASSISTANT',
           content: assistantText,
         });
 
@@ -288,7 +289,7 @@ export async function streamWorkspaceChat(
           });
         }
 
-        logger.info("AI query completed", {
+        logger.info('AI query completed', {
           workspaceId,
           conversationId: conversation.id,
           model: chatModel,
@@ -302,11 +303,11 @@ export async function streamWorkspaceChat(
       response: res,
       stream,
       headers: {
-        "X-Conversation-Id": conversation.id,
+        'X-Conversation-Id': conversation.id,
       },
     });
   } catch (error) {
-    logger.error("AI query failed", {
+    logger.error('AI query failed', {
       workspaceId,
       conversationId: input.conversationId,
       error: error instanceof Error ? error.message : String(error),

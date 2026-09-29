@@ -1,14 +1,15 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { ChevronDown, LogOut, Plus } from "lucide-react";
-import { useAppState } from "@/components/providers/app-provider";
-import { WorkspaceDialog } from "@/components/workspace/workspace-dialog";
-import { PlanBadge } from "@/components/workspace/plan-banner";
-import { authClient } from "@/lib/auth-client";
-import { signOut } from "@/features/auth/auth";
-import { Easing, motion } from "framer-motion";
+import { Easing, motion } from 'framer-motion';
+import { ChevronDown, LogOut, Plus } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+
+import { useAppState } from '@/components/providers/app-provider';
+import { PlanBadge } from '@/components/workspace/plan-banner';
+import { WorkspaceDialog } from '@/components/workspace/workspace-dialog';
+import { signOut } from '@/features/auth/auth';
+import { authClient } from '@/lib/auth-client';
 
 interface AppNavbarProps {
   activeWorkspaceId?: string;
@@ -19,7 +20,7 @@ const itemVariants = {
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.4, ease: "easeOut" as Easing },
+    transition: { duration: 0.4, ease: 'easeOut' as Easing },
   },
 };
 
@@ -30,17 +31,17 @@ export function AppNavbar({ activeWorkspaceId }: AppNavbarProps) {
   const [userOpen, setUserOpen] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
 
-  const { data: session} = authClient.useSession();
+  const { data: session } = authClient.useSession();
 
   const user = session?.user;
 
-  const activeWs = workspaces.find((ws) => ws.id === activeWorkspaceId);
+  const activeWs = workspaces.find(ws => ws.id === activeWorkspaceId);
 
   const handleLogOut = async () => {
     try {
       await signOut();
 
-      router.push("/");
+      router.push('/');
     } catch (error) {
       console.error(error);
     }
@@ -48,13 +49,13 @@ export function AppNavbar({ activeWorkspaceId }: AppNavbarProps) {
 
   return (
     <>
-      <nav className="sticky top-0 z-50 w-full bg-[#FFFBF0] border-b-[3px] border-black">
-        <div className="flex items-center justify-between px-5 h-14 gap-4">
+      <nav className="sticky top-0 z-50 w-full border-b-[3px] border-black bg-[#FFFBF0]">
+        <div className="flex h-14 items-center justify-between gap-4 px-5">
           {/* Logo */}
           <motion.a
             variants={itemVariants}
             href="/"
-            className="flex items-center shrink-0"
+            className="flex shrink-0 items-center"
           >
             <svg
               className="anvesh-logo"
@@ -120,16 +121,16 @@ export function AppNavbar({ activeWorkspaceId }: AppNavbarProps) {
                 </g>
               </g>
             </svg>
-            <span className="font-black text-lg text-black tracking-tight">
+            <span className="text-lg font-black tracking-tight text-black">
               Anvesh
             </span>
           </motion.a>
 
           {activeWs ? (
-            <div className="relative flex-1 flex justify-center">
+            <div className="relative flex flex-1 justify-center">
               <button
-                onClick={() => setWsOpen((v) => !v)}
-                className="flex items-center gap-2 px-3 py-1.5 rounded-lg border-[2px] border-black bg-white font-bold text-sm text-black shadow-[2px_2px_0px_#000] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all max-w-xs"
+                onClick={() => setWsOpen(v => !v)}
+                className="flex max-w-xs items-center gap-2 rounded-lg border-[2px] border-black bg-white px-3 py-1.5 text-sm font-bold text-black shadow-[2px_2px_0px_#000] transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
               >
                 <span className="truncate">{activeWs.title}</span>
                 <ChevronDown size={14} className="shrink-0" />
@@ -141,24 +142,24 @@ export function AppNavbar({ activeWorkspaceId }: AppNavbarProps) {
                     className="fixed inset-0 z-10"
                     onClick={() => setWsOpen(false)}
                   />
-                  <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 z-20 min-w-[220px] rounded-xl border-[2.5px] border-black bg-white shadow-[4px_4px_0px_#000] overflow-hidden">
-                    <div className="p-1.5 flex flex-col gap-0.5">
-                      {workspaces.map((ws) => (
+                  <div className="absolute top-full left-1/2 z-20 mt-2 min-w-[220px] -translate-x-1/2 overflow-hidden rounded-xl border-[2.5px] border-black bg-white shadow-[4px_4px_0px_#000]">
+                    <div className="flex flex-col gap-0.5 p-1.5">
+                      {workspaces.map(ws => (
                         <button
                           key={ws.id}
                           onClick={() => {
                             router.push(`/workspace/${ws.id}`);
                             setWsOpen(false);
                           }}
-                          className={`flex items-center gap-2.5 w-full rounded-lg px-3 py-2 text-sm text-left font-bold transition-colors ${
+                          className={`flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm font-bold transition-colors ${
                             ws.id === activeWorkspaceId
-                              ? "bg-[#EDE9FE] text-[#6C47FF]"
-                              : "hover:bg-gray-100 text-black"
+                              ? 'bg-[#EDE9FE] text-[#6C47FF]'
+                              : 'text-black hover:bg-gray-100'
                           }`}
                         >
                           <span className="truncate">{ws.title}</span>
                           {ws.id === activeWorkspaceId && (
-                            <span className="ml-auto w-1.5 h-1.5 rounded-full bg-[#6C47FF] shrink-0" />
+                            <span className="ml-auto h-1.5 w-1.5 shrink-0 rounded-full bg-[#6C47FF]" />
                           )}
                         </button>
                       ))}
@@ -169,7 +170,7 @@ export function AppNavbar({ activeWorkspaceId }: AppNavbarProps) {
                           setWsOpen(false);
                           setCreateOpen(true);
                         }}
-                        className="flex items-center gap-2 w-full rounded-lg px-3 py-2 text-sm font-bold text-black hover:bg-gray-100 transition-colors"
+                        className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-bold text-black transition-colors hover:bg-gray-100"
                       >
                         <Plus size={14} />
                         New workspace
@@ -184,14 +185,14 @@ export function AppNavbar({ activeWorkspaceId }: AppNavbarProps) {
           )}
 
           {/* User menu — right */}
-          <div className="flex items-center gap-2 shrink-0">
+          <div className="flex shrink-0 items-center gap-2">
             <PlanBadge />
             <div className="relative">
               <button
-                onClick={() => setUserOpen((v) => !v)}
-                className="flex items-center gap-2 px-3 py-1.5 rounded-lg border-[2px] border-black bg-white font-bold text-sm text-black shadow-[2px_2px_0px_#000] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+                onClick={() => setUserOpen(v => !v)}
+                className="flex items-center gap-2 rounded-lg border-[2px] border-black bg-white px-3 py-1.5 text-sm font-bold text-black shadow-[2px_2px_0px_#000] transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
               >
-                <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-[#EDE9FE] border-[1.5px] border-black text-[10px] font-black text-[#6C47FF]">
+                <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border-[1.5px] border-black bg-[#EDE9FE] text-[10px] font-black text-[#6C47FF]">
                   {user?.name[0]}
                 </span>
                 <span className="hidden sm:block">{user?.name}</span>
@@ -204,11 +205,11 @@ export function AppNavbar({ activeWorkspaceId }: AppNavbarProps) {
                     className="fixed inset-0 z-10"
                     onClick={() => setUserOpen(false)}
                   />
-                  <div className="absolute right-0 top-full mt-2 z-20 w-48 rounded-xl border-[2.5px] border-black bg-white shadow-[4px_4px_0px_#000] overflow-hidden">
-                    <div className="p-1.5 flex flex-col gap-0.5">
+                  <div className="absolute top-full right-0 z-20 mt-2 w-48 overflow-hidden rounded-xl border-[2.5px] border-black bg-white shadow-[4px_4px_0px_#000]">
+                    <div className="flex flex-col gap-0.5 p-1.5">
                       <button
                         onClick={handleLogOut}
-                        className="flex items-center gap-2.5 w-full rounded-lg px-3 py-2 text-sm font-bold text-[#FF6B6B] hover:bg-[#FFF0F0] transition-colors"
+                        className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-bold text-[#FF6B6B] transition-colors hover:bg-[#FFF0F0]"
                       >
                         <LogOut size={14} />
                         Sign out

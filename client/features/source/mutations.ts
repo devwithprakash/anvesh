@@ -1,18 +1,19 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+
 import {
   deleteSource,
   uploadFileSource,
   uploadTextSource,
   uploadWebsiteSource,
   uploadYoutubeSource,
-} from "./api";
+} from './api';
 import {
   DeleteSource,
   UploadFileSource,
   UploadTextInput,
   UploadWebsiteInput,
   UploadYoutubeInput,
-} from "./types";
+} from './types';
 
 export function useUploadFileSource() {
   const queryClient = useQueryClient();
@@ -22,7 +23,7 @@ export function useUploadFileSource() {
       uploadFileSource({ workspaceId, title, formData }),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: ["sources", variables.workspaceId],
+        queryKey: ['sources', variables.workspaceId],
       });
     },
   });
@@ -37,7 +38,7 @@ export function useUploadWebsiteSource() {
 
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: ["sources", variables.workspaceId],
+        queryKey: ['sources', variables.workspaceId],
       });
     },
   });
@@ -51,7 +52,7 @@ export function useUploadYoutubeSource() {
       uploadYoutubeSource({ workspaceId, data }),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: ["sources", variables.workspaceId],
+        queryKey: ['sources', variables.workspaceId],
       });
     },
   });
@@ -64,7 +65,7 @@ export function useUploadTextSource() {
       uploadTextSource({ workspaceId, data }),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: ["sources", variables.workspaceId],
+        queryKey: ['sources', variables.workspaceId],
       });
     },
   });
@@ -79,7 +80,7 @@ export function useDeleteSource() {
 
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: ["sources", variables.workspaceId],
+        queryKey: ['sources', variables.workspaceId],
       });
     },
   });

@@ -2,17 +2,18 @@ import {
   Pinecone,
   type Index,
   type PineconeRecord,
-} from "@pinecone-database/pinecone";
-import { EMBEDDING_DIMENSIONS } from "./ai/ai-config.js";
+} from '@pinecone-database/pinecone';
 
-const indexName = process.env.PINECONE_INDEX ?? "chaibook";
+import { EMBEDDING_DIMENSIONS } from './ai/ai-config.js';
+
+const indexName = process.env.PINECONE_INDEX ?? 'chaibook';
 
 let pineconeClient: Pinecone | null = null;
 let indexReady = false;
 
 function getPineconeClient() {
   if (!process.env.PINECONE_API_KEY) {
-    throw new Error("PINECONE_API_KEY is not configured");
+    throw new Error('PINECONE_API_KEY is not configured');
   }
 
   if (!pineconeClient) {
@@ -41,7 +42,7 @@ async function waitForIndexReady(name: string) {
     if (description.status?.ready) {
       return;
     }
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    await new Promise(resolve => setTimeout(resolve, 2000));
   }
 
   throw new Error(`Pinecone index "${name}" did not become ready in time`);
@@ -54,17 +55,17 @@ export async function ensurePineconeIndex() {
 
   const client = getPineconeClient();
   const indexes = await client.listIndexes();
-  const exists = indexes.indexes?.some((index) => index.name === indexName);
+  const exists = indexes.indexes?.some(index => index.name === indexName);
 
   if (!exists) {
     await client.createIndex({
       name: indexName,
       dimension: EMBEDDING_DIMENSIONS,
-      metric: "cosine",
+      metric: 'cosine',
       spec: {
         serverless: {
-          cloud: "aws",
-          region: "us-east-1",
+          cloud: 'aws',
+          region: 'us-east-1',
         },
       },
     });

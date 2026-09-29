@@ -1,9 +1,11 @@
-import type { NextFunction, Request, Response } from "express";
-import { auth } from "../lib/auth.js";
-import { fromNodeHeaders } from "better-auth/node";
-import type { Session } from "../lib/session.js";
+import { fromNodeHeaders } from 'better-auth/node';
 
-declare module "express-serve-static-core" {
+import { auth } from '../lib/auth.js';
+
+import type { Session } from '../lib/session.js';
+import type { NextFunction, Request, Response } from 'express';
+
+declare module 'express-serve-static-core' {
   interface Request {
     session: Session;
   }
@@ -19,7 +21,7 @@ export async function requireAuth(
   });
 
   if (!session?.user) {
-    res.status(401).json({ error: "Unauthorized" });
+    res.status(401).json({ error: 'Unauthorized' });
     return;
   }
 

@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import { Easing, motion } from 'framer-motion';
 import {
   Eye,
@@ -12,8 +11,10 @@ import {
   AlertCircle,
 } from 'lucide-react';
 import Link from 'next/link';
-import { signUp } from '@/features/auth/auth';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+
+import { signUp } from '@/features/auth/auth';
 import { authClient } from '@/lib/auth-client';
 
 const fadeUp = (delay = 0) => ({
@@ -99,28 +100,28 @@ export default function SignUpPage() {
     <div className="w-full max-w-md">
       <motion.div
         {...fadeUp(0)}
-        className="bg-white border-[3px] border-black rounded-2xl shadow-[6px_6px_0px_#000] overflow-hidden"
+        className="overflow-hidden rounded-2xl border-[3px] border-black bg-white shadow-[6px_6px_0px_#000]"
       >
-        <div className="bg-[#FFD166] border-b-[3px] border-black px-8 py-5">
-          <h1 className="text-2xl font-black text-black tracking-tight">
+        <div className="border-b-[3px] border-black bg-[#FFD166] px-8 py-5">
+          <h1 className="text-2xl font-black tracking-tight text-black">
             Create your account ✨
           </h1>
-          <p className="text-sm font-semibold text-black/70 mt-1">
+          <p className="mt-1 text-sm font-semibold text-black/70">
             Start for free — no credit card required
           </p>
         </div>
 
-        <div className="px-8 py-7 space-y-5">
+        <div className="space-y-5 px-8 py-7">
           <motion.div {...fadeIn(0.05)}>
             <button
               onClick={handleGoogleSignUp}
               type="button"
               disabled={googleLoading}
-              className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl border-[3px] border-black bg-white font-black text-sm text-black shadow-[4px_4px_0px_#000] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] transition-all disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:shadow-[4px_4px_0px_#000] disabled:hover:translate-x-0 disabled:hover:translate-y-0"
+              className="flex w-full items-center justify-center gap-3 rounded-xl border-[3px] border-black bg-white px-4 py-3 text-sm font-black text-black shadow-[4px_4px_0px_#000] transition-all hover:translate-x-[4px] hover:translate-y-[4px] hover:shadow-none disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-x-0 disabled:hover:translate-y-0 disabled:hover:shadow-[4px_4px_0px_#000]"
             >
               {googleLoading ? (
                 <>
-                  <span className="inline-block w-4 h-4 border-2 border-black/20 border-t-black rounded-full animate-spin" />
+                  <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-black/20 border-t-black" />
                   Connecting...
                 </>
               ) : (
@@ -155,11 +156,11 @@ export default function SignUpPage() {
           </motion.div>
 
           <motion.div {...fadeIn(0.1)} className="flex items-center gap-3">
-            <div className="flex-1 h-[2px] bg-black/10" />
-            <span className="text-xs font-black text-black/40 uppercase tracking-widest">
+            <div className="h-[2px] flex-1 bg-black/10" />
+            <span className="text-xs font-black tracking-widest text-black/40 uppercase">
               or
             </span>
-            <div className="flex-1 h-[2px] bg-black/10" />
+            <div className="h-[2px] flex-1 bg-black/10" />
           </motion.div>
 
           {/* Form */}
@@ -171,7 +172,7 @@ export default function SignUpPage() {
               <div className="relative">
                 <User
                   size={17}
-                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-black/40 pointer-events-none"
+                  className="pointer-events-none absolute top-1/2 left-3.5 -translate-y-1/2 text-black/40"
                 />
                 <input
                   type="text"
@@ -179,11 +180,11 @@ export default function SignUpPage() {
                   required
                   placeholder="Jane Smith"
                   value={form.name}
-                  onChange={(e) => {
-                    setForm((f) => ({ ...f, name: e.target.value }));
+                  onChange={e => {
+                    setForm(f => ({ ...f, name: e.target.value }));
                     if (error) setError(null);
                   }}
-                  className="w-full pl-10 pr-4 py-3 rounded-xl border-[2.5px] border-black bg-[#FFFBF0] text-sm font-semibold text-black placeholder:text-black/30 outline-none focus:ring-2 focus:ring-[#6C47FF] focus:ring-offset-1 transition"
+                  className="w-full rounded-xl border-[2.5px] border-black bg-[#FFFBF0] py-3 pr-4 pl-10 text-sm font-semibold text-black transition outline-none placeholder:text-black/30 focus:ring-2 focus:ring-[#6C47FF] focus:ring-offset-1"
                 />
               </div>
             </motion.div>
@@ -195,7 +196,7 @@ export default function SignUpPage() {
               <div className="relative">
                 <Mail
                   size={17}
-                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-black/40 pointer-events-none"
+                  className="pointer-events-none absolute top-1/2 left-3.5 -translate-y-1/2 text-black/40"
                 />
                 <input
                   type="email"
@@ -203,11 +204,11 @@ export default function SignUpPage() {
                   required
                   placeholder="you@example.com"
                   value={form.email}
-                  onChange={(e) => {
-                    setForm((f) => ({ ...f, email: e.target.value }));
+                  onChange={e => {
+                    setForm(f => ({ ...f, email: e.target.value }));
                     if (error) setError(null);
                   }}
-                  className={`w-full pl-10 pr-4 py-3 rounded-xl border-[2.5px] bg-[#FFFBF0] text-sm font-semibold text-black placeholder:text-black/30 outline-none focus:ring-2 focus:ring-offset-1 transition ${
+                  className={`w-full rounded-xl border-[2.5px] bg-[#FFFBF0] py-3 pr-4 pl-10 text-sm font-semibold text-black transition outline-none placeholder:text-black/30 focus:ring-2 focus:ring-offset-1 ${
                     error
                       ? 'border-red-500 focus:ring-red-500'
                       : 'border-black focus:ring-[#6C47FF]'
@@ -223,7 +224,7 @@ export default function SignUpPage() {
               <div className="relative">
                 <Lock
                   size={17}
-                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-black/40 pointer-events-none"
+                  className="pointer-events-none absolute top-1/2 left-3.5 -translate-y-1/2 text-black/40"
                 />
                 <input
                   type={showPassword ? 'text' : 'password'}
@@ -231,13 +232,13 @@ export default function SignUpPage() {
                   required
                   placeholder="Min. 8 characters"
                   value={form.password}
-                  onChange={(e) => {
-                    setForm((f) => ({ ...f, password: e.target.value }));
+                  onChange={e => {
+                    setForm(f => ({ ...f, password: e.target.value }));
                     if (error) setError(null);
                   }}
                   aria-invalid={!!error}
                   aria-describedby={error ? 'signup-error' : undefined}
-                  className={`w-full pl-10 pr-11 py-3 rounded-xl border-[2.5px] bg-[#FFFBF0] text-sm font-semibold text-black placeholder:text-black/30 outline-none focus:ring-2 focus:ring-offset-1 transition ${
+                  className={`w-full rounded-xl border-[2.5px] bg-[#FFFBF0] py-3 pr-11 pl-10 text-sm font-semibold text-black transition outline-none placeholder:text-black/30 focus:ring-2 focus:ring-offset-1 ${
                     error
                       ? 'border-red-500 focus:ring-red-500'
                       : 'border-black focus:ring-[#6C47FF]'
@@ -246,8 +247,8 @@ export default function SignUpPage() {
                 <button
                   type="button"
                   tabIndex={-1}
-                  onClick={() => setShowPassword((v) => !v)}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-black/40 hover:text-black transition-colors"
+                  onClick={() => setShowPassword(v => !v)}
+                  className="absolute top-1/2 right-3.5 -translate-y-1/2 text-black/40 transition-colors hover:text-black"
                 >
                   {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
                 </button>
@@ -259,7 +260,7 @@ export default function SignUpPage() {
                   animate={{ opacity: 1, y: 0 }}
                   id="signup-error"
                   role="alert"
-                  className="flex items-center gap-1.5 text-xs font-bold text-red-600 pt-0.5"
+                  className="flex items-center gap-1.5 pt-0.5 text-xs font-bold text-red-600"
                 >
                   <AlertCircle size={13} className="shrink-0" />
                   {error}
@@ -271,10 +272,10 @@ export default function SignUpPage() {
               <button
                 type="submit"
                 disabled={isLoading || googleLoading}
-                className="w-full flex items-center justify-center gap-2 px-4 py-3 mt-1 rounded-xl border-[3px] border-black bg-[#6C47FF] text-white text-sm font-black shadow-[4px_4px_0px_#000] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] transition-all disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:shadow-[4px_4px_0px_#000] disabled:hover:translate-x-0 disabled:hover:translate-y-0"
+                className="mt-1 flex w-full items-center justify-center gap-2 rounded-xl border-[3px] border-black bg-[#6C47FF] px-4 py-3 text-sm font-black text-white shadow-[4px_4px_0px_#000] transition-all hover:translate-x-[4px] hover:translate-y-[4px] hover:shadow-none disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-x-0 disabled:hover:translate-y-0 disabled:hover:shadow-[4px_4px_0px_#000]"
               >
                 {isLoading ? (
-                  <span className="inline-block w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                  <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
                 ) : (
                   <>
                     Create account
@@ -294,7 +295,7 @@ export default function SignUpPage() {
             Already have an account?{' '}
             <Link
               href="/signin"
-              className="font-black text-[#6C47FF] hover:underline underline-offset-2"
+              className="font-black text-[#6C47FF] underline-offset-2 hover:underline"
             >
               Sign in
             </Link>

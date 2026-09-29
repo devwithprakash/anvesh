@@ -1,9 +1,10 @@
-import { useQuery } from "@tanstack/react-query";
-import { getSubscriptionStatus, getPlans } from "./api";
+import { useQuery } from '@tanstack/react-query';
+
+import { getSubscriptionStatus, getPlans } from './api';
 
 export const subscriptionKeys = {
-  status: ["subscription"] as const,
-  plans: ["plans"] as const,
+  status: ['subscription'] as const,
+  plans: ['plans'] as const,
 };
 
 export function useSubscriptionStatus() {

@@ -1,8 +1,9 @@
-"use client";
+'use client';
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { authClient } from "@/lib/auth-client";
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
+
+import { authClient } from '@/lib/auth-client';
 
 export function useRequireAuth() {
   const router = useRouter();
@@ -10,7 +11,7 @@ export function useRequireAuth() {
 
   useEffect(() => {
     if (!isPending && !session) {
-      router.replace("/");
+      router.replace('/');
     }
   }, [isPending, session, router]);
 

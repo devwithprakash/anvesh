@@ -1,10 +1,11 @@
-import type { Prisma } from "../generated/prisma/client.js";
-import prisma from "../lib/db.js";
-import { ConflictError, NotFoundError } from "../types/app-error.js";
+import prisma from '../lib/db.js';
+import { ConflictError, NotFoundError } from '../types/app-error.js';
+
+import type { Prisma } from '../generated/prisma/client.js';
 import type {
   CreateWorkspaceInput,
   UpdateWorkspaceInput,
-} from "../validators/workspace.validator.js";
+} from '../validators/workspace.validator.js';
 
 export const workspaceSelect = {
   id: true,
@@ -34,13 +35,13 @@ function addOneMonth(presentDate: Date): Date {
 
 export function getSubscriptionByUserId(userId: string) {
   return prisma.subscription.findFirst({
-    where: { userId, status: "ACTIVE" },
+    where: { userId, status: 'ACTIVE' },
   });
 }
 
 export function getFreePlan() {
   return prisma.plan.findUnique({
-    where: { name: "FREE" },
+    where: { name: 'FREE' },
   });
 }
 
@@ -62,7 +63,7 @@ export function findWorkspacesByUserId(userId: string) {
   return prisma.workspace.findMany({
     where: { userId },
     select: workspaceSelect,
-    orderBy: { updatedAt: "desc" },
+    orderBy: { updatedAt: 'desc' },
   });
 }
 
@@ -104,7 +105,7 @@ export function updateWorkspaceRecord(
       }),
       ...(data.icon !== undefined && {
         icon: data.icon,
-      })
+      }),
     },
     select: workspaceSelect,
   });
@@ -114,13 +115,13 @@ export async function deleteWorkspaceRecord(
   workspaceId: string,
   userId: string,
 ) {
-  return prisma.$transaction(async (tx) => {
+  return prisma.$transaction(async tx => {
     const workspace = await tx.workspace.findFirst({
       where: { id: workspaceId, userId },
     });
 
     if (!workspace) {
-      throw new NotFoundError("Workspace not found");
+      throw new NotFoundError('Workspace not found');
     }
 
     await tx.workspace.delete({
@@ -143,10 +144,7 @@ export async function deleteWorkspaceRecord(
 
 // ── Usage records ────────────────────────────────────────────────────────────
 
-async function ensureUsageRecord(
-  tx: Prisma.TransactionClient,
-  userId: string,
-) {
+async function ensureUsageRecord(tx: Prisma.TransactionClient, userId: string) {
   const now = new Date();
   const periodStart = new Date(now.getFullYear(), now.getMonth(), 1);
   const periodEnd = addOneMonth(periodStart);
@@ -187,7 +185,7 @@ export async function updateAiQueryUsageRecord(
   userId: string,
   maxAiQueries: number,
 ) {
-  return prisma.$transaction(async (tx) => {
+  return prisma.$transaction(async tx => {
     await ensureUsageRecord(tx, userId);
     await resetExpiredUsageIfNeeded(tx, userId);
 
@@ -203,7 +201,7 @@ export async function updateAiQueryUsageRecord(
 
     if (result.count === 0) {
       throw new ConflictError(
-        "Monthly AI query limit reached. Upgrade your plan.",
+        'Monthly AI query limit reached. Upgrade your plan.',
       );
     }
 
@@ -216,7 +214,7 @@ export async function createWorkspaceWithQuota(
   input: CreateWorkspaceInput,
   maxWorkspaces: number,
 ) {
-  return prisma.$transaction(async (tx) => {
+  return prisma.$transaction(async tx => {
     // Ensure usage record exists
     await ensureUsageRecord(tx, userId);
 
@@ -227,7 +225,7 @@ export async function createWorkspaceWithQuota(
 
     if (usage && usage.workspaces >= maxWorkspaces) {
       throw new ConflictError(
-        "Maximum workspace limit reached. Upgrade your plan.",
+        'Maximum workspace limit reached. Upgrade your plan.',
       );
     }
 

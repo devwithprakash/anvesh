@@ -1,9 +1,10 @@
 ﻿'use client';
 
-import { authClient } from '@/lib/auth-client';
+import { motion, Variants } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { useEffect, type ReactNode } from 'react';
-import { motion, Variants } from 'framer-motion';
+
+import { authClient } from '@/lib/auth-client';
 
 const itemVariants: Variants = {
   hidden: {
@@ -39,13 +40,13 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
     return null;
   }
   return (
-    <div className="min-h-screen bg-[#FFFBF0] flex flex-col">
+    <div className="flex min-h-screen flex-col bg-[#FFFBF0]">
       <header className="w-full border-b-[3px] border-black bg-[#FFFBF0]">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center">
+        <div className="mx-auto flex h-16 max-w-7xl items-center px-6">
           <motion.a
             variants={itemVariants}
             href="/"
-            className="flex items-center shrink-0"
+            className="flex shrink-0 items-center"
           >
             <svg
               className="anvesh-logo"
@@ -111,14 +112,14 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
                 </g>
               </g>
             </svg>
-            <span className="font-black text-lg text-black tracking-tight">
+            <span className="text-lg font-black tracking-tight text-black">
               Anvesh
             </span>
           </motion.a>
         </div>
       </header>
 
-      <main className="flex-1 flex items-center justify-center px-4 py-12">
+      <main className="flex flex-1 items-center justify-center px-4 py-12">
         {children}
       </main>
 

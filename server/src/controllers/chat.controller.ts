@@ -1,18 +1,19 @@
-import type { Request, Response } from "express";
-import { workspaceIdParamSchema } from "../validators/workspace.validator.js";
-import {
-  chatBodySchema,
-  conversationIdParamSchema,
-  createConversationSchema,
-} from "../validators/chat.validator.js";
 import {
   createConversationForWorkspace,
   deleteConversationForWorkspace,
   getConversationMessagesForWorkspace,
   listConversationsForWorkspace,
   streamWorkspaceChat,
-} from "../services/chat.service.js";
-import type { UIMessage } from "ai";
+} from '../services/chat.service.js';
+import {
+  chatBodySchema,
+  conversationIdParamSchema,
+  createConversationSchema,
+} from '../validators/chat.validator.js';
+import { workspaceIdParamSchema } from '../validators/workspace.validator.js';
+
+import type { UIMessage } from 'ai';
+import type { Request, Response } from 'express';
 
 export async function createConversation(req: Request, res: Response) {
   const { workspaceId } = workspaceIdParamSchema.parse(req.params);
@@ -44,7 +45,6 @@ export async function listConversationMessages(req: Request, res: Response) {
     req.params,
   );
 
-
   const messages = await getConversationMessagesForWorkspace(
     workspaceId,
     conversationId,
@@ -72,7 +72,6 @@ export async function streamChat(req: Request, res: Response) {
   const { workspaceId } = workspaceIdParamSchema.parse(req.params);
 
   const body = chatBodySchema.parse(req.body);
-
 
   await streamWorkspaceChat(res, workspaceId, req.session.user.id, {
     messages: body.messages as unknown as UIMessage[],

@@ -1,4 +1,5 @@
-import { api } from "@/lib/api/client";
+import { api } from '@/lib/api/client';
+
 import {
   CreateConversationOutputSchema,
   CreateConversationVariables,
@@ -6,7 +7,7 @@ import {
   GetConversationOutputSchema,
   GetMessageInputSchema,
   GetMessageOutputSchema,
-} from "./types";
+} from './types';
 
 export async function createConversation({
   workspaceId,
@@ -15,7 +16,7 @@ export async function createConversation({
   return api<CreateConversationOutputSchema>(
     `/workspaces/${workspaceId}/conversation`,
     {
-      method: "POST",
+      method: 'POST',
       data,
     },
   );
@@ -32,11 +33,15 @@ export async function deleteConversation({
   conversationId,
 }: DeleteConversation) {
   return api(`/workspaces/${workspaceId}/conversation/${conversationId}`, {
-    method: "DELETE",
+    method: 'DELETE',
   });
 }
 
-
-export async function getMessages({workspaceId, conversationId}: GetMessageInputSchema) {
-    return api<GetMessageOutputSchema[]>(`/workspaces/${workspaceId}/conversation/${conversationId}/messages`)
+export async function getMessages({
+  workspaceId,
+  conversationId,
+}: GetMessageInputSchema) {
+  return api<GetMessageOutputSchema[]>(
+    `/workspaces/${workspaceId}/conversation/${conversationId}/messages`,
+  );
 }

@@ -1,6 +1,7 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createCheckout, cancelSubscription } from "./api";
-import { subscriptionKeys } from "./queries";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+
+import { createCheckout, cancelSubscription } from './api';
+import { subscriptionKeys } from './queries';
 
 export function useCreateCheckout() {
   const queryClient = useQueryClient();

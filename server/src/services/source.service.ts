@@ -1,27 +1,28 @@
-import { uploadFileToCloudinary } from "../lib/cloudinary.js";
-import { scrapeWebsite } from "../lib/external/firecrawl.js";
-import { enqueueSourceProcessing } from "../lib/events/source-events.js";
-import { fetchYoutubeTranscript } from "../lib/youtube.js";
+import { getWorkspaceByIdForUser } from './workspace.service.js';
+import { uploadFileToCloudinary } from '../lib/cloudinary.js';
+import { enqueueSourceProcessing } from '../lib/events/source-events.js';
+import { scrapeWebsite } from '../lib/external/firecrawl.js';
+import { fetchYoutubeTranscript } from '../lib/youtube.js';
 import {
   createSourceRecord,
   deleteSourceRecord,
   findSourceByIdAndWorkspaceId,
   findSourcesByWorkspaceId,
   type SourceRecord,
-} from "../repositories/source.repository.js";
-import { NotFoundError } from "../types/app-error.js";
+} from '../repositories/source.repository.js';
+import {
+  getFreePlan,
+  getPlanById,
+  getSubscriptionByUserId,
+} from '../repositories/workspace.repository.js';
+import { NotFoundError } from '../types/app-error.js';
+
 import type {
   CreateSourceInput,
   ImportWebsiteInput,
   ImportYoutubeInput,
   ListSourcesQuery,
-} from "../validators/source.validator.js";
-import { getWorkspaceByIdForUser } from "./workspace.service.js";
-import {
-  getFreePlan,
-  getPlanById,
-  getSubscriptionByUserId,
-} from "../repositories/workspace.repository.js";
+} from '../validators/source.validator.js';
 
 async function assertWorkspaceAccess(workspaceId: string, userId: string) {
   await getWorkspaceByIdForUser(workspaceId, userId);
@@ -38,7 +39,7 @@ async function createAndProcessSource(
     : await getFreePlan();
 
   if (!plan) {
-    throw new Error("Plan not found");
+    throw new Error('Plan not found');
   }
 
   const source = await createSourceRecord(data, plan.maxSourcesPerWorkspace);
@@ -70,7 +71,7 @@ export async function getSourceForWorkspace(
   const source = await findSourceByIdAndWorkspaceId(sourceId, workspaceId);
 
   if (!source) {
-    throw new NotFoundError("Source not found");
+    throw new NotFoundError('Source not found');
   }
 
   return source;
@@ -110,7 +111,7 @@ export async function createTextOrMarkdownSource(
       type: input.type,
       title: input.title,
       content: input.content,
-      status: "PENDING",
+      status: 'PENDING',
     },
     userId,
   );
@@ -128,14 +129,14 @@ export async function uploadFileSource(
 
   const extension = file.originalname
     .toLowerCase()
-    .slice(file.originalname.lastIndexOf("."));
+    .slice(file.originalname.lastIndexOf('.'));
 
   const sourceType =
-    extension === ".pdf" ? "PDF" : extension === ".md" ? "MARKDOWN" : "TEXT";
+    extension === '.pdf' ? 'PDF' : extension === '.md' ? 'MARKDOWN' : 'TEXT';
 
   const originalNameWithoutExtension = file.originalname.replace(
     /\.[^/.]+$/,
-    "",
+    '',
   );
 
   return createAndProcessSource(
@@ -144,7 +145,7 @@ export async function uploadFileSource(
       type: sourceType,
       title: title?.trim() || originalNameWithoutExtension,
       content: null,
-      status: "PENDING",
+      status: 'PENDING',
       metadata: {
         fileUrl: upload.secureUrl,
         fileName: upload.originalFileName,
@@ -155,7 +156,7 @@ export async function uploadFileSource(
     },
     userId,
   );
-} 
+}
 
 export async function importWebsiteSource(
   workspaceId: string,
@@ -169,11 +170,11 @@ export async function importWebsiteSource(
   return createAndProcessSource(
     {
       workspaceId,
-      type: "WEBSITE",
+      type: 'WEBSITE',
       title: input.title || scraped.title || input.url,
       content: scraped.markdown,
       url: scraped.sourceUrl,
-      status: "PENDING",
+      status: 'PENDING',
       metadata: {
         importedFrom: scraped.sourceUrl,
       },
@@ -194,11 +195,11 @@ export async function importYoutubeSource(
   return createAndProcessSource(
     {
       workspaceId,
-      type: "YOUTUBE",
+      type: 'YOUTUBE',
       title: input.title || `YouTube: ${transcript.videoId}`,
       content: transcript.content,
       url: input.url,
-      status: "PENDING",
+      status: 'PENDING',
       metadata: {
         videoId: transcript.videoId,
       },

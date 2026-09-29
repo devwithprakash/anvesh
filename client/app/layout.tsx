@@ -1,68 +1,78 @@
-import type { Metadata } from "next";
+import { Analytics } from '@vercel/analytics/next';
 import {
   Geist,
   Geist_Mono,
   IBM_Plex_Sans,
   Source_Sans_3,
-} from "next/font/google";
-import "./globals.css";
-import { cn } from "@/lib/utils";
-import { QueryProvider } from "@/components/providers/query-provider";
-import Script from "next/script";
-import { Analytics } from "@vercel/analytics/next";
+} from 'next/font/google';
+import Script from 'next/script';
+
+import { QueryProvider } from '@/components/providers/query-provider';
+import { cn } from '@/lib/utils';
+
+import type { Metadata } from 'next';
+
+import './globals.css';
 
 const sourceSans3Heading = Source_Sans_3({
-  subsets: ["latin"],
-  variable: "--font-heading",
+  subsets: ['latin'],
+  variable: '--font-heading',
 });
 
 const ibmPlexSans = IBM_Plex_Sans({
-  subsets: ["latin"],
-  variable: "--font-sans",
+  subsets: ['latin'],
+  variable: '--font-sans',
 });
 
 const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
+  variable: '--font-geist-sans',
+  subsets: ['latin'],
 });
 
 const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  variable: '--font-geist-mono',
+  subsets: ['latin'],
 });
 
 export const metadata: Metadata = {
   title: {
-    default: "Anvesh",
-    template: "%s | Anvesh",
+    default: 'Anvesh',
+    template: '%s | Anvesh',
   },
   description:
-    "Anvesh is your AI-powered research assistant. Upload documents, import websites, and chat with your sources using the power of AI.",
-  keywords: ["AI", "research", "documents", "NotebookLM", "Anvesh", "workspace"],
+    'Anvesh is your AI-powered research assistant. Upload documents, import websites, and chat with your sources using the power of AI.',
+  keywords: [
+    'AI',
+    'research',
+    'documents',
+    'NotebookLM',
+    'Anvesh',
+    'workspace',
+  ],
   openGraph: {
-    title: "Anvesh – AI-Powered Research Assistant",
+    title: 'Anvesh – AI-Powered Research Assistant',
     description:
-      "Upload documents, import websites, and chat with your sources using the power of AI.",
-    type: "website",
+      'Upload documents, import websites, and chat with your sources using the power of AI.',
+    type: 'website',
   },
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({ children }: LayoutProps<'/'>) {
   return (
     <html
       lang="en"
       className={cn(
-        "h-full",
-        "antialiased",
+        'h-full',
+        'antialiased',
         geistSans.variable,
         geistMono.variable,
-        "font-sans",
+        'font-sans',
         ibmPlexSans.variable,
         sourceSans3Heading.variable,
       )}
     >
       <QueryProvider>
-        <body className="min-h-full flex flex-col">
+        <body className="flex min-h-full flex-col">
           <Script
             src="https://checkout.razorpay.com/v1/checkout.js"
             strategy="lazyOnload"

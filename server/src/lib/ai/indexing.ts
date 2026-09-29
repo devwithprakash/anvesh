@@ -1,5 +1,6 @@
-import { OpenAI } from "openai";
-import { EMBEDDING_DIMENSIONS, EMBEDDING_MODEL } from "./ai-config.js";
+import { OpenAI } from 'openai';
+
+import { EMBEDDING_DIMENSIONS, EMBEDDING_MODEL } from './ai-config.js';
 
 let client: OpenAI | null = null;
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
@@ -10,7 +11,7 @@ export async function embedTexts(texts: string[]): Promise<number[][]> {
   }
 
   if (!OPENAI_API_KEY) {
-    throw new Error("OPENAI_API_KEY is not configured");
+    throw new Error('OPENAI_API_KEY is not configured');
   }
 
   if (!client) {
@@ -25,5 +26,5 @@ export async function embedTexts(texts: string[]): Promise<number[][]> {
 
   return response.data
     .sort((a, b) => a.index - b.index)
-    .map((item) => item.embedding);
+    .map(item => item.embedding);
 }

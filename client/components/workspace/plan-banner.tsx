@@ -1,8 +1,9 @@
 'use client';
 
 import { Zap, Crown, Star, ArrowRight, Loader } from 'lucide-react';
-import { useSubscriptionStatus } from '@/features/subscription/queries';
+
 import { useCreateCheckout } from '@/features/subscription/mutations';
+import { useSubscriptionStatus } from '@/features/subscription/queries';
 import type { CheckoutResponse } from '@/features/subscription/types';
 
 const PLAN_BADGES: Record<
@@ -51,7 +52,7 @@ function UsageBar({
           {used} / {max}
         </span>
       </div>
-      <div className="h-1.5 w-full rounded-full bg-gray-200 border border-black/10 overflow-hidden">
+      <div className="h-1.5 w-full overflow-hidden rounded-full border border-black/10 bg-gray-200">
         <div
           className="h-full rounded-full transition-all duration-500"
           style={{
@@ -109,10 +110,10 @@ export function PlanBanner() {
   };
 
   return (
-    <div className="rounded-xl border-[2.5px] border-black bg-white p-4 shadow-[4px_4px_0px_#000] mb-6">
-      <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+    <div className="mb-6 rounded-xl border-[2.5px] border-black bg-white p-4 shadow-[4px_4px_0px_#000]">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
         {/* Plan badge + info */}
-        <div className="flex items-center gap-3 min-w-0 flex-1">
+        <div className="flex min-w-0 flex-1 items-center gap-3">
           <span
             className={`inline-flex items-center gap-1.5 rounded-lg border-[2px] ${badge.border} ${badge.bg} ${badge.text} px-2.5 py-1 text-[11px] font-black shadow-[2px_2px_0px_#000]`}
           >
@@ -121,7 +122,7 @@ export function PlanBanner() {
           </span>
 
           {usage && (
-            <div className="flex-1 grid grid-cols-2 gap-3 max-w-sm">
+            <div className="grid max-w-sm flex-1 grid-cols-2 gap-3">
               <UsageBar
                 label="Workspaces"
                 used={usage.workspaces}
@@ -143,7 +144,7 @@ export function PlanBanner() {
           <button
             onClick={() => handleUpgrade('PRO')}
             disabled={checkout.isPending}
-            className="flex items-center gap-2 shrink-0 rounded-lg border-[2px] border-black bg-[#6C47FF] px-3 py-1.5 text-xs font-black text-white shadow-[2px_2px_0px_#000] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50"
+            className="flex shrink-0 items-center gap-2 rounded-lg border-[2px] border-black bg-[#6C47FF] px-3 py-1.5 text-xs font-black text-white shadow-[2px_2px_0px_#000] transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none disabled:opacity-50"
           >
             {checkout.isPending ? (
               <Loader size={12} className="animate-spin" />
@@ -159,7 +160,7 @@ export function PlanBanner() {
           <button
             onClick={() => handleUpgrade('PREMIUM')}
             disabled={checkout.isPending}
-            className="flex items-center gap-2 shrink-0 rounded-lg border-[2px] border-black bg-gradient-to-r from-[#6C47FF] to-[#FF6B6B] px-3 py-1.5 text-xs font-black text-white shadow-[2px_2px_0px_#000] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50"
+            className="flex shrink-0 items-center gap-2 rounded-lg border-[2px] border-black bg-gradient-to-r from-[#6C47FF] to-[#FF6B6B] px-3 py-1.5 text-xs font-black text-white shadow-[2px_2px_0px_#000] transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none disabled:opacity-50"
           >
             {checkout.isPending ? (
               <Loader size={12} className="animate-spin" />

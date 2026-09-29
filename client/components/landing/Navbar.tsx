@@ -1,9 +1,11 @@
-"use client";
+'use client';
 
-import { Easing, motion } from "framer-motion";
-import { ArrowRight } from "lucide-react";
-import { authClient } from "../../lib/auth-client";
-import { signOut } from "@/features/auth/auth";
+import { Easing, motion } from 'framer-motion';
+import { ArrowRight } from 'lucide-react';
+
+import { signOut } from '@/features/auth/auth';
+
+import { authClient } from '../../lib/auth-client';
 
 const containerVariants = {
   hidden: {},
@@ -15,7 +17,7 @@ const itemVariants = {
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.4, ease: "easeOut" as Easing },
+    transition: { duration: 0.4, ease: 'easeOut' as Easing },
   },
 };
 
@@ -32,14 +34,14 @@ export default function Navbar() {
   };
 
   const navLinks = [
-    { label: "Features", href: "/#features" },
-    { label: "How it works", href: "/#how-it-works" },
-    { label: "Pricing", href: "/pricing" },
-    { label: "Faq", href: "/#faq" },
+    { label: 'Features', href: '/#features' },
+    { label: 'How it works', href: '/#how-it-works' },
+    { label: 'Pricing', href: '/pricing' },
+    { label: 'Faq', href: '/#faq' },
   ];
 
   const links = user
-    ? [...navLinks, { label: "Dashboard", href: "/dashboard" }]
+    ? [...navLinks, { label: 'Dashboard', href: '/dashboard' }]
     : navLinks;
 
   return (
@@ -47,14 +49,14 @@ export default function Navbar() {
       initial="hidden"
       animate="visible"
       variants={containerVariants}
-      className="sticky top-0 z-50 w-full bg-[#FFFBF0] border-b-[3px] border-black"
+      className="sticky top-0 z-50 w-full border-b-[3px] border-black bg-[#FFFBF0]"
     >
-      <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between gap-8">
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-8 px-6">
         {/* Logo */}
         <motion.a
           variants={itemVariants}
           href="/"
-          className="flex items-center shrink-0"
+          className="flex shrink-0 items-center"
         >
           <svg
             className="anvesh-logo"
@@ -120,7 +122,7 @@ export default function Navbar() {
               </g>
             </g>
           </svg>
-          <span className="font-black text-lg text-black tracking-tight">
+          <span className="text-lg font-black tracking-tight text-black">
             Anvesh
           </span>
         </motion.a>
@@ -132,13 +134,13 @@ export default function Navbar() {
             variants={containerVariants}
             initial="hidden"
             animate="visible"
-            className="hidden lg:flex items-center gap-1"
+            className="hidden items-center gap-1 lg:flex"
           >
-            {links.map((link) => (
+            {links.map(link => (
               <motion.li key={link.label} variants={itemVariants}>
                 <a
                   href={link.href}
-                  className="px-3 py-1.5 text-sm font-bold text-black rounded-lg hover:bg-black hover:text-[#FFFBF0] transition-colors"
+                  className="rounded-lg px-3 py-1.5 text-sm font-bold text-black transition-colors hover:bg-black hover:text-[#FFFBF0]"
                 >
                   {link.label}
                 </a>
@@ -150,19 +152,19 @@ export default function Navbar() {
         {/* CTA Buttons */}
         <motion.div
           variants={itemVariants}
-          className="flex items-center gap-3 shrink-0"
+          className="flex shrink-0 items-center gap-3"
         >
           {user ? (
             <button
               onClick={handleLogOut}
-              className="hidden sm:inline-flex items-center px-4 py-2 rounded-xl border-2 border-black bg-white text-black text-sm font-black shadow-[3px_3px_0px_#000] hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px] transition-all"
+              className="hidden items-center rounded-xl border-2 border-black bg-white px-4 py-2 text-sm font-black text-black shadow-[3px_3px_0px_#000] transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none sm:inline-flex"
             >
               Log Out
             </button>
           ) : (
             <a
               href="/signin"
-              className="hidden sm:inline-flex items-center px-4 py-2 rounded-xl border-2 border-black bg-white text-black text-sm font-black shadow-[3px_3px_0px_#000] hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px] transition-all"
+              className="hidden items-center rounded-xl border-2 border-black bg-white px-4 py-2 text-sm font-black text-black shadow-[3px_3px_0px_#000] transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none sm:inline-flex"
             >
               Log in
             </a>
@@ -170,7 +172,7 @@ export default function Navbar() {
 
           <a
             href="/signup"
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border-2 border-black bg-[#6C47FF] text-white text-sm font-black shadow-[3px_3px_0px_#000] hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px] transition-all"
+            className="inline-flex items-center gap-2 rounded-xl border-2 border-black bg-[#6C47FF] px-4 py-2 text-sm font-black text-white shadow-[3px_3px_0px_#000] transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none"
           >
             Start for free
             <ArrowRight size={15} />

@@ -1,5 +1,6 @@
-import type { Prisma } from "../generated/prisma/client.js";
-import prisma from "../lib/db.js";
+import prisma from '../lib/db.js';
+
+import type { Prisma } from '../generated/prisma/client.js';
 
 export const conversationSelect = {
   id: true,
@@ -20,7 +21,7 @@ export function findConversationsByWorkspaceId(workspaceId: string) {
   return prisma.conversation.findMany({
     where: { workspaceId },
     select: conversationSelect,
-    orderBy: { updatedAt: "desc" },
+    orderBy: { updatedAt: 'desc' },
   });
 }
 
@@ -45,7 +46,7 @@ export function createConversationRecord(workspaceId: string, title?: string) {
   return prisma.conversation.create({
     data: {
       workspaceId,
-      title: title ?? "New Chat",
+      title: title ?? 'New Chat',
     },
     select: conversationSelect,
   });

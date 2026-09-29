@@ -1,10 +1,7 @@
 'use client';
 
-import * as React from 'react';
-import { UIMessage, DefaultChatTransport } from 'ai';
 import { useChat } from '@ai-sdk/react';
-import { useState, useRef, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { UIMessage, DefaultChatTransport } from 'ai';
 import {
   Send,
   Sparkles,
@@ -13,11 +10,15 @@ import {
   MessageSquare,
   BookOpen,
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { useRouter } from 'next/navigation';
+import { useState, useRef, useEffect } from 'react';
+import * as React from 'react';
+
 import { useAppState } from '@/components/providers/app-provider';
 import { useMessages } from '@/features/conversation/queries';
 import { useSources } from '@/features/source/queries';
 import { useSubscriptionStatus } from '@/features/subscription/queries';
+import { cn } from '@/lib/utils';
 
 function FormattedText({ text }: { text: string }) {
   const lines = text.split('\n');
@@ -34,14 +35,14 @@ function FormattedText({ text }: { text: string }) {
         if (line.startsWith('- '))
           return (
             <div key={i} className="flex gap-2 text-sm">
-              <span className="text-gray-400 mt-0.5 shrink-0">•</span>
+              <span className="mt-0.5 shrink-0 text-gray-400">•</span>
               <span>{formatInline(line.slice(2))}</span>
             </div>
           );
         if (/^\d+\.\s/.test(line))
           return (
             <div key={i} className="flex gap-2 text-sm">
-              <span className="text-gray-400 shrink-0">
+              <span className="shrink-0 text-gray-400">
                 {line.match(/^\d+/)?.[0]}.
               </span>
               <span>{formatInline(line.replace(/^\d+\.\s/, ''))}</span>
@@ -80,8 +81,8 @@ function formatInline(text: string): React.ReactNode {
 function UserMessage({ content }: { content: string }) {
   return (
     <div className="flex justify-end">
-      <div className="flex items-end gap-2 max-w-[75%]">
-        <div className="rounded-xl rounded-tr-sm border-[2px] border-black bg-[#6C47FF] px-3 py-2 shadow-[2px_2px_0px_#000] text-sm font-semibold text-white leading-relaxed">
+      <div className="flex max-w-[75%] items-end gap-2">
+        <div className="rounded-xl rounded-tr-sm border-[2px] border-black bg-[#6C47FF] px-3 py-2 text-sm leading-relaxed font-semibold text-white shadow-[2px_2px_0px_#000]">
           {content}
         </div>
         <div className="flex size-7 shrink-0 items-center justify-center rounded-full border-[2px] border-black bg-[#EDE9FE] text-[9px] font-black text-[#6C47FF]">
@@ -96,8 +97,8 @@ function UserMessage({ content }: { content: string }) {
 
 function getTextContent(message: UIMessage): string {
   return message.parts
-    .filter((part) => part.type === 'text')
-    .map((part) => part.text)
+    .filter(part => part.type === 'text')
+    .map(part => part.text)
     .join('');
 }
 
@@ -108,7 +109,7 @@ interface RawMessage {
 }
 
 function toUIMessages(raw: RawMessage[] = []): UIMessage[] {
-  return raw.map((m) => ({
+  return raw.map(m => ({
     id: m.id,
     role: m.role.toLowerCase() as 'user' | 'assistant',
     parts: [{ type: 'text', text: m.content }],
@@ -126,7 +127,7 @@ function AIMessage({ message }: { message: UIMessage }) {
       </div>
 
       {/* Bubble */}
-      <div className="flex-1 min-w-0 max-w-[85%]">
+      <div className="max-w-[85%] min-w-0 flex-1">
         <div className="rounded-xl rounded-tl-sm border-[2px] border-black bg-white px-3 py-2.5 shadow-[2px_2px_0px_#000]">
           <FormattedText text={text} />
         </div>
@@ -141,21 +142,21 @@ function StreamingBubble({ text }: { text: string }) {
   return (
     <div className="flex items-start gap-2">
       <div className="flex size-7 shrink-0 items-center justify-center rounded-full border-[2px] border-black bg-[#EDE9FE] shadow-[1px_1px_0px_#000]">
-        <Sparkles size={12} className="text-[#6C47FF] animate-pulse" />
+        <Sparkles size={12} className="animate-pulse text-[#6C47FF]" />
       </div>
-      <div className="rounded-xl rounded-tl-sm border-[2px] border-black bg-white px-3 py-2.5 shadow-[2px_2px_0px_#000] text-sm text-gray-700 leading-relaxed max-w-[85%]">
+      <div className="max-w-[85%] rounded-xl rounded-tl-sm border-[2px] border-black bg-white px-3 py-2.5 text-sm leading-relaxed text-gray-700 shadow-[2px_2px_0px_#000]">
         {text ? (
           <>
             <FormattedText text={text} />
-            <span className="inline-block w-0.5 h-3.5 ml-0.5 bg-[#6C47FF] animate-pulse align-text-bottom" />
+            <span className="ml-0.5 inline-block h-3.5 w-0.5 animate-pulse bg-[#6C47FF] align-text-bottom" />
           </>
         ) : (
-          <span className="flex items-center gap-1.5 text-gray-400 font-semibold text-xs">
+          <span className="flex items-center gap-1.5 text-xs font-semibold text-gray-400">
             <span className="flex gap-1">
-              {[0, 1, 2].map((i) => (
+              {[0, 1, 2].map(i => (
                 <span
                   key={i}
-                  className="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce"
+                  className="h-1.5 w-1.5 animate-bounce rounded-full bg-gray-400"
                   style={{ animationDelay: `${i * 0.15}s` }}
                 />
               ))}
@@ -179,25 +180,25 @@ function EmptyChat({ onSuggestion }: { onSuggestion: (q: string) => void }) {
   ];
 
   return (
-    <div className="flex flex-col items-center justify-center h-full gap-5 px-6 text-center">
+    <div className="flex h-full flex-col items-center justify-center gap-5 px-6 text-center">
       {/* Icon */}
       <div className="flex size-12 items-center justify-center rounded-2xl border-[3px] border-black bg-[#EDE9FE] shadow-[3px_3px_0px_#000]">
         <Sparkles size={22} className="text-[#6C47FF]" />
       </div>
       <div>
-        <h3 className="font-black text-lg text-black">Ask anything</h3>
-        <p className="text-xs font-semibold text-gray-500 mt-0.5">
+        <h3 className="text-lg font-black text-black">Ask anything</h3>
+        <p className="mt-0.5 text-xs font-semibold text-gray-500">
           Chat with your sources using AI
         </p>
       </div>
 
       {/* Suggestions */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full max-w-sm">
-        {suggestions.map((s) => (
+      <div className="grid w-full max-w-sm grid-cols-1 gap-2 sm:grid-cols-2">
+        {suggestions.map(s => (
           <button
             key={s}
             onClick={() => onSuggestion(s)}
-            className="rounded-lg border-[2px] border-black bg-white px-3 py-2.5 text-left text-xs font-bold text-black shadow-[2px_2px_0px_#000] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+            className="rounded-lg border-[2px] border-black bg-white px-3 py-2.5 text-left text-xs font-bold text-black shadow-[2px_2px_0px_#000] transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
           >
             {s}
           </button>
@@ -317,17 +318,17 @@ function ChatInner({
     : '';
 
   const convTitle = conversations[workspaceId]?.find(
-    (c) => c.id === conversationId,
+    c => c.id === conversationId,
   )?.title;
 
   return (
-    <div className="flex flex-1 flex-col min-h-0 min-w-0 bg-[#FFFBF0]">
-      <div className="flex items-center justify-between border-b-[2px] border-black px-3 sm:px-4 py-4 bg-[#FFFBF0] shrink-0 gap-2">
-        <div className="flex items-center gap-2 min-w-0">
+    <div className="flex min-h-0 min-w-0 flex-1 flex-col bg-[#FFFBF0]">
+      <div className="flex shrink-0 items-center justify-between gap-2 border-b-[2px] border-black bg-[#FFFBF0] px-3 py-4 sm:px-4">
+        <div className="flex min-w-0 items-center gap-2">
           {onOpenChats && (
             <button
               onClick={onOpenChats}
-              className="md:hidden flex size-7 shrink-0 items-center justify-center rounded-lg border-[2px] border-black bg-white shadow-[2px_2px_0px_#000] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+              className="flex size-7 shrink-0 items-center justify-center rounded-lg border-[2px] border-black bg-white shadow-[2px_2px_0px_#000] transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none md:hidden"
               aria-label="Open chats"
             >
               <MessageSquare size={13} />
@@ -335,18 +336,18 @@ function ChatInner({
           )}
           <Sparkles
             size={13}
-            className="text-[#6C47FF] shrink-0 hidden sm:block"
+            className="hidden shrink-0 text-[#6C47FF] sm:block"
           />
-          <span className="font-black text-sm text-black truncate">
+          <span className="truncate text-sm font-black text-black">
             {convTitle ?? 'Conversation'}
           </span>
         </div>
 
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex shrink-0 items-center gap-2">
           {onOpenSources && (
             <button
               onClick={onOpenSources}
-              className="md:hidden flex size-7 shrink-0 items-center justify-center rounded-lg border-[2px] border-black bg-white shadow-[2px_2px_0px_#000] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+              className="flex size-7 shrink-0 items-center justify-center rounded-lg border-[2px] border-black bg-white shadow-[2px_2px_0px_#000] transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none md:hidden"
               aria-label="Open sources"
             >
               <BookOpen size={13} />
@@ -355,23 +356,23 @@ function ChatInner({
         </div>
       </div>
 
-      <div ref={scrollRef} className="flex-1 min-h-0 overflow-y-auto">
+      <div ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto">
         {staticMessages.length === 0 && !isStreaming ? (
           <EmptyChat
-            onSuggestion={(q) => {
+            onSuggestion={q => {
               setInput(q);
               textareaRef.current?.focus();
             }}
           />
         ) : (
-          <div className="flex flex-col gap-3.5 px-3 sm:px-5 py-5 max-w-3xl mx-auto w-full">
+          <div className="mx-auto flex w-full max-w-3xl flex-col gap-3.5 px-3 py-5 sm:px-5">
             {staticMessages.map((msg: UIMessage) =>
               msg.role === 'user' ? (
                 <UserMessage
                   key={msg.id}
                   content={msg.parts
-                    .filter((part) => part.type === 'text')
-                    .map((part) => part.text)
+                    .filter(part => part.type === 'text')
+                    .map(part => part.text)
                     .join('')}
                 />
               ) : (
@@ -380,7 +381,7 @@ function ChatInner({
             )}
             {isStreaming && <StreamingBubble text={streamingText} />}
             {error && (
-              <div className="text-xs font-semibold text-red-500 text-center py-2">
+              <div className="py-2 text-center text-xs font-semibold text-red-500">
                 Error:{' '}
                 {error.message ?? 'Something went wrong. Please try again.'}
               </div>
@@ -390,21 +391,21 @@ function ChatInner({
         )}
       </div>
 
-      <div className="shrink-0 border-t-[2px] border-black bg-[#FFFBF0] px-3 sm:px-4 py-3">
-        {sources?.filter((s) => s.status === 'READY').length === 0 && (
+      <div className="shrink-0 border-t-[2px] border-black bg-[#FFFBF0] px-3 py-3 sm:px-4">
+        {sources?.filter(s => s.status === 'READY').length === 0 && (
           <div className="mb-2.5 flex items-center gap-2 rounded-lg border-[2px] border-amber-500 bg-amber-50 px-3 py-1.5 text-xs font-bold text-amber-700">
             ⚠️ No ready sources — add sources for grounded answers.
           </div>
         )}
 
-        <div className="max-w-3xl mx-auto">
+        <div className="mx-auto max-w-3xl">
           <form
             onSubmit={handleSubmit}
-            className="flex items-end gap-2 rounded-xl border-[2.5px] border-black bg-white px-3 py-2 shadow-[3px_3px_0px_#000] focus-within:shadow-none focus-within:translate-x-[3px] focus-within:translate-y-[3px] transition-all"
+            className="flex items-end gap-2 rounded-xl border-[2.5px] border-black bg-white px-3 py-2 shadow-[3px_3px_0px_#000] transition-all focus-within:translate-x-[3px] focus-within:translate-y-[3px] focus-within:shadow-none"
           >
             <button
               type="button"
-              onClick={() => webSearchAllowed && setWebSearch((v) => !v)}
+              onClick={() => webSearchAllowed && setWebSearch(v => !v)}
               disabled={!webSearchAllowed}
               title={
                 !webSearchAllowed
@@ -414,9 +415,9 @@ function ChatInner({
                     : 'Enable web search'
               }
               className={cn(
-                'flex items-center gap-1.5 px-2.5 py-1 rounded-lg border-[1.5px] border-black text-[11px] font-black transition-all shrink-0 mb-0.5 shadow-[1.5px_1.5px_0px_#000]',
+                'mb-0.5 flex shrink-0 items-center gap-1.5 rounded-lg border-[1.5px] border-black px-2.5 py-1 text-[11px] font-black shadow-[1.5px_1.5px_0px_#000] transition-all',
                 !webSearchAllowed
-                  ? 'text-gray-400 cursor-not-allowed bg-gray-100 border-gray-300 shadow-none'
+                  ? 'cursor-not-allowed border-gray-300 bg-gray-100 text-gray-400 shadow-none'
                   : webSearch
                     ? 'bg-[#6C47FF] text-white'
                     : 'bg-[#FFFBF0] text-black hover:bg-gray-100',
@@ -429,19 +430,19 @@ function ChatInner({
             <textarea
               ref={textareaRef}
               value={input}
-              onChange={(e) => setInput(e.target.value)}
+              onChange={e => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
               disabled={isStreaming}
               placeholder="Ask anything about your sources…"
               rows={1}
-              className="flex-1 resize-none bg-transparent text-sm font-semibold text-black placeholder:text-gray-400 outline-none min-h-0 max-h-32 py-0.5"
+              className="max-h-32 min-h-0 flex-1 resize-none bg-transparent py-0.5 text-sm font-semibold text-black outline-none placeholder:text-gray-400"
               style={{ fieldSizing: 'content' } as React.CSSProperties}
             />
             <button
               type={isStreaming ? 'button' : 'submit'}
               onClick={isStreaming ? stop : undefined}
               disabled={!isStreaming && !input.trim()}
-              className="flex size-7 shrink-0 items-center justify-center rounded-lg border-[2px] border-black bg-[#6C47FF] text-white shadow-[2px_2px_0px_#000] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-40 disabled:pointer-events-none"
+              className="flex size-7 shrink-0 items-center justify-center rounded-lg border-[2px] border-black bg-[#6C47FF] text-white shadow-[2px_2px_0px_#000] transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none disabled:pointer-events-none disabled:opacity-40"
             >
               {isStreaming ? <Square size={11} /> : <Send size={11} />}
             </button>
@@ -488,42 +489,42 @@ export function ChatInterface({
   // Only show the skeleton when the query is actually running (fetchStatus === "fetching").
   if (isPending && fetchStatus === 'fetching') {
     return (
-      <div className="flex flex-1 flex-col min-h-0 min-w-0 bg-[#FFFBF0]">
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col bg-[#FFFBF0]">
         {/* Top bar skeleton */}
-        <div className="flex items-center justify-between border-b-[2px] border-black px-4 py-2 bg-[#FFFBF0] shrink-0 gap-2">
-          <div className="h-4 w-36 rounded-lg bg-black/10 animate-pulse" />
-          <div className="h-6 w-20 rounded-full bg-black/10 animate-pulse" />
+        <div className="flex shrink-0 items-center justify-between gap-2 border-b-[2px] border-black bg-[#FFFBF0] px-4 py-2">
+          <div className="h-4 w-36 animate-pulse rounded-lg bg-black/10" />
+          <div className="h-6 w-20 animate-pulse rounded-full bg-black/10" />
         </div>
         {/* Messages skeleton */}
-        <div className="flex-1 min-h-0 overflow-y-auto px-5 py-6">
-          <div className="max-w-3xl mx-auto flex flex-col gap-5">
+        <div className="min-h-0 flex-1 overflow-y-auto px-5 py-6">
+          <div className="mx-auto flex max-w-3xl flex-col gap-5">
             <div className="flex justify-end">
-              <div className="h-10 w-52 rounded-2xl rounded-tr-sm bg-[#6C47FF]/15 animate-pulse" />
+              <div className="h-10 w-52 animate-pulse rounded-2xl rounded-tr-sm bg-[#6C47FF]/15" />
             </div>
-            <div className="flex gap-3 items-start">
-              <div className="w-7 h-7 rounded-full bg-black/10 animate-pulse shrink-0 mt-0.5" />
-              <div className="flex flex-col gap-2 flex-1">
-                <div className="h-3 w-full rounded bg-black/10 animate-pulse" />
-                <div className="h-3 w-4/5 rounded bg-black/10 animate-pulse" />
-                <div className="h-3 w-3/5 rounded bg-black/10 animate-pulse" />
+            <div className="flex items-start gap-3">
+              <div className="mt-0.5 h-7 w-7 shrink-0 animate-pulse rounded-full bg-black/10" />
+              <div className="flex flex-1 flex-col gap-2">
+                <div className="h-3 w-full animate-pulse rounded bg-black/10" />
+                <div className="h-3 w-4/5 animate-pulse rounded bg-black/10" />
+                <div className="h-3 w-3/5 animate-pulse rounded bg-black/10" />
               </div>
             </div>
             <div className="flex justify-end">
-              <div className="h-8 w-40 rounded-2xl rounded-tr-sm bg-[#6C47FF]/15 animate-pulse" />
+              <div className="h-8 w-40 animate-pulse rounded-2xl rounded-tr-sm bg-[#6C47FF]/15" />
             </div>
-            <div className="flex gap-3 items-start">
-              <div className="w-7 h-7 rounded-full bg-black/10 animate-pulse shrink-0 mt-0.5" />
-              <div className="flex flex-col gap-2 flex-1">
-                <div className="h-3 w-full rounded bg-black/10 animate-pulse" />
-                <div className="h-3 w-2/3 rounded bg-black/10 animate-pulse" />
+            <div className="flex items-start gap-3">
+              <div className="mt-0.5 h-7 w-7 shrink-0 animate-pulse rounded-full bg-black/10" />
+              <div className="flex flex-1 flex-col gap-2">
+                <div className="h-3 w-full animate-pulse rounded bg-black/10" />
+                <div className="h-3 w-2/3 animate-pulse rounded bg-black/10" />
               </div>
             </div>
           </div>
         </div>
         {/* Composer skeleton */}
         <div className="shrink-0 border-t-[2px] border-black bg-[#FFFBF0] px-4 py-3">
-          <div className="max-w-3xl mx-auto">
-            <div className="h-11 w-full rounded-xl border-[2.5px] border-black bg-white shadow-[3px_3px_0px_#000] animate-pulse" />
+          <div className="mx-auto max-w-3xl">
+            <div className="h-11 w-full animate-pulse rounded-xl border-[2.5px] border-black bg-white shadow-[3px_3px_0px_#000]" />
           </div>
         </div>
       </div>

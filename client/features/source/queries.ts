@@ -1,9 +1,10 @@
-import { useQuery } from "@tanstack/react-query";
-import { getSources } from "./api";
+import { useQuery } from '@tanstack/react-query';
+
+import { getSources } from './api';
 
 export function useSources(workspaceId: string) {
   return useQuery({
-    queryKey: ["sources", workspaceId],
+    queryKey: ['sources', workspaceId],
     queryFn: () => getSources(workspaceId),
     enabled: !!workspaceId,
   });

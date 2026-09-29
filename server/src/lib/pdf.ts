@@ -1,4 +1,5 @@
 import { extractText, getDocumentProxy } from 'unpdf';
+
 import { getSignedCloudinaryDownloadUrl } from './cloudinary.js';
 import { UnauthorizedError } from '../types/app-error.js';
 
@@ -33,7 +34,7 @@ export async function extractPdfFromBuffer(
   const { totalPages, text } = await extractText(pdf, { mergePages: false });
 
   const pages = Array.isArray(text)
-    ? text.map((page) => page.trim())
+    ? text.map(page => page.trim())
     : [String(text).trim()];
 
   const joined = pages.filter(Boolean).join('\n\n');

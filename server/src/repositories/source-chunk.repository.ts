@@ -1,5 +1,6 @@
-import type { Prisma } from "../generated/prisma/client.js";
-import prisma from "../lib/db.js";
+import prisma from '../lib/db.js';
+
+import type { Prisma } from '../generated/prisma/client.js';
 
 export const sourceChunkSelect = {
   id: true,
@@ -35,7 +36,7 @@ export function createSourceChunks(chunks: CreateSourceChunkData[]) {
   }
 
   return prisma.$transaction(
-    chunks.map((chunk) =>
+    chunks.map(chunk =>
       prisma.sourceChunk.create({
         data: {
           sourceId: chunk.sourceId,
@@ -56,6 +57,6 @@ export function findChunksBySourceId(sourceId: string) {
   return prisma.sourceChunk.findMany({
     where: { sourceId },
     select: sourceChunkSelect,
-    orderBy: { index: "asc" },
+    orderBy: { index: 'asc' },
   });
 }

@@ -1,14 +1,14 @@
-import type { Express } from "express";
-import workspaceRoutes from "./workspace.routes.js";
-import { sourceRoutes } from "./source.routes.js";
-import { chatRoutes, conversationRoutes } from "./chat.routes.js";
-import { subscriptionRoutes } from "./subscription.routes.js";
+import { chatRoutes, conversationRoutes } from './chat.routes.js';
+import { sourceRoutes } from './source.routes.js';
+import { subscriptionRoutes } from './subscription.routes.js';
+import workspaceRoutes from './workspace.routes.js';
+
+import type { Express } from 'express';
 
 export function registerRoutes(app: Express): void {
-  workspaceRoutes.use("/:workspaceId/sources", sourceRoutes);
-  workspaceRoutes.use("/:workspaceId/conversation", conversationRoutes);
-  workspaceRoutes.use("/:workspaceId/chat", chatRoutes);
-  app.use("/api/workspaces", workspaceRoutes);
-  app.use("/api/subscription", subscriptionRoutes);
+  workspaceRoutes.use('/:workspaceId/sources', sourceRoutes);
+  workspaceRoutes.use('/:workspaceId/conversation', conversationRoutes);
+  workspaceRoutes.use('/:workspaceId/chat', chatRoutes);
+  app.use('/api/workspaces', workspaceRoutes);
+  app.use('/api/subscription', subscriptionRoutes);
 }
-
