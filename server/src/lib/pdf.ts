@@ -1,5 +1,6 @@
-import { extractText, getDocumentProxy } from "unpdf";
-import { getSignedCloudinaryDownloadUrl } from "./cloudinary.js";
+import { extractText, getDocumentProxy } from 'unpdf';
+import { getSignedCloudinaryDownloadUrl } from './cloudinary.js';
+import { UnauthorizedError } from '../types/app-error.js';
 
 export type PdfExtractResult = {
   text: string;
@@ -35,10 +36,10 @@ export async function extractPdfFromBuffer(
     ? text.map((page) => page.trim())
     : [String(text).trim()];
 
-  const joined = pages.filter(Boolean).join("\n\n");
+  const joined = pages.filter(Boolean).join('\n\n');
 
   if (!joined) {
-    throw new Error("No text could be extracted from the PDF");
+    throw new Error('No text could be extracted from the PDF');
   }
 
   return {
@@ -51,14 +52,14 @@ export async function extractPdfFromBuffer(
 export async function extractPdfFromCloudinary(input: {
   fileUrl: string;
   publicId?: string;
-  resourceType?: "raw" | "image";
+  resourceType?: 'raw' | 'image';
 }): Promise<PdfExtractResult> {
   try {
     const buffer = await downloadPdf(input.fileUrl);
     return await extractPdfFromBuffer(buffer);
   } catch (error) {
     const isUnauthorized =
-      error instanceof Error && error.message.includes("(401)");
+      error instanceof Error && error.message.includes('(401)');
 
     if (!isUnauthorized || !input.publicId) {
       throw error;
@@ -66,13 +67,16 @@ export async function extractPdfFromCloudinary(input: {
 
     const signedUrl = getSignedCloudinaryDownloadUrl(
       input.publicId,
-      "pdf",
-      input.resourceType ?? "raw",
+      'pdf',
+      input.resourceType ?? 'raw',
     );
 
     if (!signedUrl) {
-      throw new Error(
-        "PDF download requires authentication. Add CLOUDINARY_API_KEY and CLOUDINARY_API_SECRET to server/.env, or re-upload the PDF.",
+      throw new UnauthorizedError(
+        'PDF download requires authentication. Add CLOUDINARY_API_KEY and CLOUDINARY_API_SECRET to server/.env, or re-upload the PDF.',
+        {
+          cause: error,
+        },
       );
     }
 

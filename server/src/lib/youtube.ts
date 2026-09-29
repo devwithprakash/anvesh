@@ -1,5 +1,5 @@
-import { YoutubeTranscript } from "youtube-transcript";
-import { ValidationError } from "../types/app-error.js";
+import { YoutubeTranscript } from 'youtube-transcript';
+import { ValidationError } from '../types/app-error.js';
 
 export async function fetchYoutubeTranscript(url: string) {
   const videoId =
@@ -8,24 +8,31 @@ export async function fetchYoutubeTranscript(url: string) {
     )?.[1] ?? url.match(/youtube\.com\/shorts\/([\w-]{11})/)?.[1];
 
   if (!videoId) {
-    throw new ValidationError("Enter a valid YouTube URL");
+    throw new ValidationError('Enter a valid YouTube URL');
   }
 
   try {
     const segments = await YoutubeTranscript.fetchTranscript(videoId);
+
     const content = segments
       .map((segment) => segment.text)
-      .join(" ")
+      .join(' ')
       .trim();
 
     if (!content) {
-      throw new ValidationError("No transcript found for this video");
+      throw new ValidationError('No transcript found for this video');
     }
 
     return { videoId, content };
   } catch (error) {
+    if (error instanceof ValidationError) {
+      throw error;
+    }
+
     throw new ValidationError(
-      "Could not fetch transcript. The video may not have captions.",
+      'Could not fetch transcript. The video may not have captions.',
+      undefined,
+      { cause: error },
     );
   }
 }

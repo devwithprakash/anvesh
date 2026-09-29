@@ -1,11 +1,11 @@
-import type { Prisma, SubscriptionStatus } from "../generated/prisma/client.js";
-import prisma from "../lib/db.js";
+import type { Prisma, SubscriptionStatus } from '../generated/prisma/client.js';
+import prisma from '../lib/db.js';
 
 // ── Subscription ─────────────────────────────────────────────────────────────
 
 export function findActiveSubscriptionByUserId(userId: string) {
   return prisma.subscription.findFirst({
-    where: { userId, status: "ACTIVE" },
+    where: { userId, status: 'ACTIVE' },
     include: { plan: true },
   });
 }
@@ -28,16 +28,10 @@ export function upsertSubscription(
     currentPeriodEnd: Date;
   },
 ) {
-  const where = data.razorpaySubscriptionId
-    ? { razorpaySubscriptionId: data.razorpaySubscriptionId }
-    : undefined;
-
-  // If we have a razorpay subscription id, try to find and update it
-  if (where) {
+  if (data.razorpaySubscriptionId) {
     return prisma.subscription.upsert({
       where: {
-        id: "nonexistent-placeholder",
-        ...({} as any),
+        razorpaySubscriptionId: data.razorpaySubscriptionId,
       },
       update: {
         status: data.status,
@@ -86,8 +80,8 @@ export async function createSubscriptionRecord(
 ) {
   // Cancel any existing active subscriptions first
   await prisma.subscription.updateMany({
-    where: { userId, status: "ACTIVE" },
-    data: { status: "CANCELED" },
+    where: { userId, status: 'ACTIVE' },
+    data: { status: 'CANCELED' },
   });
 
   return prisma.subscription.create({
@@ -129,7 +123,7 @@ export function updateSubscriptionPeriod(
 
 export function getPlans() {
   return prisma.plan.findMany({
-    orderBy: { price: "asc" },
+    orderBy: { price: 'asc' },
   });
 }
 
@@ -165,7 +159,7 @@ export function createWebhookEvent(
       eventType: event,
       payload,
       signature,
-      status: "RECEIVED",
+      status: 'RECEIVED',
     },
   });
 }
@@ -176,7 +170,7 @@ export function markWebhookEventProcessed(eventId: string) {
       eventId,
     },
     data: {
-      status: "PROCESSED",
+      status: 'PROCESSED',
       processdAt: new Date(),
     },
   });
@@ -187,7 +181,7 @@ export function markWebhookEventFailed(eventId: string, errorMessage: string) {
       eventId,
     },
     data: {
-      status: "FAILED",
+      status: 'FAILED',
       errorMessage: errorMessage,
     },
   });

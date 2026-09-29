@@ -1,6 +1,5 @@
 import { deleteWorkspaceVectors } from "../lib/pinecone.js";
 import {
-  createWorkspaceRecord,
   createWorkspaceWithQuota,
   deleteWorkspaceRecord,
   findWorkspaceByIdAndUserId,

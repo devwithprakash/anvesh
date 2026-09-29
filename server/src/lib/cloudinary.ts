@@ -1,5 +1,6 @@
-import { v2 as cloudinary } from "cloudinary";
-import { Readable } from "stream";
+import { v2 as cloudinary } from 'cloudinary';
+import type { UploadApiResponse } from 'cloudinary';
+import { Readable } from 'stream';
 
 const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
 const apiKey = process.env.CLOUDINARY_API_KEY;
@@ -16,13 +17,13 @@ export type CloudinaryUploadResult = {
   publicId: string;
   bytes: number;
   originalFileName: string;
-  resourceType: "raw" | "image";
+  resourceType: 'raw';
 };
 
 export function getSignedCloudinaryDownloadUrl(
   publicId: string,
   format: string,
-  resourceType: "raw" | "image" = "raw",
+  resourceType: 'raw' | 'image' = 'raw',
 ) {
   if (!cloudName || !apiKey || !apiSecret) {
     return null;
@@ -30,7 +31,7 @@ export function getSignedCloudinaryDownloadUrl(
 
   return cloudinary.utils.private_download_url(publicId, format, {
     resource_type: resourceType,
-    type: "private",
+    type: 'private',
     expires_at: Math.floor(Date.now() / 1000) + 60 * 5,
   });
 }
@@ -39,17 +40,22 @@ export async function uploadFileToCloudinary(
   buffer: Buffer,
   fileName: string,
 ): Promise<CloudinaryUploadResult> {
-  const result = await new Promise<any>((resolve, reject) => {
+  const result = await new Promise<UploadApiResponse>((resolve, reject) => {
     const uploadStream = cloudinary.uploader.upload_stream(
       {
-        resource_type: "raw",
-        folder: "notebook/files",
+        resource_type: 'raw',
+        folder: 'notebook/files',
         public_id: fileName,
-        type: "private",
+        type: 'private',
       },
       (error, result) => {
         if (error) {
           reject(error);
+          return;
+        }
+
+        if (!result) {
+          reject(new Error('Cloudinary upload returned no result'));
           return;
         }
 
@@ -65,6 +71,6 @@ export async function uploadFileToCloudinary(
     publicId: result.public_id,
     bytes: result.bytes,
     originalFileName: fileName,
-    resourceType: result.resource_type,
+    resourceType: 'raw',
   };
 }

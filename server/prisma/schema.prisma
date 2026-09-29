@@ -204,7 +204,7 @@ model Subscription {
   status SubscriptionStatus
 
   razorpayCustomerId     String?
-  razorpaySubscriptionId String?
+  razorpaySubscriptionId String? @unique
   currentPeriodStart     DateTime
   currentPeriodEnd       DateTime
   createdAt              DateTime @default(now())

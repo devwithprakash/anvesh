@@ -13,7 +13,6 @@ import {
 } from "ai";
 import {
   CHAT_MODEL,
-  CHAT_MODELS,
   CONVERSATION_SUMMARY_INTERVAL,
   RECENT_MESSAGE_WINDOW,
 } from "../lib/ai/ai-config.js";
