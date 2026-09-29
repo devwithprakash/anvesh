@@ -1,15 +1,9 @@
-"use client";
+'use client';
 
-import { Zap, Crown, Star, ArrowRight, Loader } from "lucide-react";
-import { useSubscriptionStatus } from "@/features/subscription/queries";
-import { useCreateCheckout } from "@/features/subscription/mutations";
-import type { CheckoutResponse } from "@/features/subscription/types";
-
-declare global {
-  interface Window {
-    Razorpay: any;
-  }
-}
+import { Zap, Crown, Star, ArrowRight, Loader } from 'lucide-react';
+import { useSubscriptionStatus } from '@/features/subscription/queries';
+import { useCreateCheckout } from '@/features/subscription/mutations';
+import type { CheckoutResponse } from '@/features/subscription/types';
 
 const PLAN_BADGES: Record<
   string,
@@ -17,21 +11,21 @@ const PLAN_BADGES: Record<
 > = {
   FREE: {
     icon: <Star size={12} />,
-    bg: "bg-[#FFE14D]",
-    text: "text-black",
-    border: "border-black",
+    bg: 'bg-[#FFE14D]',
+    text: 'text-black',
+    border: 'border-black',
   },
   PRO: {
     icon: <Zap size={12} />,
-    bg: "bg-[#6C47FF]",
-    text: "text-white",
-    border: "border-black",
+    bg: 'bg-[#6C47FF]',
+    text: 'text-white',
+    border: 'border-black',
   },
   PREMIUM: {
     icon: <Crown size={12} />,
-    bg: "bg-gradient-to-r from-[#6C47FF] to-[#FF6B6B]",
-    text: "text-white",
-    border: "border-black",
+    bg: 'bg-gradient-to-r from-[#6C47FF] to-[#FF6B6B]',
+    text: 'text-white',
+    border: 'border-black',
   },
 };
 
@@ -53,7 +47,7 @@ function UsageBar({
     <div className="flex flex-col gap-1">
       <div className="flex items-center justify-between text-[11px] font-bold">
         <span className="text-gray-600">{label}</span>
-        <span className={isNearLimit ? "text-[#FF6B6B]" : "text-gray-500"}>
+        <span className={isNearLimit ? 'text-[#FF6B6B]' : 'text-gray-500'}>
           {used} / {max}
         </span>
       </div>
@@ -62,7 +56,7 @@ function UsageBar({
           className="h-full rounded-full transition-all duration-500"
           style={{
             width: `${pct}%`,
-            backgroundColor: isNearLimit ? "#FF6B6B" : color,
+            backgroundColor: isNearLimit ? '#FF6B6B' : color,
           }}
         />
       </div>
@@ -72,13 +66,13 @@ function UsageBar({
 
 function openRazorpayModal(checkout: CheckoutResponse) {
   if (!window.Razorpay) {
-    alert("Payment SDK not loaded. Please refresh and try again.");
+    alert('Payment SDK not loaded. Please refresh and try again.');
     return;
   }
   const options = {
     key: checkout.keyId,
     subscription_id: checkout.subscriptionId,
-    name: "Anvesh",
+    name: 'Anvesh',
     description: `${checkout.planName} Plan Subscription`,
     handler: () => {
       // Payment successful — webhook will handle the rest
@@ -86,7 +80,7 @@ function openRazorpayModal(checkout: CheckoutResponse) {
       window.location.reload();
     },
     theme: {
-      color: "#6C47FF",
+      color: '#6C47FF',
     },
   };
 
@@ -102,15 +96,15 @@ export function PlanBanner() {
 
   const { plan, usage } = status;
   const badge = PLAN_BADGES[plan.name] ?? PLAN_BADGES.FREE;
-  const isFree = plan.name === "FREE";
+  const isFree = plan.name === 'FREE';
 
-  const handleUpgrade = async (planName: "PRO" | "PREMIUM") => {
+  const handleUpgrade = async (planName: 'PRO' | 'PREMIUM') => {
     try {
       const result = await checkout.mutateAsync(planName);
 
       openRazorpayModal(result);
     } catch (error) {
-      console.error("Checkout failed:", error);
+      console.error('Checkout failed:', error);
     }
   };
 
@@ -147,7 +141,7 @@ export function PlanBanner() {
         {/* Upgrade button */}
         {isFree && (
           <button
-            onClick={() => handleUpgrade("PRO")}
+            onClick={() => handleUpgrade('PRO')}
             disabled={checkout.isPending}
             className="flex items-center gap-2 shrink-0 rounded-lg border-[2px] border-black bg-[#6C47FF] px-3 py-1.5 text-xs font-black text-white shadow-[2px_2px_0px_#000] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50"
           >
@@ -161,9 +155,9 @@ export function PlanBanner() {
           </button>
         )}
 
-        {plan.name === "PRO" && (
+        {plan.name === 'PRO' && (
           <button
-            onClick={() => handleUpgrade("PREMIUM")}
+            onClick={() => handleUpgrade('PREMIUM')}
             disabled={checkout.isPending}
             className="flex items-center gap-2 shrink-0 rounded-lg border-[2px] border-black bg-gradient-to-r from-[#6C47FF] to-[#FF6B6B] px-3 py-1.5 text-xs font-black text-white shadow-[2px_2px_0px_#000] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50"
           >

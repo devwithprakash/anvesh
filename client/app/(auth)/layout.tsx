@@ -1,16 +1,22 @@
-﻿"use client";
+﻿'use client';
 
-import { authClient } from "@/lib/auth-client";
-import { useRouter } from "next/navigation";
-import { useEffect, type ReactNode } from "react";
-import { motion } from "framer-motion";
+import { authClient } from '@/lib/auth-client';
+import { useRouter } from 'next/navigation';
+import { useEffect, type ReactNode } from 'react';
+import { motion, Variants } from 'framer-motion';
 
-const itemVariants = {
-  hidden: { opacity: 0, y: -16 },
+const itemVariants: Variants = {
+  hidden: {
+    opacity: 0,
+    y: -16,
+  },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.4, ease: "easeOut" } as any,
+    transition: {
+      duration: 0.4,
+      ease: 'easeOut',
+    },
   },
 };
 
@@ -21,7 +27,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!isPending && session?.user) {
-      router.replace("/dashboard");
+      router.replace('/dashboard');
     }
   }, [session, isPending, router]);
 

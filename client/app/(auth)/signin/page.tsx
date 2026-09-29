@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { Easing, motion } from "framer-motion";
 import { Eye, EyeOff, ArrowRight, Mail, Lock, AlertCircle } from "lucide-react";
 import Link from "next/link";
 import { signIn } from "@/features/auth/auth";
@@ -12,7 +12,7 @@ const fadeUp = (delay = 0) => ({
   animate: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.5, ease: "easeOut", delay } as any,
+    transition: { duration: 0.5, ease: "easeOut" as Easing, delay },
   },
 });
 
@@ -20,7 +20,7 @@ const fadeIn = (delay = 0) => ({
   initial: { opacity: 0 },
   animate: {
     opacity: 1,
-    transition: { duration: 0.35, ease: "easeOut", delay } as any,
+    transition: { duration: 0.35, ease: "easeOut" as Easing, delay },
   },
 });
 

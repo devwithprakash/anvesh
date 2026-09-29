@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { Easing, motion } from "framer-motion";
 import {
   ArrowRight,
   Check,
@@ -15,7 +15,7 @@ const fadeUp = (delay = 0) => ({
   animate: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.55, ease: "easeOut", delay } as any,
+    transition: { duration: 0.55, ease: "easeOut" as Easing, delay },
   },
 });
 
@@ -25,7 +25,7 @@ const scaleIn = (delay = 0) => ({
     opacity: 1,
     scale: 1,
     y: 0,
-    transition: { duration: 0.6, ease: "easeOut", delay } as any,
+    transition: { duration: 0.6, ease: "easeOut" as Easing, delay },
   },
 });
 
@@ -34,7 +34,7 @@ const fadePop = (delay = 0) => ({
   animate: {
     opacity: 1,
     scale: 1,
-    transition: { duration: 0.4, ease: "backOut", delay } as any,
+    transition: { duration: 0.4, ease: "backOut" as Easing, delay },
   },
 });
 
@@ -80,10 +80,10 @@ function FlowDots({ delay = 0 }: { delay?: number }) {
           transition={
             {
               duration: 2.2,
-              ease: "easeInOut",
+              ease: "easeInOut" as Easing,
               delay: delay + i * 0.3,
               repeat: Infinity,
-            } as any
+            }
           }
           className="w-1.5 h-1.5 rounded-full bg-[#6C47FF]"
         />
@@ -138,9 +138,9 @@ function HeroVisual() {
           transition={
             {
               duration: 3,
-              ease: "easeInOut",
+              ease: "easeInOut" as Easing,
               repeat: Infinity,
-            } as any
+            }
           }
           className="absolute w-20 h-20 rounded-full bg-[#6C47FF]/20"
         />
@@ -152,10 +152,10 @@ function HeroVisual() {
           transition={
             {
               duration: 3,
-              ease: "easeInOut",
+              ease: "easeInOut" as Easing,
               delay: 0.5,
               repeat: Infinity,
-            } as any
+            }
           }
           className="absolute w-20 h-20 rounded-full bg-[#6C47FF]/15"
         />

@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import * as React from "react";
-import { UIMessage, DefaultChatTransport } from "ai";
-import { useChat } from "@ai-sdk/react";
-import { useState, useRef, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import * as React from 'react';
+import { UIMessage, DefaultChatTransport } from 'ai';
+import { useChat } from '@ai-sdk/react';
+import { useState, useRef, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   Send,
   Sparkles,
@@ -12,26 +12,26 @@ import {
   Square,
   MessageSquare,
   BookOpen,
-} from "lucide-react";
-import { cn } from "@/lib/utils";
-import { useAppState } from "@/components/providers/app-provider";
-import { useMessages } from "@/features/conversation/queries";
-import { useSources } from "@/features/source/queries";
-import { useSubscriptionStatus } from "@/features/subscription/queries";
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { useAppState } from '@/components/providers/app-provider';
+import { useMessages } from '@/features/conversation/queries';
+import { useSources } from '@/features/source/queries';
+import { useSubscriptionStatus } from '@/features/subscription/queries';
 
 function FormattedText({ text }: { text: string }) {
-  const lines = text.split("\n");
+  const lines = text.split('\n');
   return (
     <div className="flex flex-col gap-1">
       {lines.map((line, i) => {
-        if (line === "") return <div key={i} className="h-1" />;
-        if (line.startsWith("**") && line.endsWith("**") && line.length > 4)
+        if (line === '') return <div key={i} className="h-1" />;
+        if (line.startsWith('**') && line.endsWith('**') && line.length > 4)
           return (
             <p key={i} className="font-black text-black">
               {formatInline(line.slice(2, -2))}
             </p>
           );
-        if (line.startsWith("- "))
+        if (line.startsWith('- '))
           return (
             <div key={i} className="flex gap-2 text-sm">
               <span className="text-gray-400 mt-0.5 shrink-0">•</span>
@@ -44,7 +44,7 @@ function FormattedText({ text }: { text: string }) {
               <span className="text-gray-400 shrink-0">
                 {line.match(/^\d+/)?.[0]}.
               </span>
-              <span>{formatInline(line.replace(/^\d+\.\s/, ""))}</span>
+              <span>{formatInline(line.replace(/^\d+\.\s/, ''))}</span>
             </div>
           );
         return (
@@ -63,7 +63,7 @@ function formatInline(text: string): React.ReactNode {
   const parts = text.split(/(\*\*[^*]+\*\*)/g);
 
   return parts.map((part, i) => {
-    if (part.startsWith("**") && part.endsWith("**")) {
+    if (part.startsWith('**') && part.endsWith('**')) {
       return (
         <strong key={i} className="font-black">
           {part.slice(2, -2)}
@@ -96,16 +96,22 @@ function UserMessage({ content }: { content: string }) {
 
 function getTextContent(message: UIMessage): string {
   return message.parts
-    .filter((part) => part.type === "text")
+    .filter((part) => part.type === 'text')
     .map((part) => part.text)
-    .join("");
+    .join('');
 }
 
-function toUIMessages(raw: any[] = []): UIMessage[] {
+interface RawMessage {
+  id: string;
+  role: string;
+  content: string;
+}
+
+function toUIMessages(raw: RawMessage[] = []): UIMessage[] {
   return raw.map((m) => ({
     id: m.id,
-    role: m.role.toLowerCase() as "user" | "assistant",
-    parts: [{ type: "text", text: m.content }],
+    role: m.role.toLowerCase() as 'user' | 'assistant',
+    parts: [{ type: 'text', text: m.content }],
   }));
 }
 
@@ -166,10 +172,10 @@ function StreamingBubble({ text }: { text: string }) {
 
 function EmptyChat({ onSuggestion }: { onSuggestion: (q: string) => void }) {
   const suggestions = [
-    "Summarise all my sources",
-    "What are the key takeaways?",
-    "Compare and contrast the main ideas",
-    "What questions should I explore next?",
+    'Summarise all my sources',
+    'What are the key takeaways?',
+    'Compare and contrast the main ideas',
+    'What questions should I explore next?',
   ];
 
   return (
@@ -212,12 +218,13 @@ function ChatInner({
   onOpenChats,
   onOpenSources,
 }: ChatInnerProps) {
-  const [input, setInput] = useState("");
+  const [input, setInput] = useState('');
   const [webSearch, setWebSearch] = useState(false);
+  const [newConversationId, setNewConversationId] = useState<string | null>(
+    null,
+  );
 
   const router = useRouter();
-  // Prevent replacing the URL more than once per "new" chat session
-  const hasReplacedUrl = useRef(false);
 
   const { conversations } = useAppState();
   const { data: sources } = useSources(workspaceId);
@@ -228,48 +235,56 @@ function ChatInner({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const { messages, sendMessage, status, stop, error } = useChat({
-    id: conversationId ?? "new",
-    messages: initialMessages,
-    transport: new DefaultChatTransport({
-      api: `${API_BASE_URL}/workspaces/${workspaceId}/chat`,
-      credentials: "include",
-      body: {
-        conversationId,
-        webSearch,
-      },
-      // Custom fetch wrapper — intercept the Response to read the
-      // X-Conversation-Id header set by the backend, then replace
-      // the browser URL when we're on the /new route.
-      fetch: async (input, init) => {
-        const response = await fetch(input, init);
-        if (!conversationId && !hasReplacedUrl.current) {
-          const newConversationId = response.headers.get("X-Conversation-Id");
-          if (newConversationId) {
-            hasReplacedUrl.current = true;
-            router.replace(`/workspace/${workspaceId}/${newConversationId}`);
+  const transport = React.useMemo(
+    () =>
+      new DefaultChatTransport({
+        api: `${API_BASE_URL}/workspaces/${workspaceId}/chat`,
+        credentials: 'include',
+        body: {
+          conversationId,
+          webSearch,
+        },
+        fetch: async (input, init) => {
+          const response = await fetch(input, init);
+
+          if (!conversationId) {
+            const id = response.headers.get('X-Conversation-Id');
+
+            if (id) {
+              setNewConversationId(id);
+            }
           }
-        }
-        return response;
-      },
-    }),
+
+          return response;
+        },
+      }),
+    [workspaceId, conversationId, webSearch],
+  );
+
+  const { messages, sendMessage, status, stop, error } = useChat({
+    id: conversationId ?? 'new',
+    messages: initialMessages,
+    transport,
   });
+
+  useEffect(() => {
+    if (!conversationId && newConversationId) {
+      router.replace(`/workspace/${workspaceId}/${newConversationId}`);
+    }
+  }, [conversationId, newConversationId, workspaceId, router]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!input.trim() || status === "streaming" || status === "submitted") {
+    if (!input.trim() || status === 'streaming' || status === 'submitted') {
       return;
     }
 
-    sendMessage({
-      text: input,
-    });
-
-    setInput("");
+    sendMessage({ text: input });
+    setInput('');
   };
 
-  const isStreaming = status === "streaming" || status === "submitted";
+  const isStreaming = status === 'streaming' || status === 'submitted';
 
   useEffect(() => {
     textareaRef.current?.focus();
@@ -283,7 +298,7 @@ function ChatInner({
   }, [messages.length, isStreaming]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === "Enter" && !e.shiftKey) {
+    if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSubmit(e as unknown as React.FormEvent<HTMLFormElement>);
     }
@@ -293,26 +308,22 @@ function ChatInner({
   // show it in StreamingBubble so the cursor blink animation works.
   const lastMsg = messages.length > 0 ? messages[messages.length - 1] : null;
   const streamingMessage =
-    isStreaming && lastMsg?.role === "assistant" ? lastMsg : null;
+    isStreaming && lastMsg?.role === 'assistant' ? lastMsg : null;
 
   const staticMessages = streamingMessage ? messages.slice(0, -1) : messages;
 
   const streamingText = streamingMessage
     ? getTextContent(streamingMessage)
-    : "";
+    : '';
 
   const convTitle = conversations[workspaceId]?.find(
     (c) => c.id === conversationId,
   )?.title;
 
   return (
-    /* flex-col + min-h-0 is critical: makes the inner scroll area shrink properly */
     <div className="flex flex-1 flex-col min-h-0 min-w-0 bg-[#FFFBF0]">
-      {/* ── Top bar ── */}
       <div className="flex items-center justify-between border-b-[2px] border-black px-3 sm:px-4 py-4 bg-[#FFFBF0] shrink-0 gap-2">
-        {/* Left: mobile panel toggles + title */}
         <div className="flex items-center gap-2 min-w-0">
-          {/* Chats toggle — mobile only */}
           {onOpenChats && (
             <button
               onClick={onOpenChats}
@@ -327,13 +338,11 @@ function ChatInner({
             className="text-[#6C47FF] shrink-0 hidden sm:block"
           />
           <span className="font-black text-sm text-black truncate">
-            {convTitle ?? "Conversation"}
+            {convTitle ?? 'Conversation'}
           </span>
         </div>
 
-        {/* Right: sources toggle */}
         <div className="flex items-center gap-2 shrink-0">
-          {/* Sources toggle — mobile only */}
           {onOpenSources && (
             <button
               onClick={onOpenSources}
@@ -346,7 +355,6 @@ function ChatInner({
         </div>
       </div>
 
-      {/* ── Messages — flex-1 + overflow-y-auto for scroll ── */}
       <div ref={scrollRef} className="flex-1 min-h-0 overflow-y-auto">
         {staticMessages.length === 0 && !isStreaming ? (
           <EmptyChat
@@ -358,13 +366,13 @@ function ChatInner({
         ) : (
           <div className="flex flex-col gap-3.5 px-3 sm:px-5 py-5 max-w-3xl mx-auto w-full">
             {staticMessages.map((msg: UIMessage) =>
-              msg.role === "user" ? (
+              msg.role === 'user' ? (
                 <UserMessage
                   key={msg.id}
                   content={msg.parts
-                    .filter((part) => part.type === "text")
+                    .filter((part) => part.type === 'text')
                     .map((part) => part.text)
-                    .join("")}
+                    .join('')}
                 />
               ) : (
                 <AIMessage key={msg.id} message={msg} />
@@ -373,8 +381,8 @@ function ChatInner({
             {isStreaming && <StreamingBubble text={streamingText} />}
             {error && (
               <div className="text-xs font-semibold text-red-500 text-center py-2">
-                Error:{" "}
-                {error.message ?? "Something went wrong. Please try again."}
+                Error:{' '}
+                {error.message ?? 'Something went wrong. Please try again.'}
               </div>
             )}
             <div />
@@ -382,10 +390,8 @@ function ChatInner({
         )}
       </div>
 
-      {/* ── Sticky composer — shrink-0 keeps it pinned at bottom ── */}
       <div className="shrink-0 border-t-[2px] border-black bg-[#FFFBF0] px-3 sm:px-4 py-3">
-        {/* No-source warning */}
-        {sources?.filter((s) => s.status === "READY").length === 0 && (
+        {sources?.filter((s) => s.status === 'READY').length === 0 && (
           <div className="mb-2.5 flex items-center gap-2 rounded-lg border-[2px] border-amber-500 bg-amber-50 px-3 py-1.5 text-xs font-bold text-amber-700">
             ⚠️ No ready sources — add sources for grounded answers.
           </div>
@@ -396,25 +402,24 @@ function ChatInner({
             onSubmit={handleSubmit}
             className="flex items-end gap-2 rounded-xl border-[2.5px] border-black bg-white px-3 py-2 shadow-[3px_3px_0px_#000] focus-within:shadow-none focus-within:translate-x-[3px] focus-within:translate-y-[3px] transition-all"
           >
-            {/* Web Search toggle on left side of input bar */}
             <button
               type="button"
               onClick={() => webSearchAllowed && setWebSearch((v) => !v)}
               disabled={!webSearchAllowed}
               title={
                 !webSearchAllowed
-                  ? "Upgrade to Pro to use Web Search"
+                  ? 'Upgrade to Pro to use Web Search'
                   : webSearch
-                    ? "Disable web search"
-                    : "Enable web search"
+                    ? 'Disable web search'
+                    : 'Enable web search'
               }
               className={cn(
-                "flex items-center gap-1.5 px-2.5 py-1 rounded-lg border-[1.5px] border-black text-[11px] font-black transition-all shrink-0 mb-0.5 shadow-[1.5px_1.5px_0px_#000]",
+                'flex items-center gap-1.5 px-2.5 py-1 rounded-lg border-[1.5px] border-black text-[11px] font-black transition-all shrink-0 mb-0.5 shadow-[1.5px_1.5px_0px_#000]',
                 !webSearchAllowed
-                  ? "text-gray-400 cursor-not-allowed bg-gray-100 border-gray-300 shadow-none"
+                  ? 'text-gray-400 cursor-not-allowed bg-gray-100 border-gray-300 shadow-none'
                   : webSearch
-                    ? "bg-[#6C47FF] text-white"
-                    : "bg-[#FFFBF0] text-black hover:bg-gray-100",
+                    ? 'bg-[#6C47FF] text-white'
+                    : 'bg-[#FFFBF0] text-black hover:bg-gray-100',
               )}
             >
               <Globe size={12} />
@@ -430,10 +435,10 @@ function ChatInner({
               placeholder="Ask anything about your sources…"
               rows={1}
               className="flex-1 resize-none bg-transparent text-sm font-semibold text-black placeholder:text-gray-400 outline-none min-h-0 max-h-32 py-0.5"
-              style={{ fieldSizing: "content" } as React.CSSProperties}
+              style={{ fieldSizing: 'content' } as React.CSSProperties}
             />
             <button
-              type={isStreaming ? "button" : "submit"}
+              type={isStreaming ? 'button' : 'submit'}
               onClick={isStreaming ? stop : undefined}
               disabled={!isStreaming && !input.trim()}
               className="flex size-7 shrink-0 items-center justify-center rounded-lg border-[2px] border-black bg-[#6C47FF] text-white shadow-[2px_2px_0px_#000] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-40 disabled:pointer-events-none"
@@ -460,7 +465,7 @@ interface ChatInterfaceProps {
 }
 
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api";
+  process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000/api';
 
 export function ChatInterface({
   workspaceId,
@@ -468,7 +473,11 @@ export function ChatInterface({
   onOpenChats,
   onOpenSources,
 }: ChatInterfaceProps) {
-  const { data: conversationMessages, isPending, fetchStatus } = useMessages({
+  const {
+    data: conversationMessages,
+    isPending,
+    fetchStatus,
+  } = useMessages({
     workspaceId,
     conversationId,
   });
@@ -477,7 +486,7 @@ export function ChatInterface({
 
   // isPending is true even for disabled queries in TanStack Query v5.
   // Only show the skeleton when the query is actually running (fetchStatus === "fetching").
-  if (isPending && fetchStatus === "fetching") {
+  if (isPending && fetchStatus === 'fetching') {
     return (
       <div className="flex flex-1 flex-col min-h-0 min-w-0 bg-[#FFFBF0]">
         {/* Top bar skeleton */}

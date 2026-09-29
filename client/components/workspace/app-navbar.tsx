@@ -8,7 +8,7 @@ import { WorkspaceDialog } from "@/components/workspace/workspace-dialog";
 import { PlanBadge } from "@/components/workspace/plan-banner";
 import { authClient } from "@/lib/auth-client";
 import { signOut } from "@/features/auth/auth";
-import { motion } from "framer-motion";
+import { Easing, motion } from "framer-motion";
 
 interface AppNavbarProps {
   activeWorkspaceId?: string;
@@ -19,7 +19,7 @@ const itemVariants = {
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.4, ease: "easeOut" } as any,
+    transition: { duration: 0.4, ease: "easeOut" as Easing },
   },
 };
 

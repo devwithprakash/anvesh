@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { X } from "lucide-react";
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { X } from 'lucide-react';
 import {
   useCreateWorkspace,
   useUpdateWorkspace,
-} from "@/features/workspace/mutations";
-import { Workspace } from "@/features/workspace/types";
+} from '@/features/workspace/mutations';
+import { Workspace } from '@/features/workspace/types';
 
 interface CreateWorkspaceDialogProps {
   open: boolean;
@@ -20,27 +20,34 @@ export function WorkspaceDialog({
   onOpenChange,
   workspace,
 }: CreateWorkspaceDialogProps) {
+  if (!open) return null;
+
+  return (
+    <WorkspaceDialogContent
+      onOpenChange={onOpenChange}
+      workspace={workspace}
+    />
+  );
+}
+
+interface WorkspaceDialogContentProps {
+  onOpenChange: (open: boolean) => void;
+  workspace?: Workspace | null;
+}
+
+function WorkspaceDialogContent({
+  onOpenChange,
+  workspace,
+}: WorkspaceDialogContentProps) {
   const router = useRouter();
 
   const isEditMode = !!workspace;
 
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-
-  useEffect(() => {
-    if (workspace) {
-      setTitle(workspace.title);
-      setDescription(workspace.description ?? "");
-    } else {
-      setTitle("");
-      setDescription("");
-    }
-  }, [workspace, open]);
+  const [title, setTitle] = useState(workspace?.title ?? '');
+  const [description, setDescription] = useState(workspace?.description ?? '');
 
   const createWorkspace = useCreateWorkspace();
   const updateWorkspace = useUpdateWorkspace();
-
-  if (!open) return null;
 
   const handleSubmit = async () => {
     if (!title.trim()) return;
@@ -72,7 +79,7 @@ export function WorkspaceDialog({
       <div className="relative w-full max-w-md rounded-2xl border-[3px] border-black bg-[#FFFBF0] shadow-[8px_8px_0px_#000]">
         <div className="flex items-center justify-between border-b-[2px] border-black px-5 py-4">
           <h2 className="font-black text-base text-black">
-            {isEditMode ? "Edit Workspace" : "New workspace"}
+            {isEditMode ? 'Edit Workspace' : 'New workspace'}
           </h2>
           <button
             onClick={() => onOpenChange(false)}
@@ -93,7 +100,7 @@ export function WorkspaceDialog({
               placeholder="e.g. Research Papers, Product Strategy…"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
+              onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
               autoFocus
               className="h-10 w-full rounded-xl border-[2px] border-black bg-white px-3 text-sm font-semibold text-black placeholder:text-gray-400 shadow-[2px_2px_0px_#000] outline-none focus:shadow-none focus:translate-x-[2px] focus:translate-y-[2px] transition-all"
             />
@@ -125,10 +132,11 @@ export function WorkspaceDialog({
             disabled={!title.trim()}
             className="rounded-xl border-[2px] border-black bg-[#6C47FF] px-4 py-2 text-sm font-black text-white shadow-[3px_3px_0px_#000] hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px] transition-all disabled:opacity-40 disabled:pointer-events-none"
           >
-            {isEditMode ? "Save Changes" : "Create Workspace"}
+            {isEditMode ? 'Save Changes' : 'Create Workspace'}
           </button>
         </div>
       </div>
     </div>
   );
 }
+

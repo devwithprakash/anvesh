@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { motion } from "framer-motion";
+import { useState } from 'react';
+import { Easing, motion } from 'framer-motion';
 import {
   Eye,
   EyeOff,
@@ -10,18 +10,18 @@ import {
   Lock,
   User,
   AlertCircle,
-} from "lucide-react";
-import Link from "next/link";
-import { signUp } from "@/features/auth/auth";
-import { useRouter } from "next/navigation";
-import { authClient } from "@/lib/auth-client";
+} from 'lucide-react';
+import Link from 'next/link';
+import { signUp } from '@/features/auth/auth';
+import { useRouter } from 'next/navigation';
+import { authClient } from '@/lib/auth-client';
 
 const fadeUp = (delay = 0) => ({
   initial: { opacity: 0, y: 24 },
   animate: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.5, ease: "easeOut", delay } as any,
+    transition: { duration: 0.5, ease: 'easeOut' as Easing, delay },
   },
 });
 
@@ -29,7 +29,7 @@ const fadeIn = (delay = 0) => ({
   initial: { opacity: 0 },
   animate: {
     opacity: 1,
-    transition: { duration: 0.35, ease: "easeOut", delay } as any,
+    transition: { duration: 0.35, ease: 'easeOut' as Easing, delay },
   },
 });
 
@@ -39,9 +39,9 @@ export default function SignUpPage() {
   const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [form, setForm] = useState({
-    name: "",
-    email: "",
-    password: "",
+    name: '',
+    email: '',
+    password: '',
   });
   const router = useRouter();
 
@@ -55,21 +55,22 @@ export default function SignUpPage() {
 
       if (response?.error) {
         setError(
-          response.error.code === "USER_ALREADY_EXISTS" ||
+          response.error.code === 'USER_ALREADY_EXISTS' ||
             response.error.status === 409
-            ? "An account with this email already exists."
+            ? 'An account with this email already exists.'
             : (response.error.message ??
-                "Something went wrong. Please try again."),
+                'Something went wrong. Please try again.'),
         );
         return;
       }
 
       router.push(`/verify-email?email=${encodeURIComponent(form.email)}`);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(error);
       setError(
-        error?.message ??
-          "Something went wrong creating your account. Please try again.",
+        error instanceof Error
+          ? error.message
+          : 'Something went wrong creating your account. Please try again.',
       );
     } finally {
       setIsLoading(false);
@@ -81,13 +82,13 @@ export default function SignUpPage() {
     setGoogleLoading(true);
     try {
       await authClient.signIn.social({
-        provider: "google",
+        provider: 'google',
         callbackURL: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`,
       });
     } catch (error) {
       console.error(error);
       setError(
-        "Something went wrong signing up with Google. Please try again.",
+        'Something went wrong signing up with Google. Please try again.',
       );
     } finally {
       setGoogleLoading(false);
@@ -208,8 +209,8 @@ export default function SignUpPage() {
                   }}
                   className={`w-full pl-10 pr-4 py-3 rounded-xl border-[2.5px] bg-[#FFFBF0] text-sm font-semibold text-black placeholder:text-black/30 outline-none focus:ring-2 focus:ring-offset-1 transition ${
                     error
-                      ? "border-red-500 focus:ring-red-500"
-                      : "border-black focus:ring-[#6C47FF]"
+                      ? 'border-red-500 focus:ring-red-500'
+                      : 'border-black focus:ring-[#6C47FF]'
                   }`}
                 />
               </div>
@@ -225,7 +226,7 @@ export default function SignUpPage() {
                   className="absolute left-3.5 top-1/2 -translate-y-1/2 text-black/40 pointer-events-none"
                 />
                 <input
-                  type={showPassword ? "text" : "password"}
+                  type={showPassword ? 'text' : 'password'}
                   autoComplete="new-password"
                   required
                   placeholder="Min. 8 characters"
@@ -235,11 +236,11 @@ export default function SignUpPage() {
                     if (error) setError(null);
                   }}
                   aria-invalid={!!error}
-                  aria-describedby={error ? "signup-error" : undefined}
+                  aria-describedby={error ? 'signup-error' : undefined}
                   className={`w-full pl-10 pr-11 py-3 rounded-xl border-[2.5px] bg-[#FFFBF0] text-sm font-semibold text-black placeholder:text-black/30 outline-none focus:ring-2 focus:ring-offset-1 transition ${
                     error
-                      ? "border-red-500 focus:ring-red-500"
-                      : "border-black focus:ring-[#6C47FF]"
+                      ? 'border-red-500 focus:ring-red-500'
+                      : 'border-black focus:ring-[#6C47FF]'
                   }`}
                 />
                 <button
@@ -290,7 +291,7 @@ export default function SignUpPage() {
           className="border-t-[3px] border-black bg-[#FFFBF0] px-8 py-4 text-center"
         >
           <p className="text-sm font-semibold text-black/70">
-            Already have an account?{" "}
+            Already have an account?{' '}
             <Link
               href="/signin"
               className="font-black text-[#6C47FF] hover:underline underline-offset-2"
@@ -305,11 +306,11 @@ export default function SignUpPage() {
         {...fadeIn(0.32)}
         className="mt-5 text-center text-xs font-semibold text-black/40"
       >
-        By creating an account, you agree to Anvesh&apos;s{" "}
+        By creating an account, you agree to Anvesh&apos;s{' '}
         <a href="#" className="underline hover:text-black/70">
           Terms
-        </a>{" "}
-        and{" "}
+        </a>{' '}
+        and{' '}
         <a href="#" className="underline hover:text-black/70">
           Privacy Policy
         </a>

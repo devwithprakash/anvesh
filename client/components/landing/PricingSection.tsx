@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { Easing, motion } from "framer-motion";
 import { Check, ArrowRight, Zap, Crown, Star } from "lucide-react";
 import Link from "next/link";
 
@@ -77,7 +77,7 @@ const cardVariants = {
   visible: (i: number) => ({
     opacity: 1,
     y: 0,
-    transition: { duration: 0.5, ease: "easeOut", delay: i * 0.1 } as any,
+    transition: { duration: 0.5, ease: "easeOut" as Easing, delay: i * 0.1 },
   }),
 };
 

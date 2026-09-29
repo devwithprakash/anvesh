@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 const AnveshLogo = () => (
   <svg
     viewBox="0 0 200 200"
@@ -123,12 +125,12 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-6 py-14">
         <div className="flex flex-col md:flex-row gap-12 md:gap-6">
           <div className="md:w-72 shrink-0">
-            <a href="/" className="inline-flex items-center gap-2.5 mb-4">
+            <Link href="/" className="inline-flex items-center gap-2.5 mb-4">
               <AnveshLogo />
               <span className="font-black text-lg text-black tracking-tight">
                 Anvesh
               </span>
-            </a>
+            </Link>
             <p className="text-sm font-semibold text-gray-500 leading-relaxed mb-6 max-w-[220px]">
               Your knowledge. Your sources. Your AI — grounded in what matters
               to you.
@@ -151,7 +153,7 @@ export default function Footer() {
                   label: "LinkedIn",
                 },
               ].map((s) => (
-                <a
+                <Link
                   key={s.label}
                   href={s.href}
                   target="_blank"
@@ -159,7 +161,7 @@ export default function Footer() {
                   className="inline-flex items-center justify-center w-8 h-8 rounded-lg border-[2px] border-black bg-white text-black shadow-[2px_2px_0px_#000] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
                 >
                   {s.icon}
-                </a>
+                </Link>
               ))}
             </div>
           </div>
@@ -175,12 +177,12 @@ export default function Footer() {
                 <ul className="space-y-3">
                   {col.links.map((l) => (
                     <li key={l.label}>
-                      <a
+                      <Link
                         href={l.href}
                         className="text-sm font-semibold text-gray-500 hover:text-black transition-colors"
                       >
                         {l.label}
-                      </a>
+                      </Link>
                     </li>
                   ))}
                 </ul>
@@ -202,12 +204,12 @@ export default function Footer() {
             </span>
           </div>
           <div className="flex items-center gap-4 text-xs font-semibold text-gray-400">
-            <a href="#" className="hover:text-black transition-colors">
+            <Link href="#" className="hover:text-black transition-colors">
               Privacy
-            </a>
-            <a href="#" className="hover:text-black transition-colors">
+            </Link>
+            <Link href="#" className="hover:text-black transition-colors">
               Terms
-            </a>
+            </Link>
           </div>
         </div>
       </div>

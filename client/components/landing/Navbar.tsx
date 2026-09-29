@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { Easing, motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { authClient } from "../../lib/auth-client";
 import { signOut } from "@/features/auth/auth";
@@ -15,7 +15,7 @@ const itemVariants = {
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.4, ease: "easeOut" } as any,
+    transition: { duration: 0.4, ease: "easeOut" as Easing },
   },
 };
 

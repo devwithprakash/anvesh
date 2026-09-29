@@ -1,10 +1,9 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { Easing, motion } from "framer-motion";
 import {
   FolderOpen,
   MessageCircle,
-  Search,
   Layers,
   FileText,
   Globe,
@@ -156,7 +155,7 @@ function StepConnector({ index }: { index: number }) {
           initial={{ pathLength: 0, opacity: 0 }}
           whileInView={{ pathLength: 1, opacity: 1 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6, ease: "easeOut", delay: lineDelay } as any}
+          transition={{ duration: 0.6, ease: "easeOut" as Easing, delay: lineDelay }}
         />
 
         {/* Sharp chevron arrowhead that shoots out */}
@@ -170,7 +169,7 @@ function StepConnector({ index }: { index: number }) {
           initial={{ scale: 0.5, opacity: 0, x: -8 }}
           whileInView={{ scale: 1, opacity: 1, x: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.4, ease: "backOut", delay: headDelay } as any}
+          transition={{ duration: 0.4, ease: "backOut" as Easing, delay: headDelay }}
           style={{ transformOrigin: "45px 12px" }}
         />
       </svg>
@@ -183,7 +182,7 @@ const cardVariants = {
   visible: (i: number) => ({
     opacity: 1,
     y: 0,
-    transition: { duration: 0.52, ease: "easeOut", delay: i * 0.1 } as any,
+    transition: { duration: 0.52, ease: "easeOut" as Easing, delay: i * 0.1 },
   }),
 };
 

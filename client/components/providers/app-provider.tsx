@@ -10,7 +10,6 @@ import {
   type Conversation,
   type Message,
   type Source,
-  type SourceType,
 } from "@/lib/mock-data";
 
 interface AppState {
