@@ -1,7 +1,6 @@
-"use client";
+'use client';
 
-import { AppProvider } from "@/components/providers/app-provider";
-import { useRequireAuth } from "@/hooks/use-require-auth";
+import { useRequireAuth } from '@/hooks/use-require-auth';
 
 export default function DashboardLayout({
   children,
@@ -13,5 +12,5 @@ export default function DashboardLayout({
   if (isPending) return <div>Loading...</div>;
   if (!session) return null;
 
-  return <AppProvider>{children}</AppProvider>;
+  return <div>{children}</div>;
 }

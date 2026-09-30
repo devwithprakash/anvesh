@@ -1,19 +1,14 @@
 'use client';
 
 import { Easing, motion } from 'framer-motion';
-import { ChevronDown, LogOut, Plus } from 'lucide-react';
+import { ChevronDown, LogOut } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
-import { useAppState } from '@/components/providers/app-provider';
 import { PlanBadge } from '@/components/workspace/plan-banner';
 import { WorkspaceDialog } from '@/components/workspace/workspace-dialog';
 import { signOut } from '@/features/auth/auth';
 import { authClient } from '@/lib/auth-client';
-
-interface AppNavbarProps {
-  activeWorkspaceId?: string;
-}
 
 const itemVariants = {
   hidden: { opacity: 0, y: -16 },
@@ -24,18 +19,14 @@ const itemVariants = {
   },
 };
 
-export function AppNavbar({ activeWorkspaceId }: AppNavbarProps) {
+export function AppNavbar() {
   const router = useRouter();
-  const { workspaces } = useAppState();
-  const [wsOpen, setWsOpen] = useState(false);
   const [userOpen, setUserOpen] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
 
   const { data: session } = authClient.useSession();
 
   const user = session?.user;
-
-  const activeWs = workspaces.find(ws => ws.id === activeWorkspaceId);
 
   const handleLogOut = async () => {
     try {
@@ -51,7 +42,6 @@ export function AppNavbar({ activeWorkspaceId }: AppNavbarProps) {
     <>
       <nav className="sticky top-0 z-50 w-full border-b-[3px] border-black bg-[#FFFBF0]">
         <div className="flex h-14 items-center justify-between gap-4 px-5">
-          {/* Logo */}
           <motion.a
             variants={itemVariants}
             href="/"
@@ -126,65 +116,6 @@ export function AppNavbar({ activeWorkspaceId }: AppNavbarProps) {
             </span>
           </motion.a>
 
-          {activeWs ? (
-            <div className="relative flex flex-1 justify-center">
-              <button
-                onClick={() => setWsOpen(v => !v)}
-                className="flex max-w-xs items-center gap-2 rounded-lg border-[2px] border-black bg-white px-3 py-1.5 text-sm font-bold text-black shadow-[2px_2px_0px_#000] transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
-              >
-                <span className="truncate">{activeWs.title}</span>
-                <ChevronDown size={14} className="shrink-0" />
-              </button>
-
-              {wsOpen && (
-                <>
-                  <div
-                    className="fixed inset-0 z-10"
-                    onClick={() => setWsOpen(false)}
-                  />
-                  <div className="absolute top-full left-1/2 z-20 mt-2 min-w-[220px] -translate-x-1/2 overflow-hidden rounded-xl border-[2.5px] border-black bg-white shadow-[4px_4px_0px_#000]">
-                    <div className="flex flex-col gap-0.5 p-1.5">
-                      {workspaces.map(ws => (
-                        <button
-                          key={ws.id}
-                          onClick={() => {
-                            router.push(`/workspace/${ws.id}`);
-                            setWsOpen(false);
-                          }}
-                          className={`flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm font-bold transition-colors ${
-                            ws.id === activeWorkspaceId
-                              ? 'bg-[#EDE9FE] text-[#6C47FF]'
-                              : 'text-black hover:bg-gray-100'
-                          }`}
-                        >
-                          <span className="truncate">{ws.title}</span>
-                          {ws.id === activeWorkspaceId && (
-                            <span className="ml-auto h-1.5 w-1.5 shrink-0 rounded-full bg-[#6C47FF]" />
-                          )}
-                        </button>
-                      ))}
-                    </div>
-                    <div className="border-t-[2px] border-black p-1.5">
-                      <button
-                        onClick={() => {
-                          setWsOpen(false);
-                          setCreateOpen(true);
-                        }}
-                        className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-bold text-black transition-colors hover:bg-gray-100"
-                      >
-                        <Plus size={14} />
-                        New workspace
-                      </button>
-                    </div>
-                  </div>
-                </>
-              )}
-            </div>
-          ) : (
-            <div className="flex-1" />
-          )}
-
-          {/* User menu — right */}
           <div className="flex shrink-0 items-center gap-2">
             <PlanBadge />
             <div className="relative">
@@ -193,7 +124,7 @@ export function AppNavbar({ activeWorkspaceId }: AppNavbarProps) {
                 className="flex items-center gap-2 rounded-lg border-[2px] border-black bg-white px-3 py-1.5 text-sm font-bold text-black shadow-[2px_2px_0px_#000] transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
               >
                 <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border-[1.5px] border-black bg-[#EDE9FE] text-[10px] font-black text-[#6C47FF]">
-                  {user?.name[0]}
+                  {user?.name?.[0]}
                 </span>
                 <span className="hidden sm:block">{user?.name}</span>
                 <ChevronDown size={14} />

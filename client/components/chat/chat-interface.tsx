@@ -14,7 +14,6 @@ import { useRouter } from 'next/navigation';
 import { useState, useRef, useEffect } from 'react';
 import * as React from 'react';
 
-import { useAppState } from '@/components/providers/app-provider';
 import { useMessages } from '@/features/conversation/queries';
 import { useSources } from '@/features/source/queries';
 import { useSubscriptionStatus } from '@/features/subscription/queries';
@@ -227,7 +226,6 @@ function ChatInner({
 
   const router = useRouter();
 
-  const { conversations } = useAppState();
   const { data: sources } = useSources(workspaceId);
   const { data: subStatus } = useSubscriptionStatus();
 
@@ -317,10 +315,6 @@ function ChatInner({
     ? getTextContent(streamingMessage)
     : '';
 
-  const convTitle = conversations[workspaceId]?.find(
-    c => c.id === conversationId,
-  )?.title;
-
   return (
     <div className="flex min-h-0 min-w-0 flex-1 flex-col bg-[#FFFBF0]">
       <div className="flex shrink-0 items-center justify-between gap-2 border-b-[2px] border-black bg-[#FFFBF0] px-3 py-4 sm:px-4">
@@ -339,7 +333,7 @@ function ChatInner({
             className="hidden shrink-0 text-[#6C47FF] sm:block"
           />
           <span className="truncate text-sm font-black text-black">
-            {convTitle ?? 'Conversation'}
+            {'Conversation'}
           </span>
         </div>
 
