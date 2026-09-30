@@ -31,11 +31,9 @@ export function ConversationPageInner({
 
   return (
     <div className="flex flex-col bg-[#FFFBF0]" style={{ height: '100svh' }}>
-      <AppNavbar activeWorkspaceId={workspaceId} />
+      <AppNavbar />
 
-      {/* Three-panel body */}
       <div className="flex min-h-0 flex-1 overflow-hidden">
-        {/* ── Left sidebar: hidden on mobile, always visible on md+ ── */}
         <div className="hidden h-full md:flex md:w-[260px] md:shrink-0">
           <ConversationList
             workspaceId={workspaceId}
@@ -45,7 +43,6 @@ export function ConversationPageInner({
           />
         </div>
 
-        {/* ── Center: chat (takes remaining space) ── */}
         <ChatInterface
           workspaceId={workspaceId}
           conversationId={conversationId === 'new' ? undefined : conversationId}
@@ -53,21 +50,17 @@ export function ConversationPageInner({
           onOpenSources={() => setSourcesOpen(true)}
         />
 
-        {/* ── Right sidebar: hidden on mobile, always visible on md+ ── */}
         <div className="hidden h-full md:flex md:w-[260px] md:shrink-0">
           <SourcesPanel workspaceId={workspaceId} />
         </div>
       </div>
 
-      {/* ── Mobile: Chats slide-over ── */}
       {chatsOpen && (
         <div className="fixed inset-0 z-50 flex md:hidden">
-          {/* Backdrop */}
           <div
             className="absolute inset-0 bg-black/40"
             onClick={() => setChatsOpen(false)}
           />
-          {/* Drawer from left */}
           <div className="relative z-10 flex h-full w-[300px] max-w-[85vw]">
             <ConversationList
               workspaceId={workspaceId}
@@ -80,15 +73,12 @@ export function ConversationPageInner({
         </div>
       )}
 
-      {/* ── Mobile: Sources slide-over ── */}
       {sourcesOpen && (
         <div className="fixed inset-0 z-50 flex justify-end md:hidden">
-          {/* Backdrop */}
           <div
             className="absolute inset-0 bg-black/40"
             onClick={() => setSourcesOpen(false)}
           />
-          {/* Drawer from right */}
           <div className="relative z-10 flex h-full w-[300px] max-w-[85vw]">
             <SourcesPanel
               workspaceId={workspaceId}
