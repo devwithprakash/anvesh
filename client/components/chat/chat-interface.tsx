@@ -14,6 +14,7 @@ import { useRouter } from 'next/navigation';
 import { useState, useRef, useEffect } from 'react';
 import * as React from 'react';
 
+import { ChatPanelSkeleton } from '@/components/workspace/conversation-skeleton';
 import { useMessages } from '@/features/conversation/queries';
 import { useSources } from '@/features/source/queries';
 import { useSubscriptionStatus } from '@/features/subscription/queries';
@@ -482,47 +483,7 @@ export function ChatInterface({
   // isPending is true even for disabled queries in TanStack Query v5.
   // Only show the skeleton when the query is actually running (fetchStatus === "fetching").
   if (isPending && fetchStatus === 'fetching') {
-    return (
-      <div className="flex min-h-0 min-w-0 flex-1 flex-col bg-[#FFFBF0]">
-        {/* Top bar skeleton */}
-        <div className="flex shrink-0 items-center justify-between gap-2 border-b-[2px] border-black bg-[#FFFBF0] px-4 py-2">
-          <div className="h-4 w-36 animate-pulse rounded-lg bg-black/10" />
-          <div className="h-6 w-20 animate-pulse rounded-full bg-black/10" />
-        </div>
-        {/* Messages skeleton */}
-        <div className="min-h-0 flex-1 overflow-y-auto px-5 py-6">
-          <div className="mx-auto flex max-w-3xl flex-col gap-5">
-            <div className="flex justify-end">
-              <div className="h-10 w-52 animate-pulse rounded-2xl rounded-tr-sm bg-[#6C47FF]/15" />
-            </div>
-            <div className="flex items-start gap-3">
-              <div className="mt-0.5 h-7 w-7 shrink-0 animate-pulse rounded-full bg-black/10" />
-              <div className="flex flex-1 flex-col gap-2">
-                <div className="h-3 w-full animate-pulse rounded bg-black/10" />
-                <div className="h-3 w-4/5 animate-pulse rounded bg-black/10" />
-                <div className="h-3 w-3/5 animate-pulse rounded bg-black/10" />
-              </div>
-            </div>
-            <div className="flex justify-end">
-              <div className="h-8 w-40 animate-pulse rounded-2xl rounded-tr-sm bg-[#6C47FF]/15" />
-            </div>
-            <div className="flex items-start gap-3">
-              <div className="mt-0.5 h-7 w-7 shrink-0 animate-pulse rounded-full bg-black/10" />
-              <div className="flex flex-1 flex-col gap-2">
-                <div className="h-3 w-full animate-pulse rounded bg-black/10" />
-                <div className="h-3 w-2/3 animate-pulse rounded bg-black/10" />
-              </div>
-            </div>
-          </div>
-        </div>
-        {/* Composer skeleton */}
-        <div className="shrink-0 border-t-[2px] border-black bg-[#FFFBF0] px-4 py-3">
-          <div className="mx-auto max-w-3xl">
-            <div className="h-11 w-full animate-pulse rounded-xl border-[2.5px] border-black bg-white shadow-[3px_3px_0px_#000]" />
-          </div>
-        </div>
-      </div>
-    );
+    return <ChatPanelSkeleton />;
   }
 
   return (

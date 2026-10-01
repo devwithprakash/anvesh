@@ -1,6 +1,3 @@
-import { ClientAuthGuard } from '@/components/auth/client-auth-guard';
-import { AppNavbar } from '@/components/workspace/app-navbar';
-
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 
@@ -10,13 +7,9 @@ export const metadata: Metadata = {
     'View and manage your Anvesh workspace. Add sources, start AI conversations, and explore your research.',
 };
 
+// Plain passthrough — auth + navbar are handled by WorkspacePageInner directly
+// (so the nested ConversationLayout can have its own independent guard without
+// a parent guard causing sequential skeletons).
 export default function WorkspaceLayout({ children }: { children: ReactNode }) {
-  return (
-    <ClientAuthGuard skeletonVariant="workspace">
-      <div className="flex flex-col" style={{ height: '100svh' }}>
-        <AppNavbar />
-        {children}
-      </div>
-    </ClientAuthGuard>
-  );
+  return <>{children}</>;
 }

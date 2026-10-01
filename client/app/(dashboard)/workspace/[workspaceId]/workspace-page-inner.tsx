@@ -4,12 +4,17 @@ import { Plus, MessageSquare, FileText, ArrowRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
+import { AppNavbar } from '@/components/workspace/app-navbar';
 import { ConversationList } from '@/components/workspace/conversation-list';
 import { SourcesPanel } from '@/components/workspace/sources-panel';
-import { WorkspacePanelSkeleton } from '@/components/workspace/workspace-skeleton';
+import {
+  WorkspaceSkeleton,
+  WorkspacePanelSkeleton,
+} from '@/components/workspace/workspace-skeleton';
 import { useConversations } from '@/features/conversation/queries';
 import { useSources } from '@/features/source/queries';
 import { useGetWorkspace } from '@/features/workspace/queries';
+import { useRequireAuth } from '@/hooks/use-require-auth';
 
 export function WorkspacePageInner({ workspaceId }: { workspaceId: string }) {
   const [chatsOpen, setChatsOpen] = useState(false);
@@ -17,8 +22,14 @@ export function WorkspacePageInner({ workspaceId }: { workspaceId: string }) {
 
   const router = useRouter();
 
+  // ── Auth guard ─────────────────────────────────────────────────────────────
+  // Handled here (not in the parent layout) so the nested ConversationLayout
+  // can have its own independent guard without causing sequential skeletons.
+  const { session, isPending: authPending } = useRequireAuth();
+
   const { data: workspace } = useGetWorkspace(workspaceId);
-  const { data: conversations, isPending } = useConversations(workspaceId);
+  const { data: conversations, isPending: dataPending } =
+    useConversations(workspaceId);
   const { data: sources } = useSources(workspaceId);
 
   // Close drawers on Escape
@@ -33,8 +44,20 @@ export function WorkspacePageInner({ workspaceId }: { workspaceId: string }) {
     return () => window.removeEventListener('keydown', handler);
   }, []);
 
-  if (isPending || !conversations) {
-    return <WorkspacePanelSkeleton />;
+  // Auth still resolving — full-page skeleton (includes navbar shell)
+  if (authPending) return <WorkspaceSkeleton />;
+
+  // useRequireAuth redirects on no session; null prevents flash
+  if (!session) return null;
+
+  // Data still fetching — navbar is real, panel shows skeleton
+  if (dataPending || !conversations) {
+    return (
+      <div className="flex flex-col bg-[#FFFBF0]" style={{ height: '100svh' }}>
+        <AppNavbar />
+        <WorkspacePanelSkeleton />
+      </div>
+    );
   }
 
   if (!workspace) return null;
@@ -44,7 +67,9 @@ export function WorkspacePageInner({ workspaceId }: { workspaceId: string }) {
   };
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col bg-[#FFFBF0]">
+    <div className="flex flex-col bg-[#FFFBF0]" style={{ height: '100svh' }}>
+      <AppNavbar />
+
       {/* Three-panel body */}
       <div className="flex min-h-0 flex-1 overflow-hidden">
         {/* Left sidebar — hidden on mobile */}
