@@ -18,7 +18,7 @@ export const processSource = inngest.createFunction(
     triggers: [{ event: 'source/created' }],
   },
   async ({ event, step }) => {
-    const { sourceId } = event.data;
+    const sourceId = event.data.sourceId as string;
 
     logger.info('Source processing started', {
       sourceId,
@@ -82,7 +82,7 @@ export const summarizeConversation = inngest.createFunction(
     triggers: [{ event: 'conversation/summarize' }],
   },
   async ({ event, step }) => {
-    const { conversationId } = event.data;
+    const conversationId = event.data.conversationId as string;
 
     await step.run('summarize', () => {
       summarizeConversationById(conversationId);

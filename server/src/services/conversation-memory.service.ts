@@ -6,7 +6,10 @@ import {
   findConversationById,
   updateConversationSummary,
 } from '../repositories/conversation.repository.js';
-import { findMessagesByConversationId } from '../repositories/message.repository.js';
+import {
+  findMessagesByConversationId,
+  type MessageRecord,
+} from '../repositories/message.repository.js';
 import { NotFoundError } from '../types/app-error.js';
 
 export async function summarizeConversationById(conversationId: string) {
@@ -23,7 +26,7 @@ export async function summarizeConversationById(conversationId: string) {
   }
 
   const transcript = messages
-    .map(message => `${message.role}: ${message.content}`)
+    .map((message: MessageRecord) => `${message.role}: ${message.content}`)
     .join('\n\n');
   const previousSummary = conversation.summary?.trim();
 

@@ -35,7 +35,7 @@ export function createSourceRecord(
   data: CreateSourceData,
   maxSourcesPerWorkspace: number,
 ) {
-  return prisma.$transaction(async tx => {
+  return prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     const sourceCount = await tx.source.count({
       where: {
         workspaceId: data.workspaceId,

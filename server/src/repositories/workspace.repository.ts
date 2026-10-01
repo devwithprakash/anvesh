@@ -115,7 +115,7 @@ export async function deleteWorkspaceRecord(
   workspaceId: string,
   userId: string,
 ) {
-  return prisma.$transaction(async tx => {
+  return prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     const workspace = await tx.workspace.findFirst({
       where: { id: workspaceId, userId },
     });
@@ -185,7 +185,7 @@ export async function updateAiQueryUsageRecord(
   userId: string,
   maxAiQueries: number,
 ) {
-  return prisma.$transaction(async tx => {
+  return prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     await ensureUsageRecord(tx, userId);
     await resetExpiredUsageIfNeeded(tx, userId);
 
@@ -214,7 +214,7 @@ export async function createWorkspaceWithQuota(
   input: CreateWorkspaceInput,
   maxWorkspaces: number,
 ) {
-  return prisma.$transaction(async tx => {
+  return prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     // Ensure usage record exists
     await ensureUsageRecord(tx, userId);
 
