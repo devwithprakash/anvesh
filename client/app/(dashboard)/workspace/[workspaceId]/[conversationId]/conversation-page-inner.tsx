@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 
 import { ChatInterface } from '@/components/chat/chat-interface';
-import { AppNavbar } from '@/components/workspace/app-navbar';
 import { ConversationList } from '@/components/workspace/conversation-list';
 import { SourcesPanel } from '@/components/workspace/sources-panel';
 
@@ -30,9 +29,7 @@ export function ConversationPageInner({
   }, []);
 
   return (
-    <div className="flex flex-col bg-[#FFFBF0]" style={{ height: '100svh' }}>
-      <AppNavbar />
-
+    <div className="flex min-h-0 flex-1 flex-col bg-[#FFFBF0]">
       <div className="flex min-h-0 flex-1 overflow-hidden">
         <div className="hidden h-full md:flex md:w-[260px] md:shrink-0">
           <ConversationList

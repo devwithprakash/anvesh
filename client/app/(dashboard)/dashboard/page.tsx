@@ -14,7 +14,6 @@ import {
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-import { AppNavbar } from '@/components/workspace/app-navbar';
 import { PlanBanner } from '@/components/workspace/plan-banner';
 import { WorkspaceDialog } from '@/components/workspace/workspace-dialog';
 import { useConversations } from '@/features/conversation/queries';
@@ -309,18 +308,8 @@ export default function DashboardPage() {
   const totalCount = workspacesList?.length ?? 0;
 
   return (
-    <div className="flex min-h-svh flex-1 flex-col bg-[#FFFBF0]">
-      <div
-        className="pointer-events-none fixed inset-0 opacity-[0.04]"
-        style={{
-          backgroundImage: 'radial-gradient(circle, #000 1px, transparent 1px)',
-          backgroundSize: '28px 28px',
-        }}
-      />
-
+    <div>
       <FloatingSymbols />
-
-      <AppNavbar />
 
       <main className="relative z-10 mx-auto w-full max-w-5xl flex-1 px-6 py-10">
         <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
