@@ -45,7 +45,7 @@ export function WorkspacePageInner({ workspaceId }: { workspaceId: string }) {
 
   return (
     <div className="flex flex-col bg-[#FFFBF0]" style={{ height: '100svh' }}>
-      <AppNavbar activeWorkspaceId={workspaceId} />
+      <AppNavbar />
 
       {/* Three-panel body */}
       <div className="flex min-h-0 flex-1 overflow-hidden">
