@@ -263,6 +263,31 @@ function WorkspaceCard({
   );
 }
 
+function WorkspaceCardSkeleton() {
+  return (
+    <div className="flex h-full flex-col gap-4 rounded-2xl border-[2.5px] border-black bg-white p-5 shadow-[4px_4px_0px_#000]">
+      {/* Title row */}
+      <div className="flex items-start justify-between gap-2">
+        <div className="flex flex-col gap-1.5">
+          <div className="h-5 w-32 animate-pulse rounded-lg bg-black/10" />
+          <div className="h-3 w-20 animate-pulse rounded bg-black/10" />
+        </div>
+        <div className="size-7 animate-pulse rounded-lg bg-black/10" />
+      </div>
+      {/* Description */}
+      <div className="flex flex-col gap-1.5">
+        <div className="h-3 w-full animate-pulse rounded bg-black/10" />
+        <div className="h-3 w-4/5 animate-pulse rounded bg-black/10" />
+      </div>
+      {/* Stats */}
+      <div className="flex items-center gap-4 border-t-[2px] border-black/10 pt-3">
+        <div className="h-4 w-16 animate-pulse rounded bg-black/10" />
+        <div className="h-4 w-12 animate-pulse rounded bg-black/10" />
+      </div>
+    </div>
+  );
+}
+
 export default function DashboardPage() {
   const [createOpen, setCreateOpen] = useState(false);
   const [search, setSearch] = useState('');
@@ -270,7 +295,8 @@ export default function DashboardPage() {
     null,
   );
 
-  const { data: workspacesList } = useWorkspaces();
+  const { data: workspacesList, isPending: workspacesLoading } =
+    useWorkspaces();
   const deleteWorkspace = useDeleteWorkspace();
 
   const handleDeleteWorkspace = async (workspaceId: string) => {
@@ -331,9 +357,13 @@ export default function DashboardPage() {
           <div className="flex shrink-0 items-center gap-2">
             <div className="flex items-center gap-1.5 rounded-xl border-[2px] border-black bg-white px-3 py-2 shadow-[2px_2px_0px_#000]">
               <BookOpen size={13} className="text-[#6C47FF]" />
-              <span className="text-sm font-black text-black">
-                {totalCount}
-              </span>
+              {workspacesLoading ? (
+                <div className="h-4 w-4 animate-pulse rounded bg-black/10" />
+              ) : (
+                <span className="text-sm font-black text-black">
+                  {totalCount}
+                </span>
+              )}
               <span className="text-xs font-semibold text-gray-500">
                 workspace{totalCount !== 1 ? 's' : ''}
               </span>
@@ -366,7 +396,29 @@ export default function DashboardPage() {
           </button>
         </div>
 
-        {filtered.length === 0 && !search ? (
+        {workspacesLoading ? (
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {/* Dashed "New workspace" placeholder — always visible */}
+            <button
+              onClick={() => setCreateOpen(true)}
+              className="group flex min-h-[180px] flex-col items-center justify-center gap-3 rounded-2xl border-[2.5px] border-dashed border-black/40 bg-white/50 px-6 py-10 transition-all hover:border-black hover:bg-white hover:shadow-[4px_4px_0px_#000]"
+            >
+              <div className="flex size-10 items-center justify-center rounded-xl border-[2px] border-black bg-[#EDE9FE] shadow-[2px_2px_0px_#000] transition-all group-hover:translate-x-[2px] group-hover:translate-y-[2px] group-hover:shadow-none">
+                <Plus size={20} className="text-[#6C47FF]" />
+              </div>
+              <div className="text-center">
+                <p className="text-sm font-black text-black">New workspace</p>
+                <p className="mt-0.5 text-xs font-semibold text-gray-500">
+                  Start a new project
+                </p>
+              </div>
+            </button>
+            {/* Skeleton cards */}
+            {Array.from({ length: 5 }).map((_, i) => (
+              <WorkspaceCardSkeleton key={i} />
+            ))}
+          </div>
+        ) : filtered.length === 0 && !search ? (
           <div className="relative mt-4">
             <div className="overflow-hidden rounded-2xl border-[3px] border-black bg-white shadow-[6px_6px_0px_#000]">
               <div className="h-2 bg-[#6C47FF]" />

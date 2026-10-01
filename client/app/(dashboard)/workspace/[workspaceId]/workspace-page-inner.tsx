@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 
 import { ConversationList } from '@/components/workspace/conversation-list';
 import { SourcesPanel } from '@/components/workspace/sources-panel';
+import { WorkspacePanelSkeleton } from '@/components/workspace/workspace-skeleton';
 import { useConversations } from '@/features/conversation/queries';
 import { useSources } from '@/features/source/queries';
 import { useGetWorkspace } from '@/features/workspace/queries';
@@ -33,47 +34,7 @@ export function WorkspacePageInner({ workspaceId }: { workspaceId: string }) {
   }, []);
 
   if (isPending || !conversations) {
-    return (
-      <div className="flex min-h-0 flex-1 overflow-hidden">
-        {/* Left sidebar skeleton */}
-        <div className="hidden h-full w-[260px] shrink-0 flex-col gap-3 border-r-[3px] border-black bg-white p-4 md:flex">
-          <div className="h-8 w-full animate-pulse rounded-xl bg-black/10" />
-          {Array.from({ length: 5 }).map((_, i) => (
-            <div
-              key={i}
-              className="h-10 w-full animate-pulse rounded-xl bg-black/10"
-              style={{ opacity: 1 - i * 0.12 }}
-            />
-          ))}
-        </div>
-        {/* Center skeleton */}
-        <div className="flex flex-1 flex-col items-center justify-center gap-6 p-8">
-          <div className="w-full max-w-md rounded-2xl border-[3px] border-black bg-white p-6 shadow-[5px_5px_0px_#000]">
-            <div className="h-7 w-48 animate-pulse rounded-xl bg-black/10" />
-            <div className="mt-3 h-4 w-full animate-pulse rounded-lg bg-black/10" />
-            <div className="mt-4 grid grid-cols-2 gap-3">
-              <div className="h-16 animate-pulse rounded-xl bg-black/10" />
-              <div className="h-16 animate-pulse rounded-xl bg-black/10" />
-            </div>
-          </div>
-          <div className="flex w-full max-w-md flex-col gap-2.5">
-            <div className="h-11 w-full animate-pulse rounded-xl bg-black/10" />
-          </div>
-        </div>
-        {/* Right sidebar skeleton */}
-        <div className="hidden h-full w-[260px] shrink-0 flex-col gap-3 border-l-[3px] border-black bg-white p-4 md:flex">
-          <div className="h-8 w-full animate-pulse rounded-xl bg-black/10" />
-          <div className="h-10 w-full animate-pulse rounded-xl bg-black/10" />
-          {Array.from({ length: 4 }).map((_, i) => (
-            <div
-              key={i}
-              className="h-14 w-full animate-pulse rounded-xl bg-black/10"
-              style={{ opacity: 1 - i * 0.12 }}
-            />
-          ))}
-        </div>
-      </div>
-    );
+    return <WorkspacePanelSkeleton />;
   }
 
   if (!workspace) return null;

@@ -89,11 +89,45 @@ function openRazorpayModal(checkout: CheckoutResponse) {
   rzp.open();
 }
 
+function PlanBannerSkeleton() {
+  return (
+    <div className="mb-6 rounded-xl border-[2.5px] border-black bg-white p-4 shadow-[4px_4px_0px_#000]">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+        {/* Plan badge + usage bars */}
+        <div className="flex min-w-0 flex-1 items-center gap-3">
+          {/* Badge */}
+          <div className="h-6 w-14 animate-pulse rounded-lg bg-black/10" />
+          {/* Usage bars */}
+          <div className="grid max-w-sm flex-1 grid-cols-2 gap-3">
+            <div className="flex flex-col gap-1.5">
+              <div className="flex justify-between">
+                <div className="h-2.5 w-16 animate-pulse rounded bg-black/10" />
+                <div className="h-2.5 w-10 animate-pulse rounded bg-black/10" />
+              </div>
+              <div className="h-1.5 w-full animate-pulse rounded-full bg-black/10" />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <div className="flex justify-between">
+                <div className="h-2.5 w-16 animate-pulse rounded bg-black/10" />
+                <div className="h-2.5 w-10 animate-pulse rounded bg-black/10" />
+              </div>
+              <div className="h-1.5 w-full animate-pulse rounded-full bg-black/10" />
+            </div>
+          </div>
+        </div>
+        {/* Upgrade button */}
+        <div className="h-7 w-28 animate-pulse rounded-lg bg-black/10" />
+      </div>
+    </div>
+  );
+}
+
 export function PlanBanner() {
   const { data: status, isPending } = useSubscriptionStatus();
   const checkout = useCreateCheckout();
 
-  if (isPending || !status) return null;
+  if (isPending) return <PlanBannerSkeleton />;
+  if (!status) return null;
 
   const { plan, usage } = status;
   const badge = PLAN_BADGES[plan.name] ?? PLAN_BADGES.FREE;
