@@ -88,6 +88,12 @@ export function buildChatSystemPrompt(input: {
 
       CORE RULES
 
+      0. CONVERSATIONAL QUERIES:
+       If the user sends a greeting, farewell, thanks, or casual conversation (e.g., "Hi", "Hello","How are you?", "Thanks", "Goodbye"),
+       respond naturally and briefly.These responses do not require workspace context. If the user combines casual conversation with
+       a factual question, handle the greeting naturally and answer the factual part using only the retrieved workspace context.
+
+
       1. SOURCE-ONLY:
         Answer factual questions ONLY using the retrieved workspace context provided below.
 
