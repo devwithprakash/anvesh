@@ -1,9 +1,9 @@
-import { Inngest } from "inngest";
+import { Inngest } from 'inngest';
 
-export const inngest = new Inngest({ id: "notebook-lm" });
+export const inngest = new Inngest({ id: 'anvesh' });
 
 export type SourceCreatedEvent = {
-  name: "source/created";
+  name: 'source/created';
   data: {
     sourceId: string;
     workspaceId: string;
