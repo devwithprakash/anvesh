@@ -40,10 +40,6 @@ export default function Navbar() {
     { label: 'Faq', href: '/#faq' },
   ];
 
-  const links = user
-    ? [...navLinks, { label: 'Dashboard', href: '/dashboard' }]
-    : navLinks;
-
   return (
     <motion.nav
       initial="hidden"
@@ -128,26 +124,38 @@ export default function Navbar() {
         </motion.a>
 
         {/* Nav Links */}
-
-        {!authLoading && (
-          <motion.ul
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-            className="hidden items-center gap-1 lg:flex"
-          >
-            {links.map(link => (
-              <motion.li key={link.label} variants={itemVariants}>
-                <a
-                  href={link.href}
-                  className="rounded-lg px-3 py-1.5 text-sm font-bold text-black transition-colors hover:bg-black hover:text-[#FFFBF0]"
-                >
-                  {link.label}
-                </a>
-              </motion.li>
-            ))}
-          </motion.ul>
-        )}
+        <motion.ul
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="hidden items-center gap-1 lg:flex"
+        >
+          {navLinks.map(link => (
+            <motion.li key={link.label} variants={itemVariants}>
+              <a
+                href={link.href}
+                className="rounded-lg px-3 py-1.5 text-sm font-bold text-black transition-colors hover:bg-black hover:text-[#FFFBF0]"
+              >
+                {link.label}
+              </a>
+            </motion.li>
+          ))}
+          {!authLoading && user && (
+            <motion.li
+              key="dashboard"
+              initial={{ opacity: 0, y: -16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, ease: 'easeOut' }}
+            >
+              <a
+                href="/dashboard"
+                className="rounded-lg px-3 py-1.5 text-sm font-bold text-black transition-colors hover:bg-black hover:text-[#FFFBF0]"
+              >
+                Dashboard
+              </a>
+            </motion.li>
+          )}
+        </motion.ul>
 
         {/* CTA Buttons */}
         <motion.div
