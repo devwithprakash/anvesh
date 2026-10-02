@@ -153,7 +153,7 @@ function AIMessage({ message }: { message: UIMessage }) {
 function StreamingBubble({ text }: { text: string }) {
   return (
     <div className="flex flex-col gap-1.5">
-      {/* AI label */}
+      {/* AI label + inline thinking pill */}
       <div className="flex items-center gap-1.5">
         <div className="flex size-4 items-center justify-center rounded-md border-[1.5px] border-black bg-[#EDE9FE]">
           <Sparkles size={9} className="animate-pulse text-[#6C47FF]" />
@@ -161,21 +161,13 @@ function StreamingBubble({ text }: { text: string }) {
         <span className="text-[10px] font-black tracking-widest text-[#6C47FF] uppercase">
           AI
         </span>
-      </div>
-      {/* Bubble */}
-      <div className="max-w-[92%] rounded-2xl rounded-tl-sm border-[2px] border-black bg-white px-4 py-3 shadow-[3px_3px_0px_#000]">
-        {text ? (
-          <>
-            <FormattedText text={text} />
-            <span className="ml-0.5 inline-block h-3.5 w-0.5 animate-pulse bg-[#6C47FF] align-text-bottom" />
-          </>
-        ) : (
-          <span className="flex items-center gap-2 text-xs font-semibold text-gray-400">
-            <span className="flex gap-1">
+        {!text && (
+          <span className="flex items-center gap-1.5 rounded-full border-[1.5px] border-black bg-white px-2.5 py-0.5 text-[11px] font-semibold text-gray-400 shadow-[1.5px_1.5px_0px_#000]">
+            <span className="flex gap-0.5">
               {[0, 1, 2].map(i => (
                 <span
                   key={i}
-                  className="h-1.5 w-1.5 animate-bounce rounded-full bg-[#6C47FF]/50"
+                  className="h-1 w-1 animate-bounce rounded-full bg-[#6C47FF]/50"
                   style={{ animationDelay: `${i * 0.15}s` }}
                 />
               ))}
@@ -184,6 +176,13 @@ function StreamingBubble({ text }: { text: string }) {
           </span>
         )}
       </div>
+      {/* Bubble — only when text is streaming */}
+      {text && (
+        <div className="max-w-[92%] rounded-2xl rounded-tl-sm border-[2px] border-black bg-white px-4 py-3 shadow-[3px_3px_0px_#000]">
+          <FormattedText text={text} />
+          <span className="ml-0.5 inline-block h-3.5 w-0.5 animate-pulse bg-[#6C47FF] align-text-bottom" />
+        </div>
+      )}
     </div>
   );
 }
@@ -418,7 +417,7 @@ function ChatInner({
         <div className="mx-auto max-w-3xl">
           <form
             onSubmit={handleSubmit}
-            className="flex items-end gap-2 rounded-2xl border-[2.5px] border-black bg-white px-3 py-2.5 shadow-[3px_3px_0px_#000] transition-all focus-within:translate-x-[3px] focus-within:translate-y-[3px] focus-within:shadow-none"
+            className="flex items-center gap-2 rounded-2xl border-[2.5px] border-black bg-white px-3 py-2.5 shadow-[3px_3px_0px_#000] transition-all focus-within:translate-x-[3px] focus-within:translate-y-[3px] focus-within:shadow-none"
           >
             {/* Web search toggle */}
             <button
@@ -433,7 +432,7 @@ function ChatInner({
                     : 'Enable web search'
               }
               className={cn(
-                'mb-0.5 flex shrink-0 items-center gap-1.5 rounded-lg border-[1.5px] border-black px-2.5 py-1 text-[11px] font-black shadow-[1.5px_1.5px_0px_#000] transition-all',
+                'flex size-8 shrink-0 items-center justify-center gap-1.5 rounded-lg border-[1.5px] border-black text-[11px] font-black shadow-[1.5px_1.5px_0px_#000] transition-all sm:size-auto sm:px-2.5 sm:py-1',
                 !webSearchAllowed
                   ? 'cursor-not-allowed border-gray-300 bg-gray-100 text-gray-400 shadow-none'
                   : webSearch
@@ -441,7 +440,7 @@ function ChatInner({
                     : 'bg-[#FFFBF0] text-black hover:bg-[#EDE9FE]',
               )}
             >
-              <Globe size={12} />
+              <Globe size={14} className="sm:size-3" />
               <span className="hidden sm:inline">Web</span>
             </button>
 
@@ -455,7 +454,12 @@ function ChatInner({
               placeholder="Ask anything about your sources…"
               rows={1}
               className="max-h-36 min-h-0 flex-1 resize-none bg-transparent py-0.5 text-sm font-semibold text-black outline-none placeholder:font-medium placeholder:text-gray-400 disabled:opacity-60"
-              style={{ fieldSizing: 'content' } as React.CSSProperties}
+              style={
+                {
+                  fieldSizing: 'content',
+                  height: '24px',
+                } as React.CSSProperties
+              }
             />
 
             {/* Send / Stop button */}
