@@ -98,7 +98,7 @@ function FormattedText({ text }: { text: string }) {
 function UserMessage({ content }: { content: string }) {
   return (
     <div className="flex justify-end">
-      <div className="max-w-[72%] rounded-2xl rounded-br-sm border-[2px] border-black bg-[#6C47FF] px-4 py-2.5 text-sm leading-relaxed font-semibold text-white shadow-[3px_3px_0px_#000]">
+      <div className="max-w-[82%] rounded-2xl rounded-br-sm border-[2px] border-black bg-[#6C47FF] px-4 py-2.5 text-sm leading-relaxed font-semibold text-white shadow-[3px_3px_0px_#000]">
         {content}
       </div>
     </div>
@@ -141,7 +141,7 @@ function AIMessage({ message }: { message: UIMessage }) {
           AI
         </span>
       </div>
-      <div className="max-w-[85%] rounded-2xl rounded-tl-sm border-[2px] border-black bg-white px-4 py-3 shadow-[3px_3px_0px_#000]">
+      <div className="max-w-[92%] rounded-2xl rounded-tl-sm border-[2px] border-black bg-white px-4 py-3 shadow-[3px_3px_0px_#000]">
         <FormattedText text={text} />
       </div>
     </div>
@@ -163,7 +163,7 @@ function StreamingBubble({ text }: { text: string }) {
         </span>
       </div>
       {/* Bubble */}
-      <div className="max-w-[85%] rounded-2xl rounded-tl-sm border-[2px] border-black bg-white px-4 py-3 shadow-[3px_3px_0px_#000]">
+      <div className="max-w-[92%] rounded-2xl rounded-tl-sm border-[2px] border-black bg-white px-4 py-3 shadow-[3px_3px_0px_#000]">
         {text ? (
           <>
             <FormattedText text={text} />
@@ -380,7 +380,7 @@ function ChatInner({
             }}
           />
         ) : (
-          <div className="mx-auto flex w-full max-w-2xl flex-col gap-5 px-4 py-6 sm:px-6">
+          <div className="mx-auto flex w-full max-w-3xl flex-col gap-5 px-4 py-6 sm:px-6">
             {staticMessages.map((msg: UIMessage) =>
               msg.role === 'user' ? (
                 <UserMessage
@@ -410,12 +410,12 @@ function ChatInner({
       <div className="shrink-0 border-t-[2px] border-black bg-[#FFFBF0] px-3 py-3 sm:px-4">
         {/* No sources warning */}
         {noSources && (
-          <div className="mx-auto mb-2.5 flex max-w-2xl items-center gap-2 rounded-lg border-[2px] border-amber-500 bg-amber-50 px-3 py-1.5 text-xs font-bold text-amber-700">
+          <div className="mx-auto mb-2.5 flex max-w-3xl items-center gap-2 rounded-lg border-[2px] border-amber-500 bg-amber-50 px-3 py-1.5 text-xs font-bold text-amber-700">
             ⚠️ No ready sources — add sources for grounded answers.
           </div>
         )}
 
-        <div className="mx-auto max-w-2xl">
+        <div className="mx-auto max-w-3xl">
           <form
             onSubmit={handleSubmit}
             className="flex items-end gap-2 rounded-2xl border-[2.5px] border-black bg-white px-3 py-2.5 shadow-[3px_3px_0px_#000] transition-all focus-within:translate-x-[3px] focus-within:translate-y-[3px] focus-within:shadow-none"
